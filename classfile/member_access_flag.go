@@ -10,5 +10,7 @@ const (
 	ACC_VOLATILE     = 0x0040 // volatile (字段)
 	ACC_TRANSIENT    = 0x0080 // transient (字段)
 	ACC_NATIVE       = 0x0100 // native (方法)
+	INTERFACE        = 0x0200
 	ACC_ABSTRACT     = 0x0400 // abstract
+
 )
