@@ -23,3 +23,41 @@ func readConstantPool(reader *ClassReader) ConstantPool {
 
 	return constantPool
 }
+
+func (cp ConstantPool) getClassName(index uint16) string {
+	if classInfo, ok := cp[index].(*ConstantClassInfo); ok {
+		return classInfo.Name()
+	}
+	panic("Not a class info")
+}
+
+func (cp ConstantPool) getNameAndType(index uint16) (string, string) {
+	if ntInfo, ok := cp[index].(*ConstantNameAndTypeInfo); ok {
+		name := getUtf8(cp, ntInfo.nameIndex)
+		descriptor := getUtf8(cp, ntInfo.descriptorIndex)
+		return name, descriptor
+	}
+	panic("Not a name and type info")
+}
+
+func (cp ConstantPool) getMemberRef(index uint16) (className, name, descriptor string) {
+	// field ref
+	if memberRef, ok := cp[index].(*ConstantFieldRefInfo); ok {
+		return cp.resolveMemberRef(&memberRef.ConstantMemberRefInfo)
+	}
+	// method ref
+	if memberRef, ok := cp[index].(*ConstantMethodRefInfo); ok {
+		return cp.resolveMemberRef(&memberRef.ConstantMemberRefInfo)
+	}
+	// interface method ref
+	if memberRef, ok := cp[index].(*ConstantInterfaceMethodRefInfo); ok {
+		return cp.resolveMemberRef(&memberRef.ConstantMemberRefInfo)
+	}
+	panic("Not a member ref")
+}
+
+func (cp ConstantPool) resolveMemberRef(memberRef *ConstantMemberRefInfo) (className, name, descriptor string) {
+	className = cp.getClassName(memberRef.classIndex)
+	name, descriptor = cp.getNameAndType(memberRef.nameAndTypeIndex)
+	return
+}

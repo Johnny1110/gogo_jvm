@@ -43,15 +43,15 @@ func newConstantInfo(tag ConstantTag, cp ConstantPool) ConstantInfo {
 	case CONSTANT_String:
 		return &ConstantStringInfo{cp: cp}
 	case CONSTANT_Fieldref:
-		return &ConstantFieldrefInfo{ConstantMemberrefInfo{cp: cp}}
+		return &ConstantFieldRefInfo{ConstantMemberRefInfo{cp: cp}}
 	case CONSTANT_Methodref:
-		return &ConstantMethodrefInfo{ConstantMemberrefInfo{cp: cp}}
+		return &ConstantMethodRefInfo{ConstantMemberRefInfo{cp: cp}}
 	case CONSTANT_InterfaceMethodref:
-		return &ConstantInterfaceMethodrefInfo{ConstantMemberrefInfo{cp: cp}}
+		return &ConstantInterfaceMethodRefInfo{ConstantMemberRefInfo{cp: cp}}
 	case CONSTANT_NameAndType:
 		return &ConstantNameAndTypeInfo{}
 	default:
-		// MVP 階段暫不支持 MethodHandle, MethodType, InvokeDynamic
+		// TODO: MVP Phase ignore: MethodHandle, MethodType, InvokeDynamic
 		return nil
 	}
 }
@@ -149,4 +149,66 @@ func (c *ConstantClassInfo) Name() string {
 type ConstantStringInfo struct {
 	cp          ConstantPool
 	stringIndex uint16
+}
+
+func (c *ConstantStringInfo) readInfo(reader *ClassReader) {
+	c.stringIndex = reader.readU2()
+}
+
+func (c *ConstantStringInfo) String() string {
+	return getUtf8(c.cp, c.stringIndex)
+}
+
+// ConstantMemberRefInfo Member Ref constant (fields and methods)
+type ConstantMemberRefInfo struct {
+	cp               ConstantPool
+	classIndex       uint16
+	nameAndTypeIndex uint16
+}
+
+func (c *ConstantMemberRefInfo) readInfo(reader *ClassReader) {
+	c.classIndex = reader.readU2()
+	c.nameAndTypeIndex = reader.readU2()
+}
+
+// ConstantFieldRefInfo field Ref constant
+type ConstantFieldRefInfo struct {
+	ConstantMemberRefInfo
+}
+
+func (c *ConstantFieldRefInfo) String() string {
+	return fmt.Sprintf("FieldRef: class=%d, nameAndType=%d", c.classIndex, c.nameAndTypeIndex)
+}
+
+// ConstantMethodRefInfo method ref constant
+type ConstantMethodRefInfo struct {
+	ConstantMemberRefInfo
+}
+
+func (c *ConstantMethodRefInfo) String() string {
+	return fmt.Sprintf("MethodRef: class=%d, nameAndType=%d", c.classIndex, c.nameAndTypeIndex)
+}
+
+// ConstantInterfaceMethodRefInfo interface method ref constant
+type ConstantInterfaceMethodRefInfo struct {
+	ConstantMemberRefInfo
+}
+
+func (c *ConstantInterfaceMethodRefInfo) String() string {
+	return fmt.Sprintf("InterfaceMethodRef: class=%d, nameAndType=%d", c.classIndex, c.nameAndTypeIndex)
+}
+
+// ConstantNameAndTypeInfo name and type
+type ConstantNameAndTypeInfo struct {
+	nameIndex       uint16
+	descriptorIndex uint16
+}
+
+func (c *ConstantNameAndTypeInfo) readInfo(reader *ClassReader) {
+	c.nameIndex = reader.readU2()
+	c.descriptorIndex = reader.readU2()
+}
+
+func (c *ConstantNameAndTypeInfo) String() string {
+	return fmt.Sprintf("NameAndType: name=%d, descriptor=%d", c.nameIndex, c.descriptorIndex)
 }
