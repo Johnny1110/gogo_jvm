@@ -110,6 +110,10 @@ func (cp *ConstantPool) GetConstantInfo(index uint16) ConstantInfo
 ```
 
 <br>
+
+Constant Pool 補充 -> [link](../doc/tips/constant_pool.md)
+
+<br>
 <br>
 
 ### 3. ConstantTag — 常量標籤
