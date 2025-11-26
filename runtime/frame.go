@@ -1,0 +1,73 @@
+package runtime
+
+// Frame structure:
+// ┌────────────────────────────────────────┐
+// │              Frame                     │
+// ├────────────────────────────────────────┤
+// │  lower (指向下一幀，形成鏈表)             │
+// ├────────────────────────────────────────┤
+// │  localVars (局部變量表)                  │
+// │  ┌─────┬─────┬─────┬─────┬─────┐       │
+// │  │  0  │  1  │  2  │  3  │ ... │       │
+// │  └─────┴─────┴─────┴─────┴─────┘       │
+// ├────────────────────────────────────────┤
+// │  operandStack (操作數棧)                │
+// │  ┌─────┐                               │
+// │  │ top │ ← 棧頂                         │
+// │  ├─────┤                               │
+// │  │     │                               │
+// │  └─────┘                               │
+// ├────────────────────────────────────────┤
+// │  thread (所屬線程的引用)                 │
+// ├────────────────────────────────────────┤
+// │  nextPC (下一條要執行的指令地址)          │
+// └────────────────────────────────────────┘
+type Frame struct {
+	lower        *Frame // previous frame (caller frame)
+	localVars    LocalVars
+	operandStack *OperandStack
+	thread       *Thread
+	nextPC       int
+}
+
+// NewFrame create new Frame
+// thread: target thread which is frame belongs to
+func NewFrame(thread *Thread, maxLocals, maxStack uint16) *Frame {
+	return &Frame{
+		thread:       thread,
+		localVars:    NewLocalVars(maxLocals),
+		operandStack: NewOperandStack(maxStack),
+	}
+}
+
+func (f *Frame) LocalVars() LocalVars {
+	return f.localVars
+}
+
+func (f *Frame) Thread() *Thread {
+	return f.thread
+}
+
+func (f *Frame) OperandStack() *OperandStack {
+	return f.operandStack
+}
+
+func (f *Frame) NextPC() int {
+	return f.nextPC
+}
+
+// SetNextPC setup next instruction address (index)
+// use for `for` `while` `if` `break`...
+func (f *Frame) SetNextPC(nextPC int) {
+	f.nextPC = nextPC
+}
+
+// Lower return caller's frame
+func (f *Frame) Lower() *Frame {
+	return f.lower
+}
+
+// RevertNextPC revert PC to current instruction
+func (f *Frame) RevertNextPC() {
+	f.nextPC = f.thread.PC()
+}
