@@ -105,3 +105,9 @@ func (m *MemberInfo) ConstantValueAttribute() *ConstantValueAttribute {
 	}
 	return nil
 }
+
+// IsPSVM is public static void main([]String args) {...}
+func (m *MemberInfo) IsPSVM() bool {
+	return m.Name() == "main" && m.Descriptor() == "([Ljava/lang/String;)V" &&
+		m.IsStatic() && m.IsPublic()
+}

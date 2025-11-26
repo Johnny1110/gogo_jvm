@@ -154,8 +154,7 @@ func (cf *ClassFile) MinorVersion() uint16 {
 // main func sign must be `public static void main(String[] args)`
 func (cf *ClassFile) GetMainMethod() *MemberInfo {
 	for _, method := range cf.methods {
-		if method.Name() == "main" && method.Descriptor() == "([Ljava/lang/String;)V" &&
-			method.IsStatic() && method.IsPublic() {
+		if method.IsPSVM() {
 			return method
 		}
 	}

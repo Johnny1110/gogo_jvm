@@ -193,6 +193,23 @@ type ConstantMethodrefInfo struct {
 └───────┴──────────────────────┴─────────────────────────────┘
 ```
 
+<br>
+
+`([Ljava/lang/String;)V` 是一個方法描述符（Method Descriptor），它描述了方法的參數類型和回傳類型。
+
+| 部分                   | 含義         |
+|----------------------|------------|
+| `(` `)`              | 包住所有參數     |
+| `[`                  | Array      |
+| `Ljava/lang/String;` | String 類別  |
+| `V`                  | void（無回傳值） |
+
+詳見描述符補充文件 : [descriptor.md](../doc/tips/descriptor.md)
+
+<br>
+<br>
+<br>
+
 **解析流程**：
 
 1. ClassReader 讀取到 Methodref（索引 1）
@@ -224,3 +241,21 @@ type ConstantMethodrefInfo struct {
 > ClassReader 讀取二進制 → 根據 ConstantTag 判斷類型 → 建立對應的 ConstantInfo → 放入 ConstantPool
 
 這種設計的好處是解耦和可擴展：新增常量類型只需加新的 Tag 和 Info，不影響其他部分。
+
+
+<br>
+<br>
+
+## 更多方法描述符範例
+
+| 方法簽名 | 描述符 |
+|----------|--------|
+| `void run()` | `()V` |
+| `int getAge()` | `()I` |
+| `void setName(String name)` | `(Ljava/lang/String;)V` |
+| `int add(int a, int b)` | `(II)I` |
+| `String concat(String a, String b)` | `(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;` |
+| `void process(int[] arr)` | `([I)V` |
+| `double[][] createMatrix(int rows, int cols)` | `(II)[[D` |
+| `Object get(String key, boolean flag)` | `(Ljava/lang/String;Z)Ljava/lang/Object;` |
+
