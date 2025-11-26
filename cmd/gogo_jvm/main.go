@@ -30,5 +30,5 @@ func main() {
 		os.Exit(1)
 	}
 
-	classfile.Debug(cf) // print classfile details
+	classfile.Debug(cf, true) // print classfile details
 }

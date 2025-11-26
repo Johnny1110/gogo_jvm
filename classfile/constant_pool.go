@@ -14,7 +14,8 @@ func readConstantPool(reader *ClassReader) ConstantPool {
 	for i := 1; i < constantPoolCount; i++ {
 		constantPool[i] = readConstantInfo(reader, constantPool)
 
-		// caution: long and double take 2 positions (這是另一個歷史遺留問題，為了在 32 位系統上對齊)
+		// caution: long and double take 2 positions (這是一個歷史遺留問題，為了在 32 位系統上對齊)
+		// long 與 double 是 64 bit 需要拆成兩個 32 bit.
 		switch constantPool[i].(type) {
 		case *ConstantLongInfo, *ConstantDoubleInfo:
 			i++
@@ -40,7 +41,7 @@ func (cp ConstantPool) getNameAndType(index uint16) (string, string) {
 	panic("Not a name and type info")
 }
 
-func (cp ConstantPool) getMemberRef(index uint16) (className, name, descriptor string) {
+func (cp ConstantPool) getMemberRef(index int) (className, name, descriptor string) {
 	// field ref
 	if memberRef, ok := cp[index].(*ConstantFieldRefInfo); ok {
 		return cp.resolveMemberRef(&memberRef.ConstantMemberRefInfo)

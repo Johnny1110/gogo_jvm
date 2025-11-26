@@ -10,6 +10,7 @@ type ConstantInfo interface {
 	// every constant know how to read themselves by ClassReader
 	readInfo(reader *ClassReader)
 	String() string
+	Tag() ConstantTag
 }
 
 func readConstantInfo(reader *ClassReader, cp ConstantPool) ConstantInfo {
@@ -72,6 +73,10 @@ func (c *ConstantUtf8Info) String() string {
 	return c.str
 }
 
+func (c *ConstantUtf8Info) Tag() ConstantTag {
+	return CONSTANT_Utf8
+}
+
 // ConstantIntegerInfo Integer (32bit) constant
 type ConstantIntegerInfo struct {
 	val int32
@@ -84,6 +89,10 @@ func (c *ConstantIntegerInfo) readInfo(reader *ClassReader) {
 
 func (c *ConstantIntegerInfo) String() string {
 	return fmt.Sprintf("%d", c.val)
+}
+
+func (c *ConstantIntegerInfo) Tag() ConstantTag {
+	return CONSTANT_Integer
 }
 
 // ConstantFloatInfo Float (32bit) constant
@@ -100,6 +109,10 @@ func (c *ConstantFloatInfo) String() string {
 	return fmt.Sprintf("%f", c.val)
 }
 
+func (c *ConstantFloatInfo) Tag() ConstantTag {
+	return CONSTANT_Float
+}
+
 // ConstantLongInfo Long (64bit) constant
 type ConstantLongInfo struct {
 	val int64
@@ -111,6 +124,10 @@ func (c *ConstantLongInfo) readInfo(reader *ClassReader) {
 
 func (c *ConstantLongInfo) String() string {
 	return fmt.Sprintf("%d", c.val)
+}
+
+func (c *ConstantLongInfo) Tag() ConstantTag {
+	return CONSTANT_Long
 }
 
 // ConstantDoubleInfo (64bit) constant
@@ -125,6 +142,10 @@ func (c *ConstantDoubleInfo) readInfo(reader *ClassReader) {
 
 func (c *ConstantDoubleInfo) String() string {
 	return fmt.Sprintf("%f", c.val)
+}
+
+func (c *ConstantDoubleInfo) Tag() ConstantTag {
+	return CONSTANT_Double
 }
 
 // ConstantClassInfo Class Constant
@@ -145,6 +166,10 @@ func (c *ConstantClassInfo) Name() string {
 	return getUtf8(c.cp, c.nameIndex)
 }
 
+func (c *ConstantClassInfo) Tag() ConstantTag {
+	return CONSTANT_Class
+}
+
 // ConstantStringInfo String constant
 type ConstantStringInfo struct {
 	cp          ConstantPool
@@ -157,6 +182,10 @@ func (c *ConstantStringInfo) readInfo(reader *ClassReader) {
 
 func (c *ConstantStringInfo) String() string {
 	return getUtf8(c.cp, c.stringIndex)
+}
+
+func (c *ConstantStringInfo) Tag() ConstantTag {
+	return CONSTANT_String
 }
 
 // ConstantMemberRefInfo Member Ref constant (fields and methods)
@@ -180,6 +209,10 @@ func (c *ConstantFieldRefInfo) String() string {
 	return fmt.Sprintf("FieldRef: class=%d, nameAndType=%d", c.classIndex, c.nameAndTypeIndex)
 }
 
+func (c *ConstantFieldRefInfo) Tag() ConstantTag {
+	return CONSTANT_Fieldref
+}
+
 // ConstantMethodRefInfo method ref constant
 type ConstantMethodRefInfo struct {
 	ConstantMemberRefInfo
@@ -189,6 +222,10 @@ func (c *ConstantMethodRefInfo) String() string {
 	return fmt.Sprintf("MethodRef: class=%d, nameAndType=%d", c.classIndex, c.nameAndTypeIndex)
 }
 
+func (c *ConstantMethodRefInfo) Tag() ConstantTag {
+	return CONSTANT_Methodref
+}
+
 // ConstantInterfaceMethodRefInfo interface method ref constant
 type ConstantInterfaceMethodRefInfo struct {
 	ConstantMemberRefInfo
@@ -196,6 +233,10 @@ type ConstantInterfaceMethodRefInfo struct {
 
 func (c *ConstantInterfaceMethodRefInfo) String() string {
 	return fmt.Sprintf("InterfaceMethodRef: class=%d, nameAndType=%d", c.classIndex, c.nameAndTypeIndex)
+}
+
+func (c *ConstantInterfaceMethodRefInfo) Tag() ConstantTag {
+	return CONSTANT_InterfaceMethodref
 }
 
 // ConstantNameAndTypeInfo name and type
@@ -211,4 +252,8 @@ func (c *ConstantNameAndTypeInfo) readInfo(reader *ClassReader) {
 
 func (c *ConstantNameAndTypeInfo) String() string {
 	return fmt.Sprintf("NameAndType: name=%d, descriptor=%d", c.nameIndex, c.descriptorIndex)
+}
+
+func (c *ConstantNameAndTypeInfo) Tag() ConstantTag {
+	return CONSTANT_NameAndType
 }

@@ -34,7 +34,7 @@ func Parse(classData []byte) (cf *ClassFile, err error) {
 	return
 }
 
-// fill the ClassFile by input ClassReader
+// fill the ClassFile by input ClassReader (must be ordered like this)
 func (cf *ClassFile) read(reader *ClassReader) {
 	cf.readAndCheckMagic(reader)
 	cf.readAndCheckVersion(reader)
