@@ -177,3 +177,30 @@ for {
 
 <br>
 <br>
+
+## 建立一些基礎指令 - Const (把 Const PUSH 到 Stack)
+
+<br>
+
+### CONST 指令
+
+把一些常用的 int (-1~5) long, float double 壓入 Stack 時使用。
+
+### IPUSH 指令
+
+使用 CONST 無法滿足時，可以使用 `BIPUSH` 和 `SIPUSH`
+
+* `BIPUSH`: Byte Immediate PUSH
+  - 操作數是 1 byte 有符號數
+  - 範圍：-128 ~ 127
+
+* `SIPUSH`: Short Immediate PUSH
+  - 操作數是 2 bytes 有符號數
+  - 範圍：-32768 ~ 32767
+
+舉例：
+```java
+int a = 100;    // 編譯成 bipush 100
+int b = 1000;   // 編譯成 sipush 1000
+int c = 100000; // 編譯成 ldc（從常量池載入）
+```

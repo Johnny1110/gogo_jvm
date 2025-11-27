@@ -13,6 +13,8 @@ type Instruction interface {
 	// Execute execute inst
 	// access LocalVars and Stack from Frame
 	Execute(frame *runtime.Frame)
+
+	Opcode() uint8
 }
 
 // ================== define prototype =======================
