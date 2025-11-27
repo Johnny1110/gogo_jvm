@@ -2,7 +2,7 @@ package classfile
 
 import "fmt"
 
-// constant pool (JVM Spec 4.4)
+// constants pool (JVM Spec 4.4)
 // Java 的不同類型信息（className, methodName, String）在常量池中用不同標籤區分
 type ConstantTag uint8
 

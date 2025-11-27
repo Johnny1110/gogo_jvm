@@ -5,9 +5,9 @@ import (
 	"math"
 )
 
-// ConstantInfo interface for all constant
+// ConstantInfo interface for all constants
 type ConstantInfo interface {
-	// every constant know how to read themselves by ClassReader
+	// every constants know how to read themselves by ClassReader
 	readInfo(reader *ClassReader)
 	String() string
 	Tag() ConstantTag
@@ -18,7 +18,7 @@ func readConstantInfo(reader *ClassReader, cp ConstantPool) ConstantInfo {
 	if tag, err := uint8ToTag(tagUint8); err == nil {
 		info := newConstantInfo(tag, cp)
 		if info == nil {
-			panic(fmt.Sprintf("java.lang.ClassFormatError: constant pool tag %d", tag))
+			panic(fmt.Sprintf("java.lang.ClassFormatError: constants pool tag %d", tag))
 		}
 		info.readInfo(reader)
 		return info
@@ -57,7 +57,7 @@ func newConstantInfo(tag ConstantTag, cp ConstantPool) ConstantInfo {
 	}
 }
 
-// ConstantUtf8Info UTF8 string constant
+// ConstantUtf8Info UTF8 string constants
 type ConstantUtf8Info struct {
 	str string
 }
@@ -77,7 +77,7 @@ func (c *ConstantUtf8Info) Tag() ConstantTag {
 	return CONSTANT_Utf8
 }
 
-// ConstantIntegerInfo Integer (32bit) constant
+// ConstantIntegerInfo Integer (32bit) constants
 type ConstantIntegerInfo struct {
 	val int32
 }
@@ -95,7 +95,7 @@ func (c *ConstantIntegerInfo) Tag() ConstantTag {
 	return CONSTANT_Integer
 }
 
-// ConstantFloatInfo Float (32bit) constant
+// ConstantFloatInfo Float (32bit) constants
 type ConstantFloatInfo struct {
 	val float32
 }
@@ -113,7 +113,7 @@ func (c *ConstantFloatInfo) Tag() ConstantTag {
 	return CONSTANT_Float
 }
 
-// ConstantLongInfo Long (64bit) constant
+// ConstantLongInfo Long (64bit) constants
 type ConstantLongInfo struct {
 	val int64
 }
@@ -130,7 +130,7 @@ func (c *ConstantLongInfo) Tag() ConstantTag {
 	return CONSTANT_Long
 }
 
-// ConstantDoubleInfo (64bit) constant
+// ConstantDoubleInfo (64bit) constants
 type ConstantDoubleInfo struct {
 	val float64
 }
@@ -151,7 +151,7 @@ func (c *ConstantDoubleInfo) Tag() ConstantTag {
 // ConstantClassInfo Class Constant
 type ConstantClassInfo struct {
 	cp        ConstantPool
-	nameIndex uint16 // point to UTF8 constant
+	nameIndex uint16 // point to UTF8 constants
 }
 
 func (c *ConstantClassInfo) readInfo(reader *ClassReader) {
@@ -170,7 +170,7 @@ func (c *ConstantClassInfo) Tag() ConstantTag {
 	return CONSTANT_Class
 }
 
-// ConstantStringInfo String constant
+// ConstantStringInfo String constants
 type ConstantStringInfo struct {
 	cp          ConstantPool
 	stringIndex uint16
@@ -188,7 +188,7 @@ func (c *ConstantStringInfo) Tag() ConstantTag {
 	return CONSTANT_String
 }
 
-// ConstantMemberRefInfo Member Ref constant (fields and methods)
+// ConstantMemberRefInfo Member Ref constants (fields and methods)
 type ConstantMemberRefInfo struct {
 	cp               ConstantPool
 	classIndex       uint16
@@ -200,7 +200,7 @@ func (c *ConstantMemberRefInfo) readInfo(reader *ClassReader) {
 	c.nameAndTypeIndex = reader.readU2()
 }
 
-// ConstantFieldRefInfo field Ref constant
+// ConstantFieldRefInfo field Ref constants
 type ConstantFieldRefInfo struct {
 	ConstantMemberRefInfo
 }
@@ -213,7 +213,7 @@ func (c *ConstantFieldRefInfo) Tag() ConstantTag {
 	return CONSTANT_Fieldref
 }
 
-// ConstantMethodRefInfo method ref constant
+// ConstantMethodRefInfo method ref constants
 type ConstantMethodRefInfo struct {
 	ConstantMemberRefInfo
 }
@@ -226,7 +226,7 @@ func (c *ConstantMethodRefInfo) Tag() ConstantTag {
 	return CONSTANT_Methodref
 }
 
-// ConstantInterfaceMethodRefInfo interface method ref constant
+// ConstantInterfaceMethodRefInfo interface method ref constants
 type ConstantInterfaceMethodRefInfo struct {
 	ConstantMemberRefInfo
 }

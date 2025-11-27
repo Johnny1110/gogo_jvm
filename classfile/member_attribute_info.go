@@ -127,7 +127,7 @@ func readExceptionTable(reader *ClassReader) []*ExceptionHandler {
 	return exceptionTable
 }
 
-// ConstantValueAttribute represent constant value (static final)
+// ConstantValueAttribute represent constants value (static final)
 type ConstantValueAttribute struct {
 	constantValueIndex uint16
 }

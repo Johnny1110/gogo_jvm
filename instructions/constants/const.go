@@ -1,4 +1,4 @@
-package constant
+package constants
 
 import (
 	"github.com/Johnny1110/gogo_jvm/instructions/base"

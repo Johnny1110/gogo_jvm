@@ -10,7 +10,7 @@ func getUtf8(cp ConstantPool, index uint16) string {
 	if utf8Info, ok := cp[index].(*ConstantUtf8Info); ok {
 		return utf8Info.str
 	}
-	panic(fmt.Sprintf("Wrong constant pool index for UTF-8 tag: %d", index))
+	panic(fmt.Sprintf("Wrong constants pool index for UTF-8 tag: %d", index))
 }
 
 func Debug(cf *ClassFile, printCP bool) {
@@ -173,7 +173,7 @@ func printConstantPool(pool ConstantPool) {
 			printNameAndTypeInfo(c, pool)
 
 		default:
-			fmt.Printf("%-20s [Unknown constant type]\n", "Unknown")
+			fmt.Printf("%-20s [Unknown constants type]\n", "Unknown")
 		}
 	}
 

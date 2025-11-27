@@ -10,7 +10,7 @@ type ClassFile struct {
 	magic        uint32 // magic number: 0xCAFEBABE, for classify .class file (4 bytes)
 	minorVersion uint16
 	majorVersion uint16
-	constantPool ConstantPool    // constant pool
+	constantPool ConstantPool    // constants pool
 	accessFlags  uint16          // class access flags
 	thisClass    uint16          // this class index (pointing to constantPool)
 	superClass   uint16          // super class index

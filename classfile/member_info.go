@@ -3,8 +3,8 @@ package classfile
 // MemberInfo represent field and method.
 // in a class, field and method structure are the same.
 // - access_flags     : access flag
-// - name_index       : index of name in constant pool
-// - descriptor_index : descriptor in constant pool
+// - name_index       : index of name in constants pool
+// - descriptor_index : descriptor in constants pool
 // - attributes       : attributes list
 type MemberInfo struct {
 	cp              ConstantPool
