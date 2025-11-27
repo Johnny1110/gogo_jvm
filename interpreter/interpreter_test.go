@@ -7,10 +7,6 @@ import (
 	"testing"
 )
 
-// ============================================================
-// 解釋器測試
-// ============================================================
-
 // executeAndGetLocal0 執行字節碼並返回 locals[0] 的值
 func executeAndGetLocal0(code []byte, maxLocals, maxStack uint16, debug bool) int32 {
 	thread := runtime.NewThread()
@@ -169,67 +165,6 @@ func TestIINC(t *testing.T) {
 	t.Log("✓ i=0; i++; i++; i++ => i=3")
 }
 
-// TestConditionalJump 測試條件跳轉
-// if (10 > 5) return 1; else return 0;
-func TestConditionalJump(t *testing.T) {
-	code := []byte{
-		0x10, 10, // 0: bipush 10
-		0x08,             // 2: iconst_5
-		0xA4, 0x00, 0x07, // 3: if_icmple +7 -> 如果 10<=5 跳到 10
-		0x04,             // 6: iconst_1     (10 > 5 的情況)
-		0x3B,             // 7: istore_0
-		0xA7, 0x00, 0x04, // 8: goto +4      -> 跳到 12
-		0x03, // 11: iconst_0    (10 <= 5 的情況)
-		0x3B, // 12: istore_0
-		0xB1, // 13: return
-	}
-
-	result := executeAndGetLocal0(code, 1, 2, false)
-	if result != 1 {
-		t.Errorf("Expected 1, got %d", result)
-	}
-	t.Log("✓ if (10 > 5) => 1")
-}
-
-// TestSimpleLoop 測試簡單循環
-// sum = 0; for (i = 1; i <= 5; i++) sum += i;
-// 計算 1+2+3+4+5 = 15
-func TestSimpleLoop(t *testing.T) {
-	code := []byte{
-		// sum = 0, i = 1
-		0x03, // 0: iconst_0    sum = 0
-		0x3B, // 1: istore_0    locals[0] = sum
-		0x04, // 2: iconst_1    i = 1
-		0x3C, // 3: istore_1    locals[1] = i
-
-		// 循環條件: i <= 5
-		0x1B,             // 4: iload_1     stack: [i]
-		0x08,             // 5: iconst_5    stack: [i, 5]
-		0xA3, 0x00, 0x0D, // 6: if_icmpgt +13 -> 如果 i>5 跳到 19
-
-		// sum += i
-		0x1A, // 9: iload_0     stack: [sum]
-		0x1B, // 10: iload_1    stack: [sum, i]
-		0x60, // 11: iadd       stack: [sum+i]
-		0x3B, // 12: istore_0   sum = sum + i
-
-		// i++
-		0x84, 0x01, 0x01, // 13: iinc 1, 1
-
-		// 跳回循環
-		0xA7, 0xFF, 0xED, // 16: goto -19   -> 跳到 4
-
-		// 結束
-		0xB1, // 19: return
-	}
-
-	result := executeAndGetLocal0(code, 2, 2, false)
-	if result != 15 {
-		t.Errorf("Expected 15, got %d", result)
-	}
-	t.Log("✓ sum(1..5) = 15")
-}
-
 // TestComplexExpression 測試複雜表達式
 // result = (10 + 20) * 3 - 5 = 85
 func TestComplexExpression(t *testing.T) {
@@ -250,4 +185,76 @@ func TestComplexExpression(t *testing.T) {
 		t.Errorf("Expected 85, got %d", result)
 	}
 	t.Log("✓ (10 + 20) * 3 - 5 = 85")
+}
+
+// TestSimpleIf 測試簡單 if 語句
+// 使用 IFEQ: if (value == 0) result = 1; else result = 2;
+func TestSimpleIf(t *testing.T) {
+	// 測試 value = 0 的情況
+	code := []byte{
+		0x03,             // 0: iconst_0      value = 0
+		0x9A, 0x00, 0x06, // 1: ifne +6       如果 != 0 跳到 7
+		0x04, // 4: iconst_1      result = 1
+		0x3B, // 5: istore_0
+		0xB1, // 6: return
+		0x05, // 7: iconst_2      result = 2
+		0x3B, // 8: istore_0
+		0xB1, // 9: return
+	}
+
+	result := executeAndGetLocal0(code, 1, 1, false)
+	if result != 1 {
+		t.Errorf("Expected 1, got %d", result)
+	}
+	t.Log("✓ if (0 == 0) => 1")
+}
+
+// TestSimpleLoop 測試簡單循環
+// sum = 0; for (i = 1; i <= 3; i++) sum += i;
+// 計算 1+2+3 = 6
+func TestSimpleLoop(t *testing.T) {
+	// 仔細計算每個指令的 PC 位置
+	// PC  Instruction
+	// 0   iconst_0
+	// 1   istore_0
+	// 2   iconst_1
+	// 3   istore_1
+	// 4   iload_1
+	// 5   iconst_3
+	// 6   if_icmpgt (3 bytes: opcode + 2 byte offset)
+	// 9   iload_0
+	// 10  iload_1
+	// 11  iadd
+	// 12  istore_0
+	// 13  iinc (3 bytes)
+	// 16  goto (3 bytes) - 要跳到 PC=4, offset = 4 - 16 = -12
+	// 19  return
+
+	code := []byte{
+		0x03, // 0: iconst_0
+		0x3B, // 1: istore_0   sum = 0
+		0x04, // 2: iconst_1
+		0x3C, // 3: istore_1   i = 1
+
+		0x1B,             // 4: iload_1    load i
+		0x06,             // 5: iconst_3   load 3
+		0xA3, 0x00, 0x0D, // 6: if_icmpgt +13  如果 i>3 跳到 19
+
+		0x1A, // 9: iload_0    load sum
+		0x1B, // 10: iload_1   load i
+		0x60, // 11: iadd      sum + i
+		0x3B, // 12: istore_0  sum = sum + i
+
+		0x84, 0x01, 0x01, // 13: iinc 1, 1  i++
+
+		0xA7, 0xFF, 0xF4, // 16: goto -12   跳到 4 (16 + (-12) = 4)
+
+		0xB1, // 19: return
+	}
+
+	result := executeAndGetLocal0(code, 2, 2, false)
+	if result != 6 {
+		t.Errorf("Expected 6, got %d", result)
+	}
+	t.Log("✓ sum(1..3) = 6")
 }
