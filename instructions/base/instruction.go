@@ -23,7 +23,7 @@ type Instruction interface {
 // usage:
 // - iconst_0, iconst_1, ..., iconst_5
 // - iadd, isub, imul, idiv
-// - ireturn, return
+// - ireturn, control
 // those inst FetchOperands do nothing
 type NoOperandsInstruction struct{}
 

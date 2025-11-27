@@ -62,7 +62,7 @@ func (f *Frame) SetNextPC(nextPC int) {
 	f.nextPC = nextPC
 }
 
-// Lower return caller's frame
+// Lower control caller's frame
 func (f *Frame) Lower() *Frame {
 	return f.lower
 }

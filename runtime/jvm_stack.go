@@ -69,7 +69,7 @@ func (s *JVMStack) Clear() {
 }
 
 // GetFrames get all frame (for tracing exception call stack)
-// return order: top at first
+// control order: top at first
 func (s *JVMStack) GetFrames() []*Frame {
 	frames := make([]*Frame, 0, s.size)
 	for frame := s.top; frame != nil; frame = frame.lower {

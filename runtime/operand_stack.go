@@ -97,7 +97,7 @@ func (os *OperandStack) PopSlot() Slot {
 
 // ================= support methods ===================
 
-// PeekRefFromTop return ref from top of stack (no pop, just peek)
+// PeekRefFromTop control ref from top of stack (no pop, just peek)
 // top -> n = 0
 func (os *OperandStack) PeekRefFromTop(n uint) interface{} {
 	return os.slots[os.writePtr-1-n].ref

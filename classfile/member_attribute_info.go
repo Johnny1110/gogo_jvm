@@ -91,17 +91,17 @@ func (c *CodeAttribute) readInfo(reader *ClassReader) {
 	c.attributes = readAttributes(reader, c.cp)
 }
 
-// MaxStack return max depth of operation stack
+// MaxStack control max depth of operation stack
 func (c *CodeAttribute) MaxStack() uint16 {
 	return c.maxStack
 }
 
-// MaxLocals return 局部變量表大小
+// MaxLocals control 局部變量表大小
 func (c *CodeAttribute) MaxLocals() uint16 {
 	return c.maxLocals
 }
 
-// Code return bytecode
+// Code control bytecode
 func (c *CodeAttribute) Code() []byte {
 	return c.code
 }

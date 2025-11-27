@@ -12,7 +12,7 @@ func (br *BytecodeReader) Reset(code []byte, pc int) {
 	br.pc = pc
 }
 
-// PC return current pc
+// PC control current pc
 func (br *BytecodeReader) PC() int {
 	return br.pc
 }
