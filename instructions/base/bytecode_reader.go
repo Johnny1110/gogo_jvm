@@ -1,4 +1,4 @@
-package instructions
+package base
 
 type BytecodeReader struct {
 	code []byte // bytecode (from Code Attribute)

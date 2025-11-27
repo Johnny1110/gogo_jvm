@@ -148,3 +148,32 @@ BytecodeReader 封裝了字節碼的讀取邏輯，提供：
  │  ...                                                       │
  └────────────────────────────────────────────────────────────┘
 ```
+
+<br>
+<br>
+
+## Instruction 指令接口
+
+**設計背景：**
+
+這是 JVM 指令的抽象表示。每一條 JVM 指令都需要實現這個接口。
+
+* FetchOperands：負責「讀取」（從字節碼讀操作數）
+* Execute：負責「執行」（操作棧和局部變量）
+
+**解釋器的工作流程：**
+
+```
+for {                                                      
+    pc := frame.NextPC()                                   
+    reader.SetPC(pc)                                       
+                                                              
+    opcode := reader.ReadUint8()       1. 讀取 opcode       
+    inst := decodeInstruction(opcode)  2. 解碼得到指令       
+    inst.FetchOperands(reader)         3. 讀取操作數         
+    inst.Execute(frame)                4. 執行指令          
+}  
+```
+
+<br>
+<br>
