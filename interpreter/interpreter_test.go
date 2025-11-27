@@ -17,6 +17,11 @@ func executeAndGetLocal0(code []byte, maxLocals, maxStack uint16, debug bool) in
 
 	for !thread.IsStackEmpty() {
 		currentFrame := thread.CurrentFrame()
+
+		if currentFrame == nil {
+			println("@@ currentFrame is nil!!")
+		}
+
 		pc := currentFrame.NextPC()
 		thread.SetPC(pc)
 

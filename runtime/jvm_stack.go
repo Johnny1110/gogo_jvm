@@ -26,7 +26,7 @@ func (s *JVMStack) Push(frame *Frame) {
 		frame.lower = currentFrame
 	}
 
-	s.top = currentFrame
+	s.top = frame
 	s.size++
 }
 
