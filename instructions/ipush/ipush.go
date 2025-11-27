@@ -1,4 +1,4 @@
-package push
+package ipush
 
 import (
 	"github.com/Johnny1110/gogo_jvm/instructions/base"
