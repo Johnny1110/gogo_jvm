@@ -11,7 +11,7 @@ type MemberInfo struct {
 	accessFlags     uint16
 	nameIndex       uint16
 	descriptorIndex uint16
-	attributes      []AttributeInfo
+	attributes      []AttributeInfo // could contains: Code, ConstantValue, Exceptions, SourceFile, LineNumberTable, LocalVariableTable
 }
 
 func readMembers(reader *ClassReader, cp ConstantPool) []*MemberInfo {

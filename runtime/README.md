@@ -87,7 +87,7 @@ runtime/
 
 **JVM 需要一個統一的方式來存儲不同類型的數據。**
 
-問題：如何用統一的結構存儲 int, float, reference?
+問題：如何用統一的結構存儲 int, float, long, double, reference?
 
 解決方案：Slot（32-bit 槽位）
 
@@ -414,9 +414,78 @@ JVM 規範允許限制棧的大小。當棧幀數量超過限制時， 應該拋
 
 <br>
 
+**Thread 裡面有一個 PC，Frame 裡面也有一個 nextPC，為什麼？**
+
+* Thread.pc        →  當前正在執行的指令地址（跳轉計算用）
+* Frame.nextPC     →  下一條要執行的指令地址（循環控制用）
+
+原因 1：跳轉指令需要知道「當前指令地址」:
+
+```go
+// control/comparisons.go
+func branch(frame *runtime.Frame, offset int) {
+    pc := frame.Thread().PC()  // 需要當前指令的起始地址
+    nextPC := pc + offset      // 偏移量是相對於當前指令的
+    frame.SetNextPC(nextPC)
+}
+```
+
+如果只有 `Frame.nextPC`，執行到跳轉指令時，`nextPC` 已經指向下一條指令了，無法計算正確的跳轉目標。
+
+```go
+例子：goto -10                                             
+                                                             
+讀取操作數後: Frame.nextPC = 23（指向下一條指令）           
+                                                             
+計算跳轉目標：                                            
+❌ 錯誤: 23 + (-10) = 13                                   
+✅ 正確: 20 + (-10) = 10  （需要原始 PC）                   
+```
+
+<br>
+
+原因 2：異常處理和調試
+
+```go
+// Java 異常堆棧追蹤需要知道每個棧幀的當前 PC
+Exception in thread "main" java.lang.NullPointerException
+    at MyClass.foo(MyClass.java:10)   // PC -> 行號
+    at MyClass.main(MyClass.java:5)
+```
+
+<br>
+
+原因 3：多線程
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ 多線程場景                                                    │
+│                                                             │
+│  Thread 1                    Thread 2                       │
+│  ┌─────────────┐            ┌─────────────┐                 │
+│  │ pc = 100    │            │ pc = 50     │                 │
+│  │ ┌─────────┐ │            │ ┌─────────┐ │                 │
+│  │ │ Frame A │ │            │ │ Frame X │ │                 │
+│  │ │ next=103│ │            │ │ next=53 │ │                 │
+│  │ └─────────┘ │            │ └─────────┘ │                 │
+│  └─────────────┘            └─────────────┘                 │
+│                                                             │
+│  線程切換時，需要保存/恢復 Thread.pc                            │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+<br>
+
 到目前為止，runtime 模組還缺少 2 個關鍵單元：
 
 * Heap
 * Method Area
 
 __因為 Heap 和 Method Area 需要 ClassLoader，在沒有實現出來之前，都還無法完成整個 runtime。__
+
+<br>
+
+runtime 目前結構總結：
+
+![1](https://hackmd-prod-images.s3-ap-northeast-1.amazonaws.com/uploads/upload_1d0b5ff97c20228489dd45b94fe3c83a.jpg?AWSAccessKeyId=AKIA3XSAAW6AWSKNINWO&Expires=1764299713&Signature=tvmp3JraPo5AOXRK5vOiP4wn%2BHs%3D)

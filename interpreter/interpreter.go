@@ -57,7 +57,10 @@ func InterpretWithArgs(code []byte, maxLocals, maxStack uint16, args []int32, de
 func loop(thread *runtime.Thread, code []byte, debug bool) {
 	reader := &base.BytecodeReader{}
 
-	for {
+	// check is end
+	// when func returned, stack will be empty (for main method)
+	// or current frame is not origin frame (for not main method)
+	for !thread.IsStackEmpty() {
 		// get current frame
 		frame := thread.CurrentFrame()
 
@@ -80,13 +83,6 @@ func loop(thread *runtime.Thread, code []byte, debug bool) {
 
 		// Execute: perform instruction
 		instruction.Execute(frame)
-
-		// check is end
-		// when func returned, stack will be empty (for main method)
-		// or current frame is not origin frame (for not main method)
-		if thread.IsStackEmpty() {
-			break
-		}
 	}
 }
 
