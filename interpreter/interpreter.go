@@ -64,7 +64,7 @@ func loop(thread *runtime.Thread, code []byte, debug bool) {
 		// get current frame
 		frame := thread.CurrentFrame()
 
-		// calculate OC
+		// calculate PC
 		pc := frame.NextPC()
 		thread.SetPC(pc)
 

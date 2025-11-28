@@ -291,6 +291,52 @@ JVM 的算術運算完全基於操作數棧
 
 <br>
 
+### 跳轉與比較指令
+
+比較大小與跳行相關
+
+舉一個間單的範例，有一個簡單的 if 條件式：
+
+ex: `if (a < b) { ... }`
+
+編譯過後為：
+```
+compiled:
+   iload_0       // load a
+   iload_1       // load b
+   if_icmpge L1  // if a >= b jump to L1（skip if block）
+   ...           // if block logics
+   L1:           // if ending
+```
+
+看一下 `if_icmpge` 指令 source code 實現：
+
+```go
+// IF_ICMPGE jump if v1 >= v2
+// opcode = 0xA2
+type IF_ICMPGE struct{ base.BranchInstruction }
+
+func (i *IF_ICMPGE) Execute(frame *runtime.Frame) {
+  stack := frame.OperandStack()
+  v2 := stack.PopInt() // pop 出 a
+  v1 := stack.PopInt() // pop 出 b
+  if v1 >= v2 {        // 進行比較 
+    branch(frame, i.Offset) // 達成跳行條件，執行跳行
+  }
+}
+```
+
+跳行實作：
+
+```go
+// branch helper func: perform jump
+func branch(frame *runtime.Frame, offset int) {
+	pc := frame.Thread().PC() // Thread PC 記錄起始位置
+	nextPC := pc + offset     // 起始位置 + 偏移量
+	frame.SetNextPC(nextPC)   // 設定新的 PC 給 frame，下一次 Fetch 指令時，從新指定的 nextPC 開始
+}
+```
+
 ### RETURN 系列指令
 
 當方法執行完畢時，需要返回到調用者
@@ -317,10 +363,16 @@ JVM 的算術運算完全基於操作數棧
 ```
 
 <br>
+<br>
 
-### 跳轉與比較指令
+## Instruction Factory 指令集工廠
 
-比較大小與跳行相關
+使用工廠模式維護 Instruction 實現的取得
+
+需要注意的是，指令在這裡分成兩類，一類是無狀態的 `NoOperandsInstruction`，一類是帶有狀態的 `BranchInstruction` 與 `IndexInstruction`。
+
+* 無狀態的 Instruction 可以做成單例，節省運行成本。
+* 有狀態的 Instruction (帶有 index, offset 等資訊) 則必須每次初始化一個新的
 
 <br>
 <br>
