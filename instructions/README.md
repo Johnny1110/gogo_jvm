@@ -313,7 +313,7 @@ compiled:
 
 ```go
 // IF_ICMPGE jump if v1 >= v2
-// opcode = 0xA2
+// opcodes = 0xA2
 type IF_ICMPGE struct{ base.BranchInstruction }
 
 func (i *IF_ICMPGE) Execute(frame *runtime.Frame) {

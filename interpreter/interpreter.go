@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/Johnny1110/gogo_jvm/instructions"
 	"github.com/Johnny1110/gogo_jvm/instructions/base"
+	"github.com/Johnny1110/gogo_jvm/instructions/base/opcodes"
 	"github.com/Johnny1110/gogo_jvm/runtime"
 )
 
@@ -68,7 +69,7 @@ func loop(thread *runtime.Thread, code []byte, debug bool) {
 		pc := frame.NextPC()
 		thread.SetPC(pc)
 
-		// Fetch: 1 byte opcode
+		// Fetch: 1 byte opcodes
 		reader.Reset(code, pc)
 		opcode := reader.ReadUint8()
 
@@ -88,7 +89,7 @@ func loop(thread *runtime.Thread, code []byte, debug bool) {
 
 // printDebug print debug info
 func printDebug(pc int, opcode uint8, inst base.Instruction, frame *runtime.Frame) {
-	opName := base.OpcodeNames[opcode]
+	opName := opcodes.OpcodeNames[opcode]
 	if opName == "" {
 		opName = fmt.Sprintf("unknown(0x%02X)", opcode)
 	}

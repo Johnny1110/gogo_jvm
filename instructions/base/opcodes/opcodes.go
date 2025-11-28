@@ -1,4 +1,4 @@
-package base
+package opcodes
 
 // JVM Opcode define
 const (

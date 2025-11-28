@@ -6,7 +6,7 @@ import (
 )
 
 // RETURN control void
-// opcode = 0xB1
+// opcodes = 0xB1
 // usage: void methods
 type RETURN struct{ base.NoOperandsInstruction }
 
@@ -21,7 +21,7 @@ func (r *RETURN) Opcode() uint8 {
 }
 
 // IRETURN control int
-// opcode = 0xAC
+// opcodes = 0xAC
 // also use for: boolean, byte, char, short（they are all int in JVM）
 type IRETURN struct{ base.NoOperandsInstruction }
 
@@ -40,7 +40,7 @@ func (r *IRETURN) Opcode() uint8 {
 }
 
 // LRETURN control long
-// opcode = 0xAD
+// opcodes = 0xAD
 type LRETURN struct{ base.NoOperandsInstruction }
 
 func (l *LRETURN) Execute(frame *runtime.Frame) {
@@ -56,7 +56,7 @@ func (r *LRETURN) Opcode() uint8 {
 }
 
 // FRETURN control float
-// opcode = 0xAE
+// opcodes = 0xAE
 type FRETURN struct{ base.NoOperandsInstruction }
 
 func (f *FRETURN) Execute(frame *runtime.Frame) {
@@ -72,7 +72,7 @@ func (r *FRETURN) Opcode() uint8 {
 }
 
 // DRETURN control double
-// opcode = 0xAF
+// opcodes = 0xAF
 type DRETURN struct{ base.NoOperandsInstruction }
 
 func (d *DRETURN) Execute(frame *runtime.Frame) {
@@ -88,7 +88,7 @@ func (r *DRETURN) Opcode() uint8 {
 }
 
 // ARETURN control Ref
-// opcode = 0xB0
+// opcodes = 0xB0
 type ARETURN struct{ base.NoOperandsInstruction }
 
 func (a *ARETURN) Execute(frame *runtime.Frame) {

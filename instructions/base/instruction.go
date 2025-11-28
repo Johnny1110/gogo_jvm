@@ -42,7 +42,8 @@ type BranchInstruction struct {
 }
 
 func (b *BranchInstruction) FetchOperands(reader *BytecodeReader) {
-	b.Offset = int(reader.ReadUint16()) // 2 bytes offset
+	_int16 := int16(reader.ReadUint16())
+	b.Offset = int(_int16) // 2 bytes offset
 }
 
 // Index8Instruction single byte index inst

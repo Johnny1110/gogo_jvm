@@ -10,7 +10,7 @@ import (
 // ============================================================
 
 // IADD int
-// opcode = 0x60
+// opcodes = 0x60
 type IADD struct{ base.NoOperandsInstruction }
 
 func (i *IADD) Execute(frame *runtime.Frame) {
@@ -26,7 +26,7 @@ func (i *IADD) Opcode() uint8 {
 }
 
 // LADD long
-// opcode = 0x61
+// opcodes = 0x61
 type LADD struct{ base.NoOperandsInstruction }
 
 func (l *LADD) Execute(frame *runtime.Frame) {
@@ -42,7 +42,7 @@ func (i *LADD) Opcode() uint8 {
 }
 
 // FADD float
-// opcode = 0x62
+// opcodes = 0x62
 type FADD struct{ base.NoOperandsInstruction }
 
 func (f *FADD) Execute(frame *runtime.Frame) {
@@ -58,7 +58,7 @@ func (i *FADD) Opcode() uint8 {
 }
 
 // DADD double
-// opcode = 0x63
+// opcodes = 0x63
 type DADD struct{ base.NoOperandsInstruction }
 
 func (d *DADD) Execute(frame *runtime.Frame) {
@@ -78,7 +78,7 @@ func (i *DADD) Opcode() uint8 {
 // ============================================================
 
 // ISUB int
-// opcode = 0x64
+// opcodes = 0x64
 type ISUB struct{ base.NoOperandsInstruction }
 
 func (i *ISUB) Execute(frame *runtime.Frame) {
@@ -94,7 +94,7 @@ func (i *ISUB) Opcode() uint8 {
 }
 
 // LSUB long
-// opcode = 0x65
+// opcodes = 0x65
 type LSUB struct{ base.NoOperandsInstruction }
 
 func (l *LSUB) Execute(frame *runtime.Frame) {
@@ -110,7 +110,7 @@ func (i *LSUB) Opcode() uint8 {
 }
 
 // FSUB float
-// opcode = 0x66
+// opcodes = 0x66
 type FSUB struct{ base.NoOperandsInstruction }
 
 func (f *FSUB) Execute(frame *runtime.Frame) {
@@ -126,7 +126,7 @@ func (i *FSUB) Opcode() uint8 {
 }
 
 // DSUB double
-// opcode = 0x67
+// opcodes = 0x67
 type DSUB struct{ base.NoOperandsInstruction }
 
 func (d *DSUB) Execute(frame *runtime.Frame) {
@@ -146,7 +146,7 @@ func (i *DSUB) Opcode() uint8 {
 // ============================================================
 
 // IMUL int
-// opcode = 0x68
+// opcodes = 0x68
 type IMUL struct{ base.NoOperandsInstruction }
 
 func (i *IMUL) Execute(frame *runtime.Frame) {
@@ -162,7 +162,7 @@ func (i *IMUL) Opcode() uint8 {
 }
 
 // LMUL long
-// opcode = 0x69
+// opcodes = 0x69
 type LMUL struct{ base.NoOperandsInstruction }
 
 func (l *LMUL) Execute(frame *runtime.Frame) {
@@ -178,7 +178,7 @@ func (i *LMUL) Opcode() uint8 {
 }
 
 // FMUL float
-// opcode = 0x6A
+// opcodes = 0x6A
 type FMUL struct{ base.NoOperandsInstruction }
 
 func (f *FMUL) Execute(frame *runtime.Frame) {
@@ -194,7 +194,7 @@ func (i *FMUL) Opcode() uint8 {
 }
 
 // DMUL double
-// opcode = 0x6B
+// opcodes = 0x6B
 type DMUL struct{ base.NoOperandsInstruction }
 
 func (d *DMUL) Execute(frame *runtime.Frame) {
@@ -216,7 +216,7 @@ func (i *DMUL) Opcode() uint8 {
 // TODO: we using panic instead temporary (MVP Phase)
 
 // IDIV int
-// opcode = 0x6C
+// opcodes = 0x6C
 type IDIV struct{ base.NoOperandsInstruction }
 
 func (i *IDIV) Execute(frame *runtime.Frame) {
@@ -235,7 +235,7 @@ func (i *IDIV) Opcode() uint8 {
 }
 
 // LDIV long
-// opcode = 0x6D
+// opcodes = 0x6D
 type LDIV struct{ base.NoOperandsInstruction }
 
 func (l *LDIV) Execute(frame *runtime.Frame) {
@@ -254,7 +254,7 @@ func (i *LDIV) Opcode() uint8 {
 }
 
 // FDIV float
-// opcode = 0x6E
+// opcodes = 0x6E
 // Floating-point division does not throw an exception; dividing by 0 yields Infinity or NaN.
 type FDIV struct{ base.NoOperandsInstruction }
 
@@ -271,7 +271,7 @@ func (i *FDIV) Opcode() uint8 {
 }
 
 // DDIV double
-// opcode = 0x6F
+// opcodes = 0x6F
 type DDIV struct{ base.NoOperandsInstruction }
 
 func (d *DDIV) Execute(frame *runtime.Frame) {
@@ -291,7 +291,7 @@ func (i *DDIV) Opcode() uint8 {
 // ============================================================
 
 // IREM int
-// opcode = 0x70
+// opcodes = 0x70
 type IREM struct{ base.NoOperandsInstruction }
 
 func (i *IREM) Execute(frame *runtime.Frame) {
@@ -310,7 +310,7 @@ func (i *IREM) Opcode() uint8 {
 }
 
 // LREM long
-// opcode = 0x71
+// opcodes = 0x71
 type LREM struct{ base.NoOperandsInstruction }
 
 func (l *LREM) Execute(frame *runtime.Frame) {
@@ -329,7 +329,7 @@ func (i *LREM) Opcode() uint8 {
 }
 
 // FREM float
-// opcode = 0x72
+// opcodes = 0x72
 type FREM struct{ base.NoOperandsInstruction }
 
 func (f *FREM) Execute(frame *runtime.Frame) {
@@ -347,7 +347,7 @@ func (i *FREM) Opcode() uint8 {
 }
 
 // DREM double
-// opcode = 0x73
+// opcodes = 0x73
 type DREM struct{ base.NoOperandsInstruction }
 
 func (d *DREM) Execute(frame *runtime.Frame) {
@@ -367,7 +367,7 @@ func (i *DREM) Opcode() uint8 {
 // ============================================================
 
 // INEG int
-// opcode = 0x74
+// opcodes = 0x74
 type INEG struct{ base.NoOperandsInstruction }
 
 func (i *INEG) Execute(frame *runtime.Frame) {
@@ -381,7 +381,7 @@ func (i *INEG) Opcode() uint8 {
 }
 
 // LNEG long
-// opcode = 0x75
+// opcodes = 0x75
 type LNEG struct{ base.NoOperandsInstruction }
 
 func (l *LNEG) Execute(frame *runtime.Frame) {
@@ -395,7 +395,7 @@ func (i *LNEG) Opcode() uint8 {
 }
 
 // FNEG float
-// opcode = 0x76
+// opcodes = 0x76
 type FNEG struct{ base.NoOperandsInstruction }
 
 func (f *FNEG) Execute(frame *runtime.Frame) {
@@ -409,7 +409,7 @@ func (i *FNEG) Opcode() uint8 {
 }
 
 // DNEG double
-// opcode = 0x77
+// opcodes = 0x77
 type DNEG struct{ base.NoOperandsInstruction }
 
 func (d *DNEG) Execute(frame *runtime.Frame) {
@@ -430,7 +430,7 @@ func (i *DNEG) Opcode() uint8 {
 // faster than using stack
 
 // IINC add const to a var in LocalVars
-// opcode = 0x84
+// opcodes = 0x84
 // format: iinc index const
 // ex: iinc 1 1  （把局部變量1加1，即 i++）
 type IINC struct {

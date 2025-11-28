@@ -69,7 +69,7 @@ func loop(thread *runtime.Thread, code []byte, debug bool) {
 		pc := frame.NextPC()
 		thread.SetPC(pc)
 
-		// Fetch: 1 byte opcode
+		// Fetch: 1 byte opcodes
 		reader.Reset(code, pc)
 		opcode := reader.ReadUint8()
 

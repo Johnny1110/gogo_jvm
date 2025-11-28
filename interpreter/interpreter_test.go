@@ -1,8 +1,10 @@
 package interpreter
 
 import (
+	"fmt"
 	"github.com/Johnny1110/gogo_jvm/instructions"
 	"github.com/Johnny1110/gogo_jvm/instructions/base"
+	"github.com/Johnny1110/gogo_jvm/instructions/base/opcodes"
 	"github.com/Johnny1110/gogo_jvm/runtime"
 	"testing"
 )
@@ -15,16 +17,16 @@ func executeAndGetLocal0(code []byte, maxLocals, maxStack uint16, debug bool) in
 
 	reader := &base.BytecodeReader{}
 
-	for !thread.IsStackEmpty() {
-		currentFrame := thread.CurrentFrame()
+	loopCount := 0
 
-		if currentFrame == nil {
-			println("@@ currentFrame is nil!!")
-		}
+	for !thread.IsStackEmpty() {
+		loopCount++
+		fmt.Printf("<loop> -----------------------count: %v --------------------------- <loop> \n", loopCount)
+
+		currentFrame := thread.CurrentFrame()
 
 		pc := currentFrame.NextPC()
 		thread.SetPC(pc)
-
 		reader.Reset(code, pc)
 		opcode := reader.ReadUint8()
 		inst := instructions.NewInstruction(opcode)
@@ -32,11 +34,12 @@ func executeAndGetLocal0(code []byte, maxLocals, maxStack uint16, debug bool) in
 		currentFrame.SetNextPC(reader.PC())
 
 		if debug {
-			name := base.OpcodeNames[opcode]
+			name := opcodes.OpcodeNames[opcode]
 			if name == "" {
 				name = "???"
 			}
-			println("PC:", pc, "OP:", name)
+			println("threadPC:", thread.PC(), "nextPC:", pc, "OP:", name)
+			fmt.Printf("LocalVars: %v \n", frame.LocalVars())
 		}
 
 		inst.Execute(currentFrame)
@@ -116,10 +119,10 @@ func TestDivide(t *testing.T) {
 // TestNegation 測試取負: -(42) = -42
 func TestNegation(t *testing.T) {
 	code := []byte{
-		0x10, 42, // bipush 42
-		0x74, // ineg
-		0x3B, // istore_0
-		0xB1, // return
+		opcodes.BIPUSH, 42, // bipush 42
+		opcodes.INEG,     // ineg
+		opcodes.ISTORE_0, // istore_0
+		opcodes.RETURN,   // return
 	}
 
 	result := executeAndGetLocal0(code, 1, 2, false)
@@ -197,21 +200,43 @@ func TestComplexExpression(t *testing.T) {
 func TestSimpleIf(t *testing.T) {
 	// 測試 value = 0 的情況
 	code := []byte{
-		0x03,             // 0: iconst_0      value = 0
-		0x9A, 0x00, 0x06, // 1: ifne +6       如果 != 0 跳到 7
-		0x04, // 4: iconst_1      result = 1
-		0x3B, // 5: istore_0
-		0xB1, // 6: return
-		0x05, // 7: iconst_2      result = 2
-		0x3B, // 8: istore_0
-		0xB1, // 9: return
+		opcodes.ICONST_0,         // 0: iconst_0      value = 0
+		opcodes.IFNE, 0x00, 0x06, // 1: ifne +6       如果 != 0 跳到 7 --> fetch 2 bytes 當作 offset 這裡會是 6，pop 出 val 0，當 val != 0 時會跳到 初始 pc+6 = 0+6 = 6, 但是這裡為 0 所以不跳行
+		opcodes.ICONST_1, // 4: iconst_1      result = 1
+		opcodes.ISTORE_0, // 5: istore_0
+		opcodes.RETURN,   // 6: return
+		opcodes.ICONST_2, // 7: iconst_2      result = 2
+		opcodes.ISTORE_0, // 8: istore_0
+		opcodes.RETURN,   // 9: return
 	}
 
-	result := executeAndGetLocal0(code, 1, 1, false)
+	result := executeAndGetLocal0(code, 1, 1, true)
 	if result != 1 {
 		t.Errorf("Expected 1, got %d", result)
 	}
 	t.Log("✓ if (0 == 0) => 1")
+}
+
+// TestSimpleIf 測試簡單 if 語句 - 2
+// 使用 IFEQ: if (value == 0) result = 1; else result = 2;
+func TestSimpleIf_2(t *testing.T) {
+	// 測試 value = 1 的情況
+	code := []byte{
+		opcodes.ICONST_1,         // 0: iconst_1      value = 1
+		opcodes.IFNE, 0x00, 0x06, // 1: ifne +6       如果 != 0 跳到 7 --> fetch 2 bytes 當作 offset 這裡會是 6，pop 出 val 0，當 val != 0 時會跳到 thread.pc+6 = 1+6 = 7
+		opcodes.ICONST_1, // 4: iconst_1      result = 1
+		opcodes.ISTORE_0, // 5: istore_0
+		opcodes.RETURN,   // 6: return
+		opcodes.ICONST_2, // 7: iconst_2      result = 2
+		opcodes.ISTORE_0, // 8: istore_0
+		opcodes.RETURN,   // 9: return
+	}
+
+	result := executeAndGetLocal0(code, 1, 1, true)
+	if result != 2 {
+		t.Errorf("Expected 2, got %d", result)
+	}
+	t.Log("✓ if (1 != 0) => 2")
 }
 
 // TestSimpleLoop 測試簡單循環
@@ -226,7 +251,7 @@ func TestSimpleLoop(t *testing.T) {
 	// 3   istore_1
 	// 4   iload_1
 	// 5   iconst_3
-	// 6   if_icmpgt (3 bytes: opcode + 2 byte offset)
+	// 6   if_icmpgt (3 bytes: opcodes + 2 byte offset)
 	// 9   iload_0
 	// 10  iload_1
 	// 11  iadd
@@ -236,28 +261,32 @@ func TestSimpleLoop(t *testing.T) {
 	// 19  return
 
 	code := []byte{
-		0x03, // 0: iconst_0
-		0x3B, // 1: istore_0   sum = 0
-		0x04, // 2: iconst_1
-		0x3C, // 3: istore_1   i = 1
+		opcodes.ICONST_0, // 0: iconst_0 -> 推 0 到 stack
+		opcodes.ISTORE_0, // 1: istore_0 -> sum = 0 -> pop 0 出來，放進 LocalVars[0]
+		opcodes.ICONST_1, // 2: iconst_1 -> 推 1 到 stack
+		opcodes.ISTORE_1, // 3: istore_1   i = 1  -> pop 1 出來，放進 LocalVars[1]
 
-		0x1B,             // 4: iload_1    load i
-		0x06,             // 5: iconst_3   load 3
-		0xA3, 0x00, 0x0D, // 6: if_icmpgt +13  如果 i>3 跳到 19
+		// []LocalVars = {0, 1}
+		// LocalVars 第一個元素是 sum
+		// LocalVars 第二個元素是 i
 
-		0x1A, // 9: iload_0    load sum
-		0x1B, // 10: iload_1   load i
-		0x60, // 11: iadd      sum + i
-		0x3B, // 12: istore_0  sum = sum + i
+		opcodes.ILOAD_1,               // 4: iload_1    load i -> 把 i load 到 stack 中
+		opcodes.ICONST_3,              // 5: iconst_3   load 3 -> 把 3 推入 stack
+		opcodes.IF_ICMPGT, 0x00, 0x0D, // 6: if_icmpgt +13(0x0D)  如果 i>3 跳到 19 (return)
 
-		0x84, 0x01, 0x01, // 13: iinc 1, 1  i++
+		opcodes.ILOAD_0,  // 9: iload_0    load sum
+		opcodes.ILOAD_1,  // 10: iload_1   load i
+		opcodes.IADD,     // 11: iadd      sum + i
+		opcodes.ISTORE_0, // 12: istore_0  sum = sum + i
 
-		0xA7, 0xFF, 0xF4, // 16: goto -12   跳到 4 (16 + (-12) = 4)
+		opcodes.IINC, 0x01, 0x01, // 13: iinc 1, 1  i++
 
-		0xB1, // 19: return
+		opcodes.GOTO, 0xFF, 0xF4, // 16: goto -12   跳到 4 (16 + (-12) = 4)
+
+		opcodes.RETURN, // 19: return
 	}
 
-	result := executeAndGetLocal0(code, 2, 2, false)
+	result := executeAndGetLocal0(code, 2, 2, true)
 	if result != 6 {
 		t.Errorf("Expected 6, got %d", result)
 	}

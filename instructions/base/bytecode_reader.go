@@ -23,7 +23,7 @@ func (br *BytecodeReader) SetPC(pc int) {
 }
 
 // ReadUint8 read 1 byte (unsign)
-// usage: read opcode, bipush...
+// usage: read opcodes, bipush...
 func (br *BytecodeReader) ReadUint8() uint8 {
 	b := br.code[br.pc]
 	br.pc++
@@ -67,7 +67,7 @@ func (br *BytecodeReader) ReadInt32s(count int32) []int32 {
 
 // SkipPadding skip padding bytes
 // tableswitch and lookupswitch need align 4 bytes, this is for efficiency (access aligned data is fast)
-// ex: if opcode at index 5, we need skip 3 bytes, start from index 8.
+// ex: if opcodes at index 5, we need skip 3 bytes, start from index 8.
 func (br *BytecodeReader) SkipPadding() {
 	br.pc += (4 - br.pc%4) % 4
 }

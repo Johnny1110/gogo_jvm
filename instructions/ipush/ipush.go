@@ -10,7 +10,7 @@ import (
 // ============================================================
 
 // BIPUSH PUSH 1 bytes signed byte (int) into stack
-// opcode = 0x10
+// opcodes = 0x10
 type BIPUSH struct {
 	val int8 // operands: 1 byte signed int
 }
@@ -29,7 +29,7 @@ func (b *BIPUSH) Opcode() uint8 {
 }
 
 // SIPUSH PUSH 2 bytes signed int into stack
-// opcode = 0x11
+// opcodes = 0x11
 type SIPUSH struct {
 	val int16 // operands: 2 bytes
 }

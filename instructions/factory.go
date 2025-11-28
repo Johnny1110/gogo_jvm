@@ -3,6 +3,7 @@ package instructions
 import (
 	"fmt"
 	"github.com/Johnny1110/gogo_jvm/instructions/base"
+	"github.com/Johnny1110/gogo_jvm/instructions/base/opcodes"
 	"github.com/Johnny1110/gogo_jvm/instructions/constants"
 	"github.com/Johnny1110/gogo_jvm/instructions/control"
 	"github.com/Johnny1110/gogo_jvm/instructions/ipush"
@@ -105,254 +106,254 @@ var (
 	_return     = &control.RETURN{}
 )
 
-// NewInstruction return instruction based on input opcode
+// NewInstruction return instruction based on input opcodes
 func NewInstruction(opcode byte) base.Instruction {
 	switch opcode {
 	// const instructions
-	case base.NOP:
+	case opcodes.NOP:
 		return nop
-	case base.ACONST_NULL:
+	case opcodes.ACONST_NULL:
 		return aconst_null
-	case base.ICONST_M1:
+	case opcodes.ICONST_M1:
 		return iconst_m1
-	case base.ICONST_0:
+	case opcodes.ICONST_0:
 		return iconst_0
-	case base.ICONST_1:
+	case opcodes.ICONST_1:
 		return iconst_1
-	case base.ICONST_2:
+	case opcodes.ICONST_2:
 		return iconst_2
-	case base.ICONST_3:
+	case opcodes.ICONST_3:
 		return iconst_3
-	case base.ICONST_4:
+	case opcodes.ICONST_4:
 		return iconst_4
-	case base.ICONST_5:
+	case opcodes.ICONST_5:
 		return iconst_5
-	case base.LCONST_0:
+	case opcodes.LCONST_0:
 		return lconst_0
-	case base.LCONST_1:
+	case opcodes.LCONST_1:
 		return lconst_1
-	case base.FCONST_0:
+	case opcodes.FCONST_0:
 		return fconst_0
-	case base.FCONST_1:
+	case opcodes.FCONST_1:
 		return fconst_1
-	case base.FCONST_2:
+	case opcodes.FCONST_2:
 		return fconst_2
-	case base.DCONST_0:
+	case opcodes.DCONST_0:
 		return dconst_0
-	case base.DCONST_1:
+	case opcodes.DCONST_1:
 		return dconst_1
-	case base.BIPUSH:
+	case opcodes.BIPUSH:
 		return &ipush.BIPUSH{}
-	case base.SIPUSH:
+	case opcodes.SIPUSH:
 		return &ipush.SIPUSH{}
 
 	// load instructions
-	case base.ILOAD:
+	case opcodes.ILOAD:
 		return &loads.ILOAD{}
-	case base.LLOAD:
+	case opcodes.LLOAD:
 		return &loads.LLOAD{}
-	case base.FLOAD:
+	case opcodes.FLOAD:
 		return &loads.FLOAD{}
-	case base.DLOAD:
+	case opcodes.DLOAD:
 		return &loads.DLOAD{}
-	case base.ALOAD:
+	case opcodes.ALOAD:
 		return &loads.ALOAD{}
-	case base.ILOAD_0:
+	case opcodes.ILOAD_0:
 		return iload_0
-	case base.ILOAD_1:
+	case opcodes.ILOAD_1:
 		return iload_1
-	case base.ILOAD_2:
+	case opcodes.ILOAD_2:
 		return iload_2
-	case base.ILOAD_3:
+	case opcodes.ILOAD_3:
 		return iload_3
-	case base.LLOAD_0:
+	case opcodes.LLOAD_0:
 		return lload_0
-	case base.LLOAD_1:
+	case opcodes.LLOAD_1:
 		return lload_1
-	case base.LLOAD_2:
+	case opcodes.LLOAD_2:
 		return lload_2
-	case base.LLOAD_3:
+	case opcodes.LLOAD_3:
 		return lload_3
-	case base.FLOAD_0:
+	case opcodes.FLOAD_0:
 		return fload_0
-	case base.FLOAD_1:
+	case opcodes.FLOAD_1:
 		return fload_1
-	case base.FLOAD_2:
+	case opcodes.FLOAD_2:
 		return fload_2
-	case base.FLOAD_3:
+	case opcodes.FLOAD_3:
 		return fload_3
-	case base.DLOAD_0:
+	case opcodes.DLOAD_0:
 		return dload_0
-	case base.DLOAD_1:
+	case opcodes.DLOAD_1:
 		return dload_1
-	case base.DLOAD_2:
+	case opcodes.DLOAD_2:
 		return dload_2
-	case base.DLOAD_3:
+	case opcodes.DLOAD_3:
 		return dload_3
-	case base.ALOAD_0:
+	case opcodes.ALOAD_0:
 		return aload_0
-	case base.ALOAD_1:
+	case opcodes.ALOAD_1:
 		return aload_1
-	case base.ALOAD_2:
+	case opcodes.ALOAD_2:
 		return aload_2
-	case base.ALOAD_3:
+	case opcodes.ALOAD_3:
 		return aload_3
 
 	// store instructions
-	case base.ISTORE:
+	case opcodes.ISTORE:
 		return &stores.ISTORE{}
-	case base.LSTORE:
+	case opcodes.LSTORE:
 		return &stores.LSTORE{}
-	case base.FSTORE:
+	case opcodes.FSTORE:
 		return &stores.FSTORE{}
-	case base.DSTORE:
+	case opcodes.DSTORE:
 		return &stores.DSTORE{}
-	case base.ASTORE:
+	case opcodes.ASTORE:
 		return &stores.ASTORE{}
-	case base.ISTORE_0:
+	case opcodes.ISTORE_0:
 		return istore_0
-	case base.ISTORE_1:
+	case opcodes.ISTORE_1:
 		return istore_1
-	case base.ISTORE_2:
+	case opcodes.ISTORE_2:
 		return istore_2
-	case base.ISTORE_3:
+	case opcodes.ISTORE_3:
 		return istore_3
-	case base.LSTORE_0:
+	case opcodes.LSTORE_0:
 		return lstore_0
-	case base.LSTORE_1:
+	case opcodes.LSTORE_1:
 		return lstore_1
-	case base.LSTORE_2:
+	case opcodes.LSTORE_2:
 		return lstore_2
-	case base.LSTORE_3:
+	case opcodes.LSTORE_3:
 		return lstore_3
-	case base.FSTORE_0:
+	case opcodes.FSTORE_0:
 		return fstore_0
-	case base.FSTORE_1:
+	case opcodes.FSTORE_1:
 		return fstore_1
-	case base.FSTORE_2:
+	case opcodes.FSTORE_2:
 		return fstore_2
-	case base.FSTORE_3:
+	case opcodes.FSTORE_3:
 		return fstore_3
-	case base.DSTORE_0:
+	case opcodes.DSTORE_0:
 		return dstore_0
-	case base.DSTORE_1:
+	case opcodes.DSTORE_1:
 		return dstore_1
-	case base.DSTORE_2:
+	case opcodes.DSTORE_2:
 		return dstore_2
-	case base.DSTORE_3:
+	case opcodes.DSTORE_3:
 		return dstore_3
-	case base.ASTORE_0:
+	case opcodes.ASTORE_0:
 		return astore_0
-	case base.ASTORE_1:
+	case opcodes.ASTORE_1:
 		return astore_1
-	case base.ASTORE_2:
+	case opcodes.ASTORE_2:
 		return astore_2
-	case base.ASTORE_3:
+	case opcodes.ASTORE_3:
 		return astore_3
 
 	// // math instructions
-	case base.IADD:
+	case opcodes.IADD:
 		return iadd
-	case base.LADD:
+	case opcodes.LADD:
 		return ladd
-	case base.FADD:
+	case opcodes.FADD:
 		return fadd
-	case base.DADD:
+	case opcodes.DADD:
 		return dadd
-	case base.ISUB:
+	case opcodes.ISUB:
 		return isub
-	case base.LSUB:
+	case opcodes.LSUB:
 		return lsub
-	case base.FSUB:
+	case opcodes.FSUB:
 		return fsub
-	case base.DSUB:
+	case opcodes.DSUB:
 		return dsub
-	case base.IMUL:
+	case opcodes.IMUL:
 		return imul
-	case base.LMUL:
+	case opcodes.LMUL:
 		return lmul
-	case base.FMUL:
+	case opcodes.FMUL:
 		return fmul
-	case base.DMUL:
+	case opcodes.DMUL:
 		return dmul
-	case base.IDIV:
+	case opcodes.IDIV:
 		return idiv
-	case base.LDIV:
+	case opcodes.LDIV:
 		return ldiv
-	case base.FDIV:
+	case opcodes.FDIV:
 		return fdiv
-	case base.DDIV:
+	case opcodes.DDIV:
 		return ddiv
-	case base.IREM:
+	case opcodes.IREM:
 		return irem
-	case base.LREM:
+	case opcodes.LREM:
 		return lrem
-	case base.FREM:
+	case opcodes.FREM:
 		return frem
-	case base.DREM:
+	case opcodes.DREM:
 		return drem
-	case base.INEG:
+	case opcodes.INEG:
 		return ineg
-	case base.LNEG:
+	case opcodes.LNEG:
 		return lneg
-	case base.FNEG:
+	case opcodes.FNEG:
 		return fneg
-	case base.DNEG:
+	case opcodes.DNEG:
 		return dneg
-	case base.IINC:
+	case opcodes.IINC:
 		return &math.IINC{}
 
 	// compare instructions
-	case base.IFEQ:
+	case opcodes.IFEQ:
 		return &control.IFEQ{}
-	case base.IFNE:
+	case opcodes.IFNE:
 		return &control.IFNE{}
-	case base.IFLT:
+	case opcodes.IFLT:
 		return &control.IFLT{}
-	case base.IFGE:
+	case opcodes.IFGE:
 		return &control.IFGE{}
-	case base.IFGT:
+	case opcodes.IFGT:
 		return &control.IFGT{}
-	case base.IFLE:
+	case opcodes.IFLE:
 		return &control.IFLE{}
-	case base.IF_ICMPEQ:
+	case opcodes.IF_ICMPEQ:
 		return &control.IF_ICMPEQ{}
-	case base.IF_ICMPNE:
+	case opcodes.IF_ICMPNE:
 		return &control.IF_ICMPNE{}
-	case base.IF_ICMPLT:
+	case opcodes.IF_ICMPLT:
 		return &control.IF_ICMPLT{}
-	case base.IF_ICMPGE:
+	case opcodes.IF_ICMPGE:
 		return &control.IF_ICMPGE{}
-	case base.IF_ICMPGT:
+	case opcodes.IF_ICMPGT:
 		return &control.IF_ICMPGT{}
-	case base.IF_ICMPLE:
+	case opcodes.IF_ICMPLE:
 		return &control.IF_ICMPLE{}
-	case base.IF_ACMPEQ:
+	case opcodes.IF_ACMPEQ:
 		return &control.IF_ACMPEQ{}
-	case base.IF_ACMPNE:
+	case opcodes.IF_ACMPNE:
 		return &control.IF_ACMPNE{}
-	case base.GOTO:
+	case opcodes.GOTO:
 		return &control.GOTO{}
-	case base.IFNULL:
+	case opcodes.IFNULL:
 		return &control.IFNULL{}
-	case base.IFNONNULL:
+	case opcodes.IFNONNULL:
 		return &control.IFNONNULL{}
 
 	// return instructions
-	case base.IRETURN:
+	case opcodes.IRETURN:
 		return ireturn
-	case base.LRETURN:
+	case opcodes.LRETURN:
 		return lreturn
-	case base.FRETURN:
+	case opcodes.FRETURN:
 		return freturn
-	case base.DRETURN:
+	case opcodes.DRETURN:
 		return dreturn
-	case base.ARETURN:
+	case opcodes.ARETURN:
 		return areturn
-	case base.RETURN:
+	case opcodes.RETURN:
 		return _return
 
 	default:
-		panic(fmt.Sprintf("Unsupported opcode: 0x%02X", opcode))
+		panic(fmt.Sprintf("Unsupported opcodes: 0x%02X", opcode))
 	}
 }

@@ -10,7 +10,7 @@ import (
 // ============================================================
 
 // NOP extend NoOperandsInstruction
-// opcode = 0x00
+// opcodes = 0x00
 // do nothing
 type NOP struct {
 	base.NoOperandsInstruction
@@ -29,7 +29,7 @@ func (n *NOP) Opcode() uint8 {
 // ============================================================
 
 // ACONST_NULL
-// opcode = 0x01
+// opcodes = 0x01
 // create null Ref
 type ACONST_NULL struct {
 	base.NoOperandsInstruction
@@ -49,7 +49,7 @@ func (n *ACONST_NULL) Opcode() uint8 {
 // PUSH int into stack
 
 // ICONST_M1 PUSH -1 into stack (M1 = Minus 1)
-// opcode = 0x02
+// opcodes = 0x02
 type ICONST_M1 struct {
 	base.NoOperandsInstruction
 }
@@ -63,7 +63,7 @@ func (i *ICONST_M1) Opcode() uint8 {
 }
 
 // ICONST_0 PUSH 0
-// opcode = 0x03
+// opcodes = 0x03
 type ICONST_0 struct {
 	base.NoOperandsInstruction
 }
@@ -77,7 +77,7 @@ func (i *ICONST_0) Opcode() uint8 {
 }
 
 // ICONST_1 PUSH 1
-// opcode = 0x04
+// opcodes = 0x04
 type ICONST_1 struct{ base.NoOperandsInstruction }
 
 func (i *ICONST_1) Execute(frame *runtime.Frame) {
@@ -89,7 +89,7 @@ func (i *ICONST_1) Opcode() uint8 {
 }
 
 // ICONST_2 PUSH 2
-// opcode = 0x05
+// opcodes = 0x05
 type ICONST_2 struct{ base.NoOperandsInstruction }
 
 func (i *ICONST_2) Execute(frame *runtime.Frame) {
@@ -101,7 +101,7 @@ func (i *ICONST_2) Opcode() uint8 {
 }
 
 // ICONST_3 PUSH 3
-// opcode = 0x06
+// opcodes = 0x06
 type ICONST_3 struct{ base.NoOperandsInstruction }
 
 func (i *ICONST_3) Execute(frame *runtime.Frame) {
@@ -113,7 +113,7 @@ func (i *ICONST_3) Opcode() uint8 {
 }
 
 // ICONST_4 PUSH 4
-// opcode = 0x07
+// opcodes = 0x07
 type ICONST_4 struct{ base.NoOperandsInstruction }
 
 func (i *ICONST_4) Execute(frame *runtime.Frame) {
@@ -125,7 +125,7 @@ func (i *ICONST_4) Opcode() uint8 {
 }
 
 // ICONST_5 PUSH 5
-// opcode = 0x08
+// opcodes = 0x08
 type ICONST_5 struct{ base.NoOperandsInstruction }
 
 func (i *ICONST_5) Execute(frame *runtime.Frame) {
@@ -142,7 +142,7 @@ func (i *ICONST_5) Opcode() uint8 {
 // PUSH long into stack
 
 // LCONST_0 PUSH 0
-// opcode = 0x09
+// opcodes = 0x09
 type LCONST_0 struct{ base.NoOperandsInstruction }
 
 func (l *LCONST_0) Execute(frame *runtime.Frame) {
@@ -154,7 +154,7 @@ func (i *LCONST_0) Opcode() uint8 {
 }
 
 // LCONST_1 PUSH 1
-// opcode = 0x0A
+// opcodes = 0x0A
 type LCONST_1 struct{ base.NoOperandsInstruction }
 
 func (l *LCONST_1) Execute(frame *runtime.Frame) {
@@ -170,7 +170,7 @@ func (i *LCONST_1) Opcode() uint8 {
 // ============================================================
 
 // FCONST_0 PUSH 0.0
-// opcode = 0x0B
+// opcodes = 0x0B
 type FCONST_0 struct{ base.NoOperandsInstruction }
 
 func (f *FCONST_0) Execute(frame *runtime.Frame) {
@@ -182,7 +182,7 @@ func (i *FCONST_0) Opcode() uint8 {
 }
 
 // FCONST_1 PUSH 1.0
-// opcode = 0x0C
+// opcodes = 0x0C
 type FCONST_1 struct{ base.NoOperandsInstruction }
 
 func (f *FCONST_1) Execute(frame *runtime.Frame) {
@@ -194,7 +194,7 @@ func (i *FCONST_1) Opcode() uint8 {
 }
 
 // FCONST_2 PUSH 2.0
-// opcode = 0x0D
+// opcodes = 0x0D
 type FCONST_2 struct{ base.NoOperandsInstruction }
 
 func (f *FCONST_2) Execute(frame *runtime.Frame) {
@@ -210,7 +210,7 @@ func (i *FCONST_2) Opcode() uint8 {
 // ============================================================
 
 // DCONST_0 PUSH 0.0
-// opcode = 0x0E
+// opcodes = 0x0E
 type DCONST_0 struct{ base.NoOperandsInstruction }
 
 func (d *DCONST_0) Execute(frame *runtime.Frame) {
@@ -222,7 +222,7 @@ func (i *DCONST_0) Opcode() uint8 {
 }
 
 // DCONST_1 PUSH 1
-// opcode = 0x0F
+// opcodes = 0x0F
 type DCONST_1 struct{ base.NoOperandsInstruction }
 
 func (d *DCONST_1) Execute(frame *runtime.Frame) {
