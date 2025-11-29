@@ -29,7 +29,7 @@ func executeAndGetLocal0(code []byte, maxLocals, maxStack uint16, debug bool) in
 		thread.SetPC(pc)
 		reader.Reset(code, pc)
 		opcode := reader.ReadUint8()
-		inst := instructions.NewInstruction(opcode)
+		inst, _ := instructions.NewInstruction(opcode)
 		inst.FetchOperands(reader)
 		currentFrame.SetNextPC(reader.PC())
 

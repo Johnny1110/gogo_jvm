@@ -74,7 +74,11 @@ func loop(thread *runtime.Thread, code []byte, debug bool) {
 		opcode := reader.ReadUint8()
 
 		// Decode:
-		instruction := instructions.NewInstruction(opcode)
+		instruction, err := instructions.NewInstruction(opcode)
+		if err != nil {
+			fmt.Errorf("error while parsing instruction: %s", err)
+			panic("instruction parse error")
+		}
 		instruction.FetchOperands(reader) // fetch index, offset if required
 		frame.SetNextPC(reader.PC())      // update PC (to next instruction)
 

@@ -269,4 +269,4 @@ type ConstantMethodrefInfo struct {
 
 ## 測試 class 檔案
 
-* [測試目標：HelloWorld.java](../test/HelloWorld_bytecode.md)
+* [測試目標：HelloWorld.java](../test/java/HelloWorld_bytecode.md)

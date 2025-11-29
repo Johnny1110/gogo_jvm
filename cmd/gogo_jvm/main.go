@@ -32,20 +32,11 @@ func main() {
 		os.Exit(1)
 	}
 
-	className := os.Args[1]
-
-	// read class file
-	classData, err := ioutil.ReadFile(className)
-	if err != nil {
-		fmt.Printf("Error reading classfile: %v\n", err)
-		os.Exit(1)
-	}
-
 	classFilePath := os.Args[1]
 	debug := len(os.Args) > 2 && os.Args[2] == "-debug"
 
 	// 1. read classfile
-	classData, err = ioutil.ReadFile(classFilePath)
+	classData, err := ioutil.ReadFile(classFilePath)
 	if err != nil {
 		fmt.Printf("Error reading class file: %v\n", err)
 		os.Exit(1)
@@ -112,7 +103,11 @@ func interpret(bytecode []byte, maxLocals uint16, maxStack uint16, debug bool) {
 		opcode := reader.ReadUint8()
 
 		// Decode
-		inst := instructions.NewInstruction(opcode)
+		inst, err := instructions.NewInstruction(opcode)
+		if err != nil {
+			fmt.Errorf("error while parsing instruction: %s", err)
+			panic("instruction parse error")
+		}
 		inst.FetchOperands(reader)
 		currentFrame.SetNextPC(reader.PC())
 

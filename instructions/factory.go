@@ -6,7 +6,6 @@ import (
 	"github.com/Johnny1110/gogo_jvm/instructions/base/opcodes"
 	"github.com/Johnny1110/gogo_jvm/instructions/constants"
 	"github.com/Johnny1110/gogo_jvm/instructions/control"
-	"github.com/Johnny1110/gogo_jvm/instructions/ipush"
 	"github.com/Johnny1110/gogo_jvm/instructions/loads"
 	"github.com/Johnny1110/gogo_jvm/instructions/math"
 	"github.com/Johnny1110/gogo_jvm/instructions/stores"
@@ -107,253 +106,253 @@ var (
 )
 
 // NewInstruction return instruction based on input opcodes
-func NewInstruction(opcode byte) base.Instruction {
+func NewInstruction(opcode byte) (base.Instruction, error) {
 	switch opcode {
 	// const instructions
 	case opcodes.NOP:
-		return nop
+		return nop, nil
 	case opcodes.ACONST_NULL:
-		return aconst_null
+		return aconst_null, nil
 	case opcodes.ICONST_M1:
-		return iconst_m1
+		return iconst_m1, nil
 	case opcodes.ICONST_0:
-		return iconst_0
+		return iconst_0, nil
 	case opcodes.ICONST_1:
-		return iconst_1
+		return iconst_1, nil
 	case opcodes.ICONST_2:
-		return iconst_2
+		return iconst_2, nil
 	case opcodes.ICONST_3:
-		return iconst_3
+		return iconst_3, nil
 	case opcodes.ICONST_4:
-		return iconst_4
+		return iconst_4, nil
 	case opcodes.ICONST_5:
-		return iconst_5
+		return iconst_5, nil
 	case opcodes.LCONST_0:
-		return lconst_0
+		return lconst_0, nil
 	case opcodes.LCONST_1:
-		return lconst_1
+		return lconst_1, nil
 	case opcodes.FCONST_0:
-		return fconst_0
+		return fconst_0, nil
 	case opcodes.FCONST_1:
-		return fconst_1
+		return fconst_1, nil
 	case opcodes.FCONST_2:
-		return fconst_2
+		return fconst_2, nil
 	case opcodes.DCONST_0:
-		return dconst_0
+		return dconst_0, nil
 	case opcodes.DCONST_1:
-		return dconst_1
+		return dconst_1, nil
 	case opcodes.BIPUSH:
-		return &ipush.BIPUSH{}
+		return &constants.BIPUSH{}, nil
 	case opcodes.SIPUSH:
-		return &ipush.SIPUSH{}
+		return &constants.SIPUSH{}, nil
 
 	// load instructions
 	case opcodes.ILOAD:
-		return &loads.ILOAD{}
+		return &loads.ILOAD{}, nil
 	case opcodes.LLOAD:
-		return &loads.LLOAD{}
+		return &loads.LLOAD{}, nil
 	case opcodes.FLOAD:
-		return &loads.FLOAD{}
+		return &loads.FLOAD{}, nil
 	case opcodes.DLOAD:
-		return &loads.DLOAD{}
+		return &loads.DLOAD{}, nil
 	case opcodes.ALOAD:
-		return &loads.ALOAD{}
+		return &loads.ALOAD{}, nil
 	case opcodes.ILOAD_0:
-		return iload_0
+		return iload_0, nil
 	case opcodes.ILOAD_1:
-		return iload_1
+		return iload_1, nil
 	case opcodes.ILOAD_2:
-		return iload_2
+		return iload_2, nil
 	case opcodes.ILOAD_3:
-		return iload_3
+		return iload_3, nil
 	case opcodes.LLOAD_0:
-		return lload_0
+		return lload_0, nil
 	case opcodes.LLOAD_1:
-		return lload_1
+		return lload_1, nil
 	case opcodes.LLOAD_2:
-		return lload_2
+		return lload_2, nil
 	case opcodes.LLOAD_3:
-		return lload_3
+		return lload_3, nil
 	case opcodes.FLOAD_0:
-		return fload_0
+		return fload_0, nil
 	case opcodes.FLOAD_1:
-		return fload_1
+		return fload_1, nil
 	case opcodes.FLOAD_2:
-		return fload_2
+		return fload_2, nil
 	case opcodes.FLOAD_3:
-		return fload_3
+		return fload_3, nil
 	case opcodes.DLOAD_0:
-		return dload_0
+		return dload_0, nil
 	case opcodes.DLOAD_1:
-		return dload_1
+		return dload_1, nil
 	case opcodes.DLOAD_2:
-		return dload_2
+		return dload_2, nil
 	case opcodes.DLOAD_3:
-		return dload_3
+		return dload_3, nil
 	case opcodes.ALOAD_0:
-		return aload_0
+		return aload_0, nil
 	case opcodes.ALOAD_1:
-		return aload_1
+		return aload_1, nil
 	case opcodes.ALOAD_2:
-		return aload_2
+		return aload_2, nil
 	case opcodes.ALOAD_3:
-		return aload_3
+		return aload_3, nil
 
 	// store instructions
 	case opcodes.ISTORE:
-		return &stores.ISTORE{}
+		return &stores.ISTORE{}, nil
 	case opcodes.LSTORE:
-		return &stores.LSTORE{}
+		return &stores.LSTORE{}, nil
 	case opcodes.FSTORE:
-		return &stores.FSTORE{}
+		return &stores.FSTORE{}, nil
 	case opcodes.DSTORE:
-		return &stores.DSTORE{}
+		return &stores.DSTORE{}, nil
 	case opcodes.ASTORE:
-		return &stores.ASTORE{}
+		return &stores.ASTORE{}, nil
 	case opcodes.ISTORE_0:
-		return istore_0
+		return istore_0, nil
 	case opcodes.ISTORE_1:
-		return istore_1
+		return istore_1, nil
 	case opcodes.ISTORE_2:
-		return istore_2
+		return istore_2, nil
 	case opcodes.ISTORE_3:
-		return istore_3
+		return istore_3, nil
 	case opcodes.LSTORE_0:
-		return lstore_0
+		return lstore_0, nil
 	case opcodes.LSTORE_1:
-		return lstore_1
+		return lstore_1, nil
 	case opcodes.LSTORE_2:
-		return lstore_2
+		return lstore_2, nil
 	case opcodes.LSTORE_3:
-		return lstore_3
+		return lstore_3, nil
 	case opcodes.FSTORE_0:
-		return fstore_0
+		return fstore_0, nil
 	case opcodes.FSTORE_1:
-		return fstore_1
+		return fstore_1, nil
 	case opcodes.FSTORE_2:
-		return fstore_2
+		return fstore_2, nil
 	case opcodes.FSTORE_3:
-		return fstore_3
+		return fstore_3, nil
 	case opcodes.DSTORE_0:
-		return dstore_0
+		return dstore_0, nil
 	case opcodes.DSTORE_1:
-		return dstore_1
+		return dstore_1, nil
 	case opcodes.DSTORE_2:
-		return dstore_2
+		return dstore_2, nil
 	case opcodes.DSTORE_3:
-		return dstore_3
+		return dstore_3, nil
 	case opcodes.ASTORE_0:
-		return astore_0
+		return astore_0, nil
 	case opcodes.ASTORE_1:
-		return astore_1
+		return astore_1, nil
 	case opcodes.ASTORE_2:
-		return astore_2
+		return astore_2, nil
 	case opcodes.ASTORE_3:
-		return astore_3
+		return astore_3, nil
 
 	// // math instructions
 	case opcodes.IADD:
-		return iadd
+		return iadd, nil
 	case opcodes.LADD:
-		return ladd
+		return ladd, nil
 	case opcodes.FADD:
-		return fadd
+		return fadd, nil
 	case opcodes.DADD:
-		return dadd
+		return dadd, nil
 	case opcodes.ISUB:
-		return isub
+		return isub, nil
 	case opcodes.LSUB:
-		return lsub
+		return lsub, nil
 	case opcodes.FSUB:
-		return fsub
+		return fsub, nil
 	case opcodes.DSUB:
-		return dsub
+		return dsub, nil
 	case opcodes.IMUL:
-		return imul
+		return imul, nil
 	case opcodes.LMUL:
-		return lmul
+		return lmul, nil
 	case opcodes.FMUL:
-		return fmul
+		return fmul, nil
 	case opcodes.DMUL:
-		return dmul
+		return dmul, nil
 	case opcodes.IDIV:
-		return idiv
+		return idiv, nil
 	case opcodes.LDIV:
-		return ldiv
+		return ldiv, nil
 	case opcodes.FDIV:
-		return fdiv
+		return fdiv, nil
 	case opcodes.DDIV:
-		return ddiv
+		return ddiv, nil
 	case opcodes.IREM:
-		return irem
+		return irem, nil
 	case opcodes.LREM:
-		return lrem
+		return lrem, nil
 	case opcodes.FREM:
-		return frem
+		return frem, nil
 	case opcodes.DREM:
-		return drem
+		return drem, nil
 	case opcodes.INEG:
-		return ineg
+		return ineg, nil
 	case opcodes.LNEG:
-		return lneg
+		return lneg, nil
 	case opcodes.FNEG:
-		return fneg
+		return fneg, nil
 	case opcodes.DNEG:
-		return dneg
+		return dneg, nil
 	case opcodes.IINC:
-		return &math.IINC{}
+		return &math.IINC{}, nil
 
 	// compare instructions
 	case opcodes.IFEQ:
-		return &control.IFEQ{}
+		return &control.IFEQ{}, nil
 	case opcodes.IFNE:
-		return &control.IFNE{}
+		return &control.IFNE{}, nil
 	case opcodes.IFLT:
-		return &control.IFLT{}
+		return &control.IFLT{}, nil
 	case opcodes.IFGE:
-		return &control.IFGE{}
+		return &control.IFGE{}, nil
 	case opcodes.IFGT:
-		return &control.IFGT{}
+		return &control.IFGT{}, nil
 	case opcodes.IFLE:
-		return &control.IFLE{}
+		return &control.IFLE{}, nil
 	case opcodes.IF_ICMPEQ:
-		return &control.IF_ICMPEQ{}
+		return &control.IF_ICMPEQ{}, nil
 	case opcodes.IF_ICMPNE:
-		return &control.IF_ICMPNE{}
+		return &control.IF_ICMPNE{}, nil
 	case opcodes.IF_ICMPLT:
-		return &control.IF_ICMPLT{}
+		return &control.IF_ICMPLT{}, nil
 	case opcodes.IF_ICMPGE:
-		return &control.IF_ICMPGE{}
+		return &control.IF_ICMPGE{}, nil
 	case opcodes.IF_ICMPGT:
-		return &control.IF_ICMPGT{}
+		return &control.IF_ICMPGT{}, nil
 	case opcodes.IF_ICMPLE:
-		return &control.IF_ICMPLE{}
+		return &control.IF_ICMPLE{}, nil
 	case opcodes.IF_ACMPEQ:
-		return &control.IF_ACMPEQ{}
+		return &control.IF_ACMPEQ{}, nil
 	case opcodes.IF_ACMPNE:
-		return &control.IF_ACMPNE{}
+		return &control.IF_ACMPNE{}, nil
 	case opcodes.GOTO:
-		return &control.GOTO{}
+		return &control.GOTO{}, nil
 	case opcodes.IFNULL:
-		return &control.IFNULL{}
+		return &control.IFNULL{}, nil
 	case opcodes.IFNONNULL:
-		return &control.IFNONNULL{}
+		return &control.IFNONNULL{}, nil
 
 	// return instructions
 	case opcodes.IRETURN:
-		return ireturn
+		return ireturn, nil
 	case opcodes.LRETURN:
-		return lreturn
+		return lreturn, nil
 	case opcodes.FRETURN:
-		return freturn
+		return freturn, nil
 	case opcodes.DRETURN:
-		return dreturn
+		return dreturn, nil
 	case opcodes.ARETURN:
-		return areturn
+		return areturn, nil
 	case opcodes.RETURN:
-		return _return
+		return _return, nil
 
 	default:
-		panic(fmt.Sprintf("Unsupported opcodes: 0x%02X", opcode))
+		return nop, fmt.Errorf("unsupported opcodes: 0x%02X", opcode)
 	}
 }
