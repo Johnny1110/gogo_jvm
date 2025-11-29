@@ -1,7 +1,7 @@
 package runtime
 
 import (
-	"github.com/Johnny1110/gogo_jvm/runtime/heap"
+	"github.com/Johnny1110/gogo_jvm/rtda/heap"
 )
 
 const DEFAULT_STACK_SIZE = 1024

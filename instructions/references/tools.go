@@ -1,8 +1,8 @@
 package references
 
 import (
+	"github.com/Johnny1110/gogo_jvm/rtda/heap"
 	"github.com/Johnny1110/gogo_jvm/runtime"
-	"github.com/Johnny1110/gogo_jvm/runtime/heap"
 )
 
 // InvokeMethod call method common func

@@ -7,7 +7,7 @@ type ClassRef struct {
 }
 
 // newClassRef create class ref
-func newClassRef(cp *RuntimeConstantPool, className string) *ClassRef {
+func NewClassRef(cp *RuntimeConstantPool, className string) *ClassRef {
 	ref := &ClassRef{}
 	ref.cp = cp
 	ref.className = className

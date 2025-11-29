@@ -3,7 +3,6 @@ package heap
 import (
 	"fmt"
 	"github.com/Johnny1110/gogo_jvm/classfile"
-	"github.com/Johnny1110/gogo_jvm/runtime"
 	"io/ioutil"
 )
 
@@ -169,6 +168,6 @@ func calcStaticFieldSlotIds(class *Class) {
 
 // allocAndInitStaticVars allocate and init static vars
 func allocAndInitStaticVars(class *Class) {
-	class.staticVars = runtime.NewSlots(class.staticSlotCount)
+	class.staticVars = NewSlots(class.staticSlotCount)
 	// TODO: 初始化 static final 常量
 }

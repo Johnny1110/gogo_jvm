@@ -2,7 +2,6 @@ package heap
 
 import (
 	"github.com/Johnny1110/gogo_jvm/classfile"
-	"github.com/Johnny1110/gogo_jvm/runtime"
 )
 
 type Class struct {
@@ -17,12 +16,12 @@ type Class struct {
 	interfaces        []*Class
 	fields            []*Field
 	staticSlotCount   uint
-	staticVars        runtime.Slots
+	staticVars        Slots
 }
 
 func newClass(cf *classfile.ClassFile) *Class {
 	class := &Class{}
-
+	return class
 }
 
 func (c *Class) IsInterface() bool {
@@ -39,4 +38,8 @@ func (c *Class) Methods() []*Method {
 
 func (c *Class) ConstantPool() *RuntimeConstantPool {
 	return c.constantPool
+}
+
+func (c *Class) GetMainMethod() *Method {
+	return nil
 }

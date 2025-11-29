@@ -1,19 +1,17 @@
-package runtime
-
-import "github.com/Johnny1110/gogo_jvm/runtime/heap"
+package heap
 
 // Object runtime Object
 // includes:
 // - class: from which class
 // - fields: object's fields
 type Object struct {
-	class  *heap.Class
+	class  *Class
 	fields Slots
 }
 
 // NewObject create new object
 // TODO: completed in Phase-2.4
-func NewObject(class *heap.Class) *Object {
+func NewObject(class *Class) *Object {
 	return &Object{
 		class:  class,
 		fields: NewSlots(class.InstanceSlotCount()),
@@ -21,7 +19,7 @@ func NewObject(class *heap.Class) *Object {
 }
 
 // Class get class
-func (o *Object) Class() *heap.Class {
+func (o *Object) Class() *Class {
 	return o.class
 }
 

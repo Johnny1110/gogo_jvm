@@ -2,29 +2,21 @@ package main
 
 import (
 	"fmt"
-	"github.com/Johnny1110/gogo_jvm/classfile"
-	"github.com/Johnny1110/gogo_jvm/instructions"
-	"github.com/Johnny1110/gogo_jvm/instructions/base"
-	"github.com/Johnny1110/gogo_jvm/instructions/base/opcodes"
-	"github.com/Johnny1110/gogo_jvm/runtime"
+	"github.com/Johnny1110/gogo_jvm/interpreter"
+	"github.com/Johnny1110/gogo_jvm/rtda/heap"
 	"io/ioutil"
 	"os"
 )
 
 // ============================================================
-// Gogo JVM - Phase 2.2
+// Gogo JVM - Phase 2.3
 // ============================================================
-
-// Read .class file and execute
-// ┌─────────────────────────────────────────────────────────┐
-// │  1. read .class file                                    │
-// │  2. Parse to ClassFile java                           │
-// │  3. find main()                                         │
-// │  4. Get bytecode, maxLocals, maxStack                   │
-// │  5. Cread Thread and Frame                              │
-// │  6. Do Fetch-Decode-Execute loop                        │
-// │  7. print result                                        │
-// └─────────────────────────────────────────────────────────┘
+//
+// 執行流程：
+// 1. 讀取 .class 文件
+// 2. 使用 ClassLoader 加載類
+// 3. 找到 main 方法
+// 4. 執行解釋器
 
 func main() {
 	if len(os.Args) < 2 {
@@ -35,121 +27,64 @@ func main() {
 	classFilePath := os.Args[1]
 	debug := len(os.Args) > 2 && os.Args[2] == "-debug"
 
-	// 1. read classfile
-	classData, err := ioutil.ReadFile(classFilePath)
-	if err != nil {
-		fmt.Printf("Error reading class file: %v\n", err)
-		os.Exit(1)
-	}
+	// 獲取類路徑（.class 文件所在目錄）
+	classPath := getClassPath(classFilePath)
+	className := getClassName(classFilePath)
 
-	// 2. parse classfile
-	cf, err := classfile.Parse(classData)
-	if err != nil {
-		fmt.Printf("Error parsing class file: %v\n", err)
-		os.Exit(1)
-	}
+	fmt.Printf("ClassPath: %s\n", classPath)
+	fmt.Printf("ClassName: %s\n", className)
+	fmt.Println("============================================")
 
-	classfile.Debug(cf, true)
+	// 創建 ClassLoader
+	loader := heap.NewClassLoader(classPath)
 
-	// 3. find main()
-	mainMethod := cf.GetMainMethod()
+	// 加載類
+	class := loader.LoadClass(className)
+
+	// 找到 main 方法
+	mainMethod := class.GetMainMethod()
 	if mainMethod == nil {
 		fmt.Println("Error: No main method found!")
 		fmt.Println("Main method signature must be: public static void main(String[] args)")
 		os.Exit(1)
 	}
 
-	// 4. get code attribute
-	codeAttr := mainMethod.CodeAttribute()
-	if codeAttr == nil {
-		fmt.Println("Error: main method has no Code attribute!")
-		os.Exit(1)
-	}
+	fmt.Printf("\n=== Executing %s.main() ===\n\n", className)
 
-	bytecode := codeAttr.Code()
-	maxLocals := codeAttr.MaxLocals()
-	maxStack := codeAttr.MaxStack()
+	// 執行
+	interpreter.Interpret(mainMethod, debug)
 
-	if debug {
-		fmt.Println("Bytecode:")
-		printBytecode(bytecode)
-		fmt.Println("============================================")
-	}
-
-	// 5. execute Fetch-Decode-Execute
-	interpret(bytecode, maxLocals, maxStack, debug)
+	fmt.Println("\n=== Execution completed ===")
 }
 
-func interpret(bytecode []byte, maxLocals uint16, maxStack uint16, debug bool) {
-	thread := runtime.NewThread()
-
-	frame := thread.NewFrame(maxLocals, maxStack)
-	thread.PushFrame(frame)
-
-	reader := &base.BytecodeReader{}
-
-	loopCount := 0
-
-	for !thread.IsStackEmpty() {
-		loopCount++
-		fmt.Printf("====== <loop count: %v> ======= \n", loopCount)
-
-		currentFrame := thread.CurrentFrame()
-		pc := currentFrame.NextPC()
-		thread.SetPC(pc)
-
-		// Fetch
-		reader.Reset(bytecode, pc)
-		opcode := reader.ReadUint8()
-
-		// Decode
-		inst, err := instructions.NewInstruction(opcode)
-		if err != nil {
-			fmt.Printf("Error parsing instruction: %s\n", err)
-			os.Exit(1)
-		}
-		inst.FetchOperands(reader)
-		currentFrame.SetNextPC(reader.PC())
-
-		if debug {
-			opName := opcodes.OpcodeNames[opcode]
-			if opName == "" {
-				opName = fmt.Sprintf("0x%02X", opcode)
-			}
-			fmt.Printf("  PC:%3d | %-12s | Locals: %v\n",
-				pc, opName, getLocalsSnapshot(currentFrame, maxLocals))
-		}
-
-		// Execute
-		inst.Execute(frame)
-
-		// print final
-		fmt.Println("Final local variables:")
-		for i := uint16(0); i < maxLocals; i++ {
-			val := frame.LocalVars().GetInt(uint(i))
-			if val != 0 {
-				fmt.Printf("  locals[%d] = %d\n", i, val)
-			}
+// getClassPath 從文件路徑獲取類路徑
+func getClassPath(filePath string) string {
+	// 找到最後一個 / 的位置
+	for i := len(filePath) - 1; i >= 0; i-- {
+		if filePath[i] == '/' || filePath[i] == '\\' {
+			return filePath[:i]
 		}
 	}
+	return "."
 }
 
-func getLocalsSnapshot(frame *runtime.Frame, maxLocals uint16) any {
-	snapshot := make([]int32, maxLocals)
-	for i := uint16(0); i < maxLocals; i++ {
-		snapshot[i] = frame.LocalVars().GetInt(uint(i))
-	}
-	return snapshot
-}
-
-func printBytecode(bytecode []byte) {
-	for i, b := range bytecode {
-		if i > 0 && i%16 == 0 {
-			fmt.Println()
+// getClassName 從文件路徑獲取類名
+func getClassName(filePath string) string {
+	// 找到文件名
+	start := 0
+	for i := len(filePath) - 1; i >= 0; i-- {
+		if filePath[i] == '/' || filePath[i] == '\\' {
+			start = i + 1
+			break
 		}
-		fmt.Printf("%02X ", b)
 	}
-	fmt.Println()
+	name := filePath[start:]
+
+	// 移除 .class 後綴
+	if len(name) > 6 && name[len(name)-6:] == ".class" {
+		name = name[:len(name)-6]
+	}
+	return name
 }
 
 func printUsage() {
@@ -158,6 +93,11 @@ func printUsage() {
 	fmt.Println("Usage: gogo_jvm <classfile> [-debug]")
 	fmt.Println()
 	fmt.Println("Examples:")
-	fmt.Println("  gogo_jvm Test.class")
-	fmt.Println("  gogo_jvm Test.class -debug")
+	fmt.Println("  gogo_jvm SimpleAdd.class")
+	fmt.Println("  gogo_jvm SimpleAdd.class -debug")
+}
+
+// readClassFile 讀取類文件（備用，如果不用 ClassLoader）
+func readClassFile(path string) ([]byte, error) {
+	return ioutil.ReadFile(path)
 }

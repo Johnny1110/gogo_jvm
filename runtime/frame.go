@@ -1,7 +1,7 @@
 package runtime
 
 import (
-	"github.com/Johnny1110/gogo_jvm/runtime/heap"
+	"github.com/Johnny1110/gogo_jvm/rtda/heap"
 )
 
 // Frame java:
@@ -28,7 +28,7 @@ import (
 // └────────────────────────────────────────┘
 type Frame struct {
 	lower        *Frame // previous frame (caller frame)
-	localVars    Slots
+	localVars    heap.Slots
 	operandStack *OperandStack
 	thread       *Thread
 	nextPC       int
@@ -54,7 +54,7 @@ func NewFrameWithMethod(thread *Thread, method *heap.Method) *Frame {
 	}
 }
 
-func (f *Frame) LocalVars() Slots {
+func (f *Frame) LocalVars() heap.Slots {
 	return f.localVars
 }
 

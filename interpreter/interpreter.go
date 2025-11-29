@@ -5,8 +5,8 @@ import (
 	"github.com/Johnny1110/gogo_jvm/instructions"
 	"github.com/Johnny1110/gogo_jvm/instructions/base"
 	"github.com/Johnny1110/gogo_jvm/instructions/base/opcodes"
+	"github.com/Johnny1110/gogo_jvm/rtda/heap"
 	"github.com/Johnny1110/gogo_jvm/runtime"
-	"github.com/Johnny1110/gogo_jvm/runtime/heap"
 	"os"
 )
 

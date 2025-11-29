@@ -1,19 +1,20 @@
 package runtime
 
 import (
+	"github.com/Johnny1110/gogo_jvm/rtda/heap"
 	"math"
 )
 
 type OperandStack struct {
 	writePtr uint // equals to current stack element count
-	slots    []Slot
+	slots    []heap.Slot
 }
 
 // NewOperandStack crate stack with max size
 func NewOperandStack(maxStack uint16) *OperandStack {
 	if maxStack > 0 {
 		return &OperandStack{
-			slots:    make([]Slot, maxStack),
+			slots:    make([]heap.Slot, maxStack),
 			writePtr: 0, // init writer pointer
 		}
 	}
@@ -27,41 +28,41 @@ func (os *OperandStack) Size() (current, max uint) {
 // ============ Basic Operations ============
 
 func (os *OperandStack) PushInt(val int32) {
-	os.slots[os.writePtr].num = val
+	os.slots[os.writePtr].Num = val
 	os.writePtr++
 }
 
 func (os *OperandStack) PopInt() int32 {
 	os.writePtr--
-	return os.slots[os.writePtr].num
+	return os.slots[os.writePtr].Num
 }
 
 func (os *OperandStack) PushFloat(val float32) {
 	bits := math.Float32bits(val)
-	os.slots[os.writePtr].num = int32(bits)
+	os.slots[os.writePtr].Num = int32(bits)
 	os.writePtr++
 }
 
 func (os *OperandStack) PopFloat() float32 {
 	os.writePtr--
-	bits := uint32(os.slots[os.writePtr].num)
+	bits := uint32(os.slots[os.writePtr].Num)
 	return math.Float32frombits(bits)
 }
 
 func (os *OperandStack) PushLong(val int64) {
 	// low 32 bit
-	os.slots[os.writePtr].num = int32(val)
+	os.slots[os.writePtr].Num = int32(val)
 	os.writePtr++
 	// high 32 bit
-	os.slots[os.writePtr].num = int32(val >> 32)
+	os.slots[os.writePtr].Num = int32(val >> 32)
 	os.writePtr++
 }
 
 func (os *OperandStack) PopLong() int64 {
 	os.writePtr--
-	highBits := uint32(os.slots[os.writePtr].num)
+	highBits := uint32(os.slots[os.writePtr].Num)
 	os.writePtr--
-	lowBits := uint32(os.slots[os.writePtr].num)
+	lowBits := uint32(os.slots[os.writePtr].Num)
 	return int64(highBits)<<32 | int64(lowBits)
 }
 
@@ -75,34 +76,34 @@ func (os *OperandStack) PopDouble() float64 {
 	return math.Float64frombits(bits)
 }
 
-func (os *OperandStack) PushRef(ref *Object) {
-	os.slots[os.writePtr].ref = ref
+func (os *OperandStack) PushRef(Ref *heap.Object) {
+	os.slots[os.writePtr].Ref = Ref
 	os.writePtr++
 }
 
-func (os *OperandStack) PopRef() *Object {
+func (os *OperandStack) PopRef() *heap.Object {
 	os.writePtr--
-	ref := os.slots[os.writePtr].ref
-	os.slots[os.writePtr].ref = nil // GC
-	return ref
+	Ref := os.slots[os.writePtr].Ref
+	os.slots[os.writePtr].Ref = nil // GC
+	return Ref
 }
 
-func (os *OperandStack) PushSlot(slot Slot) {
+func (os *OperandStack) PushSlot(slot heap.Slot) {
 	os.slots[os.writePtr] = slot
 	os.writePtr++
 }
 
-func (os *OperandStack) PopSlot() Slot {
+func (os *OperandStack) PopSlot() heap.Slot {
 	os.writePtr--
 	return os.slots[os.writePtr]
 }
 
 // ================= support methods ===================
 
-// PeekRefFromTop control ref from top of stack (no pop, just peek)
+// PeekRefFromTop control Ref from top of stack (no pop, just peek)
 // top -> n = 0
 func (os *OperandStack) PeekRefFromTop(n uint) interface{} {
-	return os.slots[os.writePtr-1-n].ref
+	return os.slots[os.writePtr-1-n].Ref
 }
 
 func (os *OperandStack) PushBoolean(val bool) {
@@ -119,8 +120,8 @@ func (os *OperandStack) PopBoolean() bool {
 
 func (os *OperandStack) Clear() {
 	os.writePtr = 0 // reset write pointer
-	// clean slot.ref for GC
+	// clean slot.Ref for GC
 	for i := range os.slots {
-		os.slots[i].ref = nil
+		os.slots[i].Ref = nil
 	}
 }
