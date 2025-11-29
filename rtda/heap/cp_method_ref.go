@@ -1,29 +1,23 @@
 package heap
 
-import (
-	"github.com/Johnny1110/gogo_jvm/classfile"
-)
+import "github.com/Johnny1110/gogo_jvm/classfile"
 
-// MethodRef Method Reference
-// ex: invokestatic Calculator.add -> nedd parse add()
-// 1. find Class by name
-// 2. find method in class
-// 3. catch result
+// MethodRef 方法引用
+// 例如：invokestatic Calculator.add → 需要解析 add 方法
 type MethodRef struct {
 	MemberRef
-	method *Method // actual in memory address
+	method *Method // 解析後的方法（緩存）
 }
 
-// newMethodRef make method ref by ClassFile
-func NewMethodRef(cp *RuntimeConstantPool, refInfo *classfile.ConstantMethodRefInfo) *MethodRef {
+// newMethodRef 從 ClassFile 創建方法引用
+func newMethodRef(cp *RuntimeConstantPool, refInfo *classfile.ConstantMethodRefInfo) *MethodRef {
 	ref := &MethodRef{}
 	ref.cp = cp
 	ref.copyMemberRefInfo(&refInfo.ConstantMemberRefInfo)
 	return ref
 }
 
-// ResolvedMethod parse method ref
-// core for: invokestatic/invokevirtual
+// ResolvedMethod 解析方法引用（這是 invokestatic 的核心！）
 func (r *MethodRef) ResolvedMethod() *Method {
 	if r.method == nil {
 		r.resolveMethodRef()
@@ -32,48 +26,58 @@ func (r *MethodRef) ResolvedMethod() *Method {
 }
 
 func (r *MethodRef) resolveMethodRef() {
-	// 1. parse class
+	// 1. 解析類
 	c := r.ResolvedClass()
 
-	// 2. check is interface（interface should using InterfaceMethodRef）
+	// 2. 檢查是否是接口
 	if c.IsInterface() {
 		panic("java.lang.IncompatibleClassChangeError")
 	}
 
-	// 3. find method
+	// 3. 查找方法
 	method := lookupMethod(c, r.name, r.descriptor)
 	if method == nil {
 		panic("java.lang.NoSuchMethodError: " + r.className + "." + r.name + r.descriptor)
 	}
 
-	// TODO: 訪問權限檢查
 	r.method = method
 }
 
-func (r *MethodRef) ResolvedClass() *Class {
-	return nil
-}
-
-// lookupMethod find method（include extend methods）
+// lookupMethod 查找方法（包含繼承）
 func lookupMethod(c *Class, name, descriptor string) *Method {
-	// find in current class
 	method := lookupMethodInClass(c, name, descriptor)
 	if method != nil {
 		return method
 	}
-
-	// TODO: 實現繼承查找 (父類別)
-	// c.super
-
+	// TODO: 在父類中遞歸查找
 	return nil
 }
 
-// lookupMethodInClass find method in target method
 func lookupMethodInClass(c *Class, name, descriptor string) *Method {
-	for _, method := range c.Methods() {
-		if method.Name() == name && method.Descriptor() == descriptor {
+	for _, method := range c.methods {
+		if method.name == name && method.descriptor == descriptor {
 			return method
 		}
 	}
 	return nil
 }
+
+//```
+//
+//**這是 `invokestatic` 指令的核心！** 解析流程：
+//```
+//invokestatic #1  (調用 Calculator.add)
+//│
+//▼
+//MethodRef.ResolvedMethod()
+//│
+//├─ 1. ResolvedClass() → 加載 Calculator 類
+//│
+//├─ 2. 檢查不是接口
+//│
+//└─ 3. lookupMethod("add", "(II)I")
+//│
+//└─ 在 Calculator.methods 中查找
+//│
+//▼
+//返回 Method 對象

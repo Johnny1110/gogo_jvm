@@ -12,9 +12,7 @@ func InvokeMethod(invokerFrame *runtime.Frame, method *heap.Method) {
 	thread := invokerFrame.Thread()
 
 	// 2. create a new frame
-	maxLocal := method.MaxLocals()
-	maxStack := method.MaxStack()
-	newFrame := thread.NewFrame(maxLocal, maxStack)
+	newFrame := thread.NewFrameWithMethod(method)
 	thread.PushFrame(newFrame)
 
 	// 3. pass vars

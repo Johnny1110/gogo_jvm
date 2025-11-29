@@ -11,7 +11,7 @@ type InterfaceMethodRef struct {
 }
 
 // newInterfaceMethodRef create ref from ClassFile
-func NewInterfaceMethodRef(cp *RuntimeConstantPool, refInfo *classfile.ConstantInterfaceMethodRefInfo) *InterfaceMethodRef {
+func newInterfaceMethodRef(cp *RuntimeConstantPool, refInfo *classfile.ConstantInterfaceMethodRefInfo) *InterfaceMethodRef {
 	ref := &InterfaceMethodRef{}
 	ref.cp = cp
 	ref.copyMemberRefInfo(&refInfo.ConstantMemberRefInfo)

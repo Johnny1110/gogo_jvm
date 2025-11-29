@@ -67,5 +67,5 @@ func (t *Thread) NewFrame(maxLocals, maxStack uint16) *Frame {
 }
 
 func (t *Thread) NewFrameWithMethod(method *heap.Method) *Frame {
-	return t.NewFrameWithMethod(method)
+	return NewFrameWithMethod(t, method)
 }

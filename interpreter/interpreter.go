@@ -33,6 +33,8 @@ func Interpret(method *heap.Method, debug bool) {
 func loop(thread *runtime.Thread, debug bool) {
 	reader := &base.BytecodeReader{}
 
+	mainMethodFrame := thread.TopFrame()
+
 	// check is end
 	// when func returned, stack will be empty (for main method)
 	// or current frame is not origin frame (for not main method)
@@ -61,24 +63,37 @@ func loop(thread *runtime.Thread, debug bool) {
 		frame.SetNextPC(reader.PC())      // update PC (to next instruction)
 
 		if debug {
-			printDebug(pc, opcode, instruction, frame)
+			printDebug(pc, instruction, frame)
 		}
 
 		// Execute: perform instruction
 		instruction.Execute(frame)
 	}
+
+	fmt.Println("================================================================")
+	fmt.Println("@@ Thread's JVMFrameStack is empty before exist LocalVarsTable:")
+	for i, slot := range mainMethodFrame.LocalVars() {
+		fmt.Printf("Slot - %d:\n", i)
+		fmt.Printf("\t num: %v \n", slot.Num)
+		fmt.Printf("\t reference: %v \n", slot.Ref)
+	}
 }
 
 // printDebug print debug info
-func printDebug(pc int, opcode uint8, inst base.Instruction, frame *runtime.Frame) {
-	opName := opcodes.OpcodeNames[opcode]
+func printDebug(pc int, inst base.Instruction, frame *runtime.Frame) {
+	opName := opcodes.OpcodeNames[inst.Opcode()]
 	if opName == "" {
-		opName = fmt.Sprintf("unknown(0x%02X)", opcode)
+		opName = fmt.Sprintf("unknown(0x%02X)", inst.Opcode())
 	}
 
 	fmt.Printf("PC:%3d | %-12s | Stack: ", pc, opName)
 	printStack(frame.OperandStack())
 	fmt.Println()
+	printLocalVars(frame.LocalVars())
+}
+
+func printLocalVars(vars heap.Slots) {
+	fmt.Printf("* LocarVars=%v \n", vars)
 }
 
 // printStack print stack details

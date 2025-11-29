@@ -1,22 +1,26 @@
 package heap
 
-import (
-	"github.com/Johnny1110/gogo_jvm/classfile"
-)
+import "github.com/Johnny1110/gogo_jvm/classfile"
 
+// MemberRef 成員引用基類（字段和方法的共同基礎）
 type MemberRef struct {
-	cp               *RuntimeConstantPool
-	classIndex       uint
-	nameAndTypeIndex uint
-	name             string
-	descriptor       string
-	className        string
+	SymRef
+	name       string // 成員名
+	descriptor string // 描述符
 }
 
-func (r *MemberRef) copyMemberRefInfo(c *classfile.ConstantMemberRefInfo) {
-	r.classIndex = uint(c.ClassIndex())
-	r.nameAndTypeIndex = uint(c.NameAndTypeIndex())
-	r.name = r.cp.GetConstant(r.classIndex).(string)
-	r.descriptor = r.cp.GetConstant(r.nameAndTypeIndex).(string)
-	// TODO
+// copyMemberRefInfo 從 ClassFile 複製成員引用信息
+func (r *MemberRef) copyMemberRefInfo(refInfo *classfile.ConstantMemberRefInfo) {
+	r.className = refInfo.ClassName()
+	r.name, r.descriptor = refInfo.NameAndDescriptor()
+}
+
+// Name 獲取成員名
+func (r *MemberRef) Name() string {
+	return r.name
+}
+
+// Descriptor 獲取描述符
+func (r *MemberRef) Descriptor() string {
+	return r.descriptor
 }

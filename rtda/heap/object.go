@@ -14,7 +14,7 @@ type Object struct {
 func NewObject(class *Class) *Object {
 	return &Object{
 		class:  class,
-		fields: NewSlots(class.InstanceSlotCount()),
+		fields: NewSlots(class.instanceSlotCount),
 	}
 }
 

@@ -75,6 +75,8 @@ func (loader *ClassLoader) defineClass(data []byte) *Class {
 		panic("java.lang.ClassFormatError: " + err.Error())
 	}
 
+	classfile.Debug(cf, true)
+
 	// 2. turn classfile to Class
 	class := newClass(cf)
 	class.loader = loader
@@ -93,10 +95,11 @@ func (loader *ClassLoader) defineClass(data []byte) *Class {
 
 // resolveSuperClass load super class
 func (loader *ClassLoader) resolveSuperClass(class *Class) {
-	if class.name != "java/lang/Object" && class.superClassName != "" {
-		// recursive
-		class.superClass = class.loader.LoadClass(class.superClassName)
-	}
+	// TODO: MVP phase -> skip this
+	//if class.name != "java/lang/Object" && class.superClassName != "" {
+	//	// recursive
+	//	class.superClass = class.loader.LoadClass(class.superClassName)
+	//}
 }
 
 // resolveInterfaces load interface

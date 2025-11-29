@@ -211,6 +211,11 @@ type ConstantMemberRefInfo struct {
 	nameAndTypeIndex uint16
 }
 
+func (c *ConstantMemberRefInfo) ClassName() string {
+	classInfo := c.cp[c.classIndex].(*ConstantClassInfo)
+	return getUtf8(c.cp, classInfo.nameIndex)
+}
+
 func (c *ConstantMemberRefInfo) readInfo(reader *ClassReader) {
 	c.classIndex = reader.readU2()
 	c.nameAndTypeIndex = reader.readU2()
@@ -222,6 +227,13 @@ func (c *ConstantMemberRefInfo) ClassIndex() uint16 {
 
 func (c *ConstantMemberRefInfo) NameAndTypeIndex() uint16 {
 	return c.nameAndTypeIndex
+}
+
+func (c *ConstantMemberRefInfo) NameAndDescriptor() (string, string) {
+	con := c.cp[c.nameAndTypeIndex].(*ConstantNameAndTypeInfo)
+	name := getUtf8(c.cp, con.nameIndex)
+	desc := getUtf8(c.cp, con.descriptorIndex)
+	return name, desc
 }
 
 // ConstantFieldRefInfo field Ref constants

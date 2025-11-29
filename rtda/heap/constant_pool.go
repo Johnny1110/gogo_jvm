@@ -62,16 +62,16 @@ func newConstantPool(class *Class, cfCp classfile.ConstantPool) *RuntimeConstant
 			consts[i] = stringInfo.String()
 		case *classfile.ConstantClassInfo:
 			classInfo := cpInfo.(*classfile.ConstantClassInfo)
-			consts[i] = NewClassRef(rtCp, classInfo.Name())
+			consts[i] = newClassRef(rtCp, classInfo.Name())
 		case *classfile.ConstantFieldRefInfo:
 			fieldRefInfo := cpInfo.(*classfile.ConstantFieldRefInfo)
-			consts[i] = NewFieldRef(rtCp, fieldRefInfo)
+			consts[i] = newFieldRef(rtCp, fieldRefInfo)
 		case *classfile.ConstantMethodRefInfo:
 			methodRefInfo := cpInfo.(*classfile.ConstantMethodRefInfo)
-			consts[i] = NewMethodRef(rtCp, methodRefInfo)
+			consts[i] = newMethodRef(rtCp, methodRefInfo)
 		case *classfile.ConstantInterfaceMethodRefInfo:
 			methodRefInfo := cpInfo.(*classfile.ConstantInterfaceMethodRefInfo)
-			consts[i] = NewInterfaceMethodRef(rtCp, methodRefInfo)
+			consts[i] = newInterfaceMethodRef(rtCp, methodRefInfo)
 			// Utf8 and NameAndType are not required to put in runtime constant pool, they are used by others.
 		}
 	}

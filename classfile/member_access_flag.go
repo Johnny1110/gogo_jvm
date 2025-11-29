@@ -14,4 +14,10 @@ const (
 	ACC_ABSTRACT     = 0x0400 // abstract
 	ACC_SYNTHETIC    = 0x1000
 	ACC_ENUM         = 0x4000
+	ACC_SUPER        = 0x0020
+	ACC_INTERFACE    = 0x0200
+	ACC_ANNOTATION   = 0x2000
+	ACC_STRICT       = 0x0800
+	ACC_VARARGS      = 0x0080
+	ACC_BRIDGE       = 0x0040
 )
