@@ -105,8 +105,8 @@ func interpret(bytecode []byte, maxLocals uint16, maxStack uint16, debug bool) {
 		// Decode
 		inst, err := instructions.NewInstruction(opcode)
 		if err != nil {
-			fmt.Errorf("error while parsing instruction: %s", err)
-			panic("instruction parse error")
+			fmt.Printf("Error parsing instruction: %s\n", err)
+			os.Exit(1)
 		}
 		inst.FetchOperands(reader)
 		currentFrame.SetNextPC(reader.PC())

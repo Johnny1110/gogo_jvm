@@ -6,6 +6,7 @@ import (
 	"github.com/Johnny1110/gogo_jvm/instructions/base"
 	"github.com/Johnny1110/gogo_jvm/instructions/base/opcodes"
 	"github.com/Johnny1110/gogo_jvm/runtime"
+	"os"
 )
 
 // Interpret Bytecode interpret
@@ -76,8 +77,8 @@ func loop(thread *runtime.Thread, code []byte, debug bool) {
 		// Decode:
 		instruction, err := instructions.NewInstruction(opcode)
 		if err != nil {
-			fmt.Errorf("error while parsing instruction: %s", err)
-			panic("instruction parse error")
+			fmt.Printf("Error parsing instruction: %s\n", err)
+			os.Exit(1)
 		}
 		instruction.FetchOperands(reader) // fetch index, offset if required
 		frame.SetNextPC(reader.PC())      // update PC (to next instruction)
