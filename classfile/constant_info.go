@@ -95,6 +95,10 @@ func (c *ConstantIntegerInfo) Tag() ConstantTag {
 	return CONSTANT_Integer
 }
 
+func (c *ConstantIntegerInfo) Value() int32 {
+	return c.val
+}
+
 // ConstantFloatInfo Float (32bit) constants
 type ConstantFloatInfo struct {
 	val float32
@@ -111,6 +115,10 @@ func (c *ConstantFloatInfo) String() string {
 
 func (c *ConstantFloatInfo) Tag() ConstantTag {
 	return CONSTANT_Float
+}
+
+func (c *ConstantFloatInfo) Value() float32 {
+	return c.val
 }
 
 // ConstantLongInfo Long (64bit) constants
@@ -130,6 +138,10 @@ func (c *ConstantLongInfo) Tag() ConstantTag {
 	return CONSTANT_Long
 }
 
+func (c *ConstantLongInfo) Value() int64 {
+	return c.val
+}
+
 // ConstantDoubleInfo (64bit) constants
 type ConstantDoubleInfo struct {
 	val float64
@@ -146,6 +158,10 @@ func (c *ConstantDoubleInfo) String() string {
 
 func (c *ConstantDoubleInfo) Tag() ConstantTag {
 	return CONSTANT_Double
+}
+
+func (c *ConstantDoubleInfo) Value() float64 {
+	return c.val
 }
 
 // ConstantClassInfo Class Constant
@@ -198,6 +214,14 @@ type ConstantMemberRefInfo struct {
 func (c *ConstantMemberRefInfo) readInfo(reader *ClassReader) {
 	c.classIndex = reader.readU2()
 	c.nameAndTypeIndex = reader.readU2()
+}
+
+func (c *ConstantMemberRefInfo) ClassIndex() uint16 {
+	return c.classIndex
+}
+
+func (c *ConstantMemberRefInfo) NameAndTypeIndex() uint16 {
+	return c.nameAndTypeIndex
 }
 
 // ConstantFieldRefInfo field Ref constants

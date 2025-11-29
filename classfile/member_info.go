@@ -1,7 +1,7 @@
 package classfile
 
 // MemberInfo represent field and method.
-// in a class, field and method structure are the same.
+// in a class, field and method java are the same.
 // - access_flags     : access flag
 // - name_index       : index of name in constants pool
 // - descriptor_index : descriptor in constants pool
@@ -84,6 +84,14 @@ func (m *MemberInfo) IsNative() bool {
 
 func (m *MemberInfo) IsAbstract() bool {
 	return m.accessFlags&ACC_ABSTRACT != 0
+}
+
+func (m *MemberInfo) IsSynthetic() bool {
+	return m.accessFlags&ACC_SYNTHETIC != 0
+}
+
+func (m *MemberInfo) IsEnum() bool {
+	return m.accessFlags&ACC_ENUM != 0
 }
 
 // Get Code attribute (method's bytecode)

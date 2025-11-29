@@ -8,6 +8,7 @@ import (
 	"github.com/Johnny1110/gogo_jvm/instructions/control"
 	"github.com/Johnny1110/gogo_jvm/instructions/loads"
 	"github.com/Johnny1110/gogo_jvm/instructions/math"
+	"github.com/Johnny1110/gogo_jvm/instructions/references"
 	"github.com/Johnny1110/gogo_jvm/instructions/stores"
 )
 
@@ -351,6 +352,10 @@ func NewInstruction(opcode byte) (base.Instruction, error) {
 		return areturn, nil
 	case opcodes.RETURN:
 		return _return, nil
+
+	// invoke
+	case opcodes.INVOKESTATIC:
+		return &references.INVOKE_STATIC{}, nil
 
 	default:
 		return nop, fmt.Errorf("unsupported opcodes: 0x%02X", opcode)

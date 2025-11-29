@@ -18,7 +18,7 @@ import (
 // Read .class file and execute
 // ┌─────────────────────────────────────────────────────────┐
 // │  1. read .class file                                    │
-// │  2. Parse to ClassFile struct                           │
+// │  2. Parse to ClassFile java                           │
 // │  3. find main()                                         │
 // │  4. Get bytecode, maxLocals, maxStack                   │
 // │  5. Cread Thread and Frame                              │

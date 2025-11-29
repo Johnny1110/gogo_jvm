@@ -1,7 +1,7 @@
 package classfile
 
 // AttributeInfo attribute interface
-// Attribute is a extendable structure in a class, using for store extra info
+// Attribute is a extendable java in a class, using for store extra info
 // like: method's bytecode, SourceFileName...
 type AttributeInfo interface {
 	// every attribute should know how to read them self.
@@ -134,6 +134,10 @@ type ConstantValueAttribute struct {
 
 func (c *ConstantValueAttribute) readInfo(reader *ClassReader) {
 	c.constantValueIndex = reader.readU2()
+}
+
+func (c *ConstantValueAttribute) ConstantValueIndex() uint16 {
+	return c.constantValueIndex
 }
 
 // ExceptionsAttribute represent exceptions that will be able to throw

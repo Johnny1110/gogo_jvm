@@ -6,6 +6,7 @@ import (
 	"github.com/Johnny1110/gogo_jvm/instructions/base"
 	"github.com/Johnny1110/gogo_jvm/instructions/base/opcodes"
 	"github.com/Johnny1110/gogo_jvm/runtime"
+	"github.com/Johnny1110/gogo_jvm/runtime/java"
 	"os"
 )
 
@@ -15,48 +16,21 @@ import (
 // maxStack: max size of opStack
 // args: method args (if exists)
 // debug: display debug message info
-func Interpret(code []byte, maxLocals, maxStack uint16, debug bool) {
+func Interpret(method *java.Method, debug bool) {
 	// 1. create thread
 	thread := runtime.NewThread()
 
 	// 2. create frame
-	frame := thread.NewFrame(maxLocals, maxStack)
+	frame := thread.NewFrameWithMethod(method)
 	thread.PushFrame(frame)
 
 	// 3. start execute
-	loop(thread, code, debug)
-}
-
-// InterpretWithArgs run with args（for testing）
-func InterpretWithArgs(code []byte, maxLocals, maxStack uint16, args []int32, debug bool) int32 {
-	// 1. create thread
-	thread := runtime.NewThread()
-
-	// 2. create frame
-	frame := thread.NewFrame(maxLocals, maxStack)
-	thread.PushFrame(frame)
-
-	// 3. put args into LocalVars
-	for i, arg := range args {
-		frame.LocalVars().SetInt(uint(i), arg)
-	}
-
-	// 4. start execute
-	loop(thread, code, debug)
-
-	// 5. return result（if have）
-	size, _ := frame.OperandStack().Size()
-	if size > 0 {
-		// actually main method should be void, this is only for testing
-		return frame.OperandStack().PopInt()
-	}
-
-	return 0
+	loop(thread, debug)
 }
 
 // loop interpreter main logic
 // Fetch -> Decode -> Execute -> Fetch ...
-func loop(thread *runtime.Thread, code []byte, debug bool) {
+func loop(thread *runtime.Thread, debug bool) {
 	reader := &base.BytecodeReader{}
 
 	// check is end
@@ -66,12 +40,15 @@ func loop(thread *runtime.Thread, code []byte, debug bool) {
 		// get current frame
 		frame := thread.CurrentFrame()
 
+		// get bytecode from frame
+		bytecode := frame.Method().Code()
+
 		// calculate PC
 		pc := frame.NextPC()
 		thread.SetPC(pc)
 
 		// Fetch: 1 byte opcodes
-		reader.Reset(code, pc)
+		reader.Reset(bytecode, pc)
 		opcode := reader.ReadUint8()
 
 		// Decode:

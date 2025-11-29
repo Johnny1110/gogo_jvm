@@ -1,5 +1,7 @@
 package runtime
 
+import "github.com/Johnny1110/gogo_jvm/runtime/java"
+
 const DEFAULT_STACK_SIZE = 1024
 
 type Thread struct {
@@ -60,4 +62,8 @@ func (t *Thread) ClearStack() {
 // NewFrame create a new Frame and put this thread as constructor's params
 func (t *Thread) NewFrame(maxLocals, maxStack uint16) *Frame {
 	return NewFrame(t, maxLocals, maxStack)
+}
+
+func (t *Thread) NewFrameWithMethod(method *java.Method) *Frame {
+	return t.NewFrameWithMethod(method)
 }

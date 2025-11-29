@@ -12,5 +12,6 @@ const (
 	ACC_NATIVE       = 0x0100 // native (方法)
 	INTERFACE        = 0x0200
 	ACC_ABSTRACT     = 0x0400 // abstract
-
+	ACC_SYNTHETIC    = 0x1000
+	ACC_ENUM         = 0x4000
 )
