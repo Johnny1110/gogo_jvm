@@ -1,8 +1,7 @@
-package marea
+package heap
 
 import (
 	"github.com/Johnny1110/gogo_jvm/classfile"
-	"github.com/Johnny1110/gogo_jvm/runtime/java"
 )
 
 // ConstantPool runtime constant pool
@@ -30,12 +29,12 @@ type Constant interface {
 }
 
 type RuntimeConstantPool struct {
-	class  *java.Class
+	class  *Class
 	consts []Constant
 }
 
 // newConstantPool create RuntimeConstantPool from classfile.ConstantPool
-func newConstantPool(class *java.Class, cfCp classfile.ConstantPool) *RuntimeConstantPool {
+func newConstantPool(class *Class, cfCp classfile.ConstantPool) *RuntimeConstantPool {
 	cpCount := len(cfCp)
 	consts := make([]Constant, cpCount)
 	rtCp := &RuntimeConstantPool{class: class, consts: consts}
@@ -63,16 +62,16 @@ func newConstantPool(class *java.Class, cfCp classfile.ConstantPool) *RuntimeCon
 			consts[i] = stringInfo.String()
 		case *classfile.ConstantClassInfo:
 			classInfo := cpInfo.(*classfile.ConstantClassInfo)
-			consts[i] = newClassRef(rtCp, classInfo.Name())
+			consts[i] = NewClassRef(rtCp, classInfo.Name())
 		case *classfile.ConstantFieldRefInfo:
 			fieldRefInfo := cpInfo.(*classfile.ConstantFieldRefInfo)
-			consts[i] = newFieldRef(rtCp, fieldRefInfo)
+			consts[i] = NewFieldRef(rtCp, fieldRefInfo)
 		case *classfile.ConstantMethodRefInfo:
 			methodRefInfo := cpInfo.(*classfile.ConstantMethodRefInfo)
-			consts[i] = newMethodRef(rtCp, methodRefInfo)
+			consts[i] = NewMethodRef(rtCp, methodRefInfo)
 		case *classfile.ConstantInterfaceMethodRefInfo:
 			methodRefInfo := cpInfo.(*classfile.ConstantInterfaceMethodRefInfo)
-			consts[i] = newInterfaceMethodRef(rtCp, methodRefInfo)
+			consts[i] = NewInterfaceMethodRef(rtCp, methodRefInfo)
 			// Utf8 and NameAndType are not required to put in runtime constant pool, they are used by others.
 		}
 	}
@@ -89,6 +88,6 @@ func (cp *RuntimeConstantPool) GetConstant(index uint) Constant {
 }
 
 // Class get class
-func (cp *RuntimeConstantPool) Class() *java.Class {
+func (cp *RuntimeConstantPool) Class() *Class {
 	return cp.class
 }

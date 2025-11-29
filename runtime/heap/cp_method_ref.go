@@ -1,9 +1,7 @@
-package cpref
+package heap
 
 import (
 	"github.com/Johnny1110/gogo_jvm/classfile"
-	"github.com/Johnny1110/gogo_jvm/runtime/java"
-	"github.com/Johnny1110/gogo_jvm/runtime/marea"
 )
 
 // MethodRef Method Reference
@@ -13,11 +11,11 @@ import (
 // 3. catch result
 type MethodRef struct {
 	MemberRef
-	method *java.Method // actual in memory address
+	method *Method // actual in memory address
 }
 
 // newMethodRef make method ref by ClassFile
-func newMethodRef(cp *marea.RuntimeConstantPool, refInfo *classfile.ConstantMethodRefInfo) *MethodRef {
+func NewMethodRef(cp *RuntimeConstantPool, refInfo *classfile.ConstantMethodRefInfo) *MethodRef {
 	ref := &MethodRef{}
 	ref.cp = cp
 	ref.copyMemberRefInfo(&refInfo.ConstantMemberRefInfo)
@@ -26,7 +24,7 @@ func newMethodRef(cp *marea.RuntimeConstantPool, refInfo *classfile.ConstantMeth
 
 // ResolvedMethod parse method ref
 // core for: invokestatic/invokevirtual
-func (r *MethodRef) ResolvedMethod() *java.Method {
+func (r *MethodRef) ResolvedMethod() *Method {
 	if r.method == nil {
 		r.resolveMethodRef()
 	}
@@ -42,7 +40,7 @@ func (r *MethodRef) resolveMethodRef() {
 		panic("java.lang.IncompatibleClassChangeError")
 	}
 
-	// 3. 查找方法
+	// 3. find method
 	method := lookupMethod(c, r.name, r.descriptor)
 	if method == nil {
 		panic("java.lang.NoSuchMethodError: " + r.className + "." + r.name + r.descriptor)
@@ -52,6 +50,30 @@ func (r *MethodRef) resolveMethodRef() {
 	r.method = method
 }
 
-func (r *MethodRef) ResolvedClass() interface{} {
+func (r *MethodRef) ResolvedClass() *Class {
+	return nil
+}
 
+// lookupMethod find method（include extend methods）
+func lookupMethod(c *Class, name, descriptor string) *Method {
+	// find in current class
+	method := lookupMethodInClass(c, name, descriptor)
+	if method != nil {
+		return method
+	}
+
+	// TODO: 實現繼承查找 (父類別)
+	// c.super
+
+	return nil
+}
+
+// lookupMethodInClass find method in target method
+func lookupMethodInClass(c *Class, name, descriptor string) *Method {
+	for _, method := range c.Methods() {
+		if method.Name() == name && method.Descriptor() == descriptor {
+			return method
+		}
+	}
+	return nil
 }

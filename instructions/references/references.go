@@ -3,7 +3,7 @@ package references
 import (
 	"github.com/Johnny1110/gogo_jvm/instructions/base"
 	"github.com/Johnny1110/gogo_jvm/runtime"
-	"github.com/Johnny1110/gogo_jvm/runtime/marea/cpref"
+	"github.com/Johnny1110/gogo_jvm/runtime/heap"
 )
 
 // INVOKE_STATIC
@@ -17,7 +17,7 @@ func (i *INVOKE_STATIC) Execute(frame *runtime.Frame) {
 	cp := frame.Method().Class().ConstantPool()
 
 	// 2. get method reference
-	methodRef := cp.GetConstant(i.Index).(*cpref.MethodRef)
+	methodRef := cp.GetConstant(i.Index).(*heap.MethodRef)
 
 	// 3. parse method ref, get target method
 	resolvedMethod := methodRef.ResolvedMethod()

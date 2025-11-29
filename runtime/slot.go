@@ -1,6 +1,8 @@
-package java
+package runtime
 
-import "math"
+import (
+	"math"
+)
 
 // Slot is JVM runtime basic data unit
 // JVM standard: local vars table and op stack all made by Slot.

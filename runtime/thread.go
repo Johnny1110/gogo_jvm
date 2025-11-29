@@ -1,6 +1,8 @@
 package runtime
 
-import "github.com/Johnny1110/gogo_jvm/runtime/java"
+import (
+	"github.com/Johnny1110/gogo_jvm/runtime/heap"
+)
 
 const DEFAULT_STACK_SIZE = 1024
 
@@ -64,6 +66,6 @@ func (t *Thread) NewFrame(maxLocals, maxStack uint16) *Frame {
 	return NewFrame(t, maxLocals, maxStack)
 }
 
-func (t *Thread) NewFrameWithMethod(method *java.Method) *Frame {
+func (t *Thread) NewFrameWithMethod(method *heap.Method) *Frame {
 	return t.NewFrameWithMethod(method)
 }

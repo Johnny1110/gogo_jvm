@@ -3,9 +3,8 @@ package classfile
 // AttributeInfo attribute interface
 // Attribute is a extendable java in a class, using for store extra info
 // like: method's bytecode, SourceFileName...
-type AttributeInfo interface {
-	// every attribute should know how to read them self.
-}
+// AttributeInfo attribute interface
+type AttributeInfo interface{}
 
 func readAttributes(reader *ClassReader, cp ConstantPool) []AttributeInfo {
 	attributesCount := reader.readU2()
@@ -21,17 +20,14 @@ func readAttribute(reader *ClassReader, cp ConstantPool) AttributeInfo {
 	attrName := getUtf8(cp, attrNameIndex)
 	attrLength := reader.readU4()
 
-	// create attribute instance according to attribute name.
 	attrInfo := newAttributeInfo(attrName, attrLength, cp)
 	if attrInfo == nil {
-		// unknown attr, skip
 		attrInfo = &UnparsedAttribute{
 			name:   attrName,
 			length: attrLength,
 			info:   reader.readBytes(attrLength),
 		}
 	} else {
-		// read attr content
 		attrInfo.(interface {
 			readInfo(*ClassReader)
 		}).readInfo(reader)
@@ -55,62 +51,45 @@ func newAttributeInfo(attrName string, attrLength uint32, cp ConstantPool) Attri
 	case "LocalVariableTable":
 		return &LocalVariableTableAttribute{}
 	default:
-		// TODO: MVP Phase - only implement part of it.
 		return nil
 	}
 }
 
-// UnparsedAttribute Unparsed Attr
+// UnparsedAttribute
 type UnparsedAttribute struct {
 	name   string
 	length uint32
 	info   []byte
 }
 
-// CodeAttribute including method's bytecode
+// CodeAttribute
 type CodeAttribute struct {
 	cp             ConstantPool
-	maxStack       uint16              // max depth of stack
-	maxLocals      uint16              // size of 局部變量表
-	code           []byte              // bytecode
-	exceptionTable []*ExceptionHandler // exception table
-	attributes     []AttributeInfo     // attribute table (nested)
+	maxStack       uint16
+	maxLocals      uint16
+	code           []byte
+	exceptionTable []*ExceptionHandler
+	attributes     []AttributeInfo
 }
 
 func (c *CodeAttribute) readInfo(reader *ClassReader) {
-	// stack
 	c.maxStack = reader.readU2()
-	// local vars table
 	c.maxLocals = reader.readU2()
-	// bytecode
 	codeLength := reader.readU4()
 	c.code = reader.readBytes(codeLength)
-	// exception
 	c.exceptionTable = readExceptionTable(reader)
-	// attr
 	c.attributes = readAttributes(reader, c.cp)
 }
 
-// MaxStack control max depth of operation stack
-func (c *CodeAttribute) MaxStack() uint16 {
-	return c.maxStack
-}
-
-// MaxLocals control 局部變量表大小
-func (c *CodeAttribute) MaxLocals() uint16 {
-	return c.maxLocals
-}
-
-// Code control bytecode
-func (c *CodeAttribute) Code() []byte {
-	return c.code
-}
+func (c *CodeAttribute) MaxStack() uint16  { return c.maxStack }
+func (c *CodeAttribute) MaxLocals() uint16 { return c.maxLocals }
+func (c *CodeAttribute) Code() []byte      { return c.code }
 
 type ExceptionHandler struct {
-	startPc   uint16 // try { position
-	endPc     uint16 // try } position
-	handlerPc uint16 // catch position
-	catchType uint16 // capture exception type (index of ConstantPool)
+	startPc   uint16
+	endPc     uint16
+	handlerPc uint16
+	catchType uint16
 }
 
 func readExceptionTable(reader *ClassReader) []*ExceptionHandler {
@@ -127,7 +106,7 @@ func readExceptionTable(reader *ClassReader) []*ExceptionHandler {
 	return exceptionTable
 }
 
-// ConstantValueAttribute represent constants value (static final)
+// ConstantValueAttribute
 type ConstantValueAttribute struct {
 	constantValueIndex uint16
 }
@@ -140,7 +119,7 @@ func (c *ConstantValueAttribute) ConstantValueIndex() uint16 {
 	return c.constantValueIndex
 }
 
-// ExceptionsAttribute represent exceptions that will be able to throw
+// ExceptionsAttribute
 type ExceptionsAttribute struct {
 	exceptionsIndexTable []uint16
 }
@@ -149,7 +128,7 @@ func (e *ExceptionsAttribute) readInfo(reader *ClassReader) {
 	e.exceptionsIndexTable = reader.readU2Table()
 }
 
-// SourceFileAttribute source file name
+// SourceFileAttribute
 type SourceFileAttribute struct {
 	cp              ConstantPool
 	sourceFileIndex uint16
@@ -163,8 +142,7 @@ func (s *SourceFileAttribute) FileName() string {
 	return getUtf8(s.cp, s.sourceFileIndex)
 }
 
-// LineNumberTableAttribute line number table
-// bytecode and line number mapping, for debug usage
+// LineNumberTableAttribute
 type LineNumberTableAttribute struct {
 	lineNumberTable []*LineNumberTableEntry
 }
@@ -185,8 +163,7 @@ func (l *LineNumberTableAttribute) readInfo(reader *ClassReader) {
 	}
 }
 
-// LocalVariableTableAttribute 局部變量表
-// for debug, mark down local vars info
+// LocalVariableTableAttribute
 type LocalVariableTableAttribute struct {
 	localVariableTable []*LocalVariableTableEntry
 }

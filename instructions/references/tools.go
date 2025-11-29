@@ -2,12 +2,12 @@ package references
 
 import (
 	"github.com/Johnny1110/gogo_jvm/runtime"
-	"github.com/Johnny1110/gogo_jvm/runtime/java"
+	"github.com/Johnny1110/gogo_jvm/runtime/heap"
 )
 
 // InvokeMethod call method common func
 // usage: invokestatic, invokevirtual
-func InvokeMethod(invokerFrame *runtime.Frame, method *java.Method) {
+func InvokeMethod(invokerFrame *runtime.Frame, method *heap.Method) {
 	// 1, get thread
 	thread := invokerFrame.Thread()
 

@@ -1,6 +1,8 @@
 package runtime
 
-import "github.com/Johnny1110/gogo_jvm/runtime/java"
+import (
+	"github.com/Johnny1110/gogo_jvm/runtime/heap"
+)
 
 // Frame java:
 // ┌────────────────────────────────────────┐
@@ -26,11 +28,11 @@ import "github.com/Johnny1110/gogo_jvm/runtime/java"
 // └────────────────────────────────────────┘
 type Frame struct {
 	lower        *Frame // previous frame (caller frame)
-	localVars    java.Slots
+	localVars    Slots
 	operandStack *OperandStack
 	thread       *Thread
 	nextPC       int
-	method       *java.Method
+	method       *heap.Method
 }
 
 // NewFrame create new Frame
@@ -43,7 +45,7 @@ func NewFrame(thread *Thread, maxLocals, maxStack uint16) *Frame {
 	}
 }
 
-func NewFrameWithMethod(thread *Thread, method *java.Method) *Frame {
+func NewFrameWithMethod(thread *Thread, method *heap.Method) *Frame {
 	return &Frame{
 		thread:       thread,
 		method:       method,
@@ -52,7 +54,7 @@ func NewFrameWithMethod(thread *Thread, method *java.Method) *Frame {
 	}
 }
 
-func (f *Frame) LocalVars() java.Slots {
+func (f *Frame) LocalVars() Slots {
 	return f.localVars
 }
 
@@ -84,4 +86,4 @@ func (f *Frame) RevertNextPC() {
 	f.nextPC = f.thread.PC()
 }
 
-func (f *Frame) Method() *java.Method { return f.method }
+func (f *Frame) Method() *heap.Method { return f.method }

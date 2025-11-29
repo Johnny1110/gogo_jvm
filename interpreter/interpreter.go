@@ -6,7 +6,7 @@ import (
 	"github.com/Johnny1110/gogo_jvm/instructions/base"
 	"github.com/Johnny1110/gogo_jvm/instructions/base/opcodes"
 	"github.com/Johnny1110/gogo_jvm/runtime"
-	"github.com/Johnny1110/gogo_jvm/runtime/java"
+	"github.com/Johnny1110/gogo_jvm/runtime/heap"
 	"os"
 )
 
@@ -16,7 +16,7 @@ import (
 // maxStack: max size of opStack
 // args: method args (if exists)
 // debug: display debug message info
-func Interpret(method *java.Method, debug bool) {
+func Interpret(method *heap.Method, debug bool) {
 	// 1. create thread
 	thread := runtime.NewThread()
 

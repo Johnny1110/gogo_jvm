@@ -1,20 +1,19 @@
 package runtime
 
 import (
-	"github.com/Johnny1110/gogo_jvm/runtime/java"
 	"math"
 )
 
 type OperandStack struct {
 	writePtr uint // equals to current stack element count
-	slots    []java.Slot
+	slots    []Slot
 }
 
 // NewOperandStack crate stack with max size
 func NewOperandStack(maxStack uint16) *OperandStack {
 	if maxStack > 0 {
 		return &OperandStack{
-			slots:    make([]java.Slot, maxStack),
+			slots:    make([]Slot, maxStack),
 			writePtr: 0, // init writer pointer
 		}
 	}
@@ -76,24 +75,24 @@ func (os *OperandStack) PopDouble() float64 {
 	return math.Float64frombits(bits)
 }
 
-func (os *OperandStack) PushRef(ref interface{}) {
+func (os *OperandStack) PushRef(ref *Object) {
 	os.slots[os.writePtr].ref = ref
 	os.writePtr++
 }
 
-func (os *OperandStack) PopRef() interface{} {
+func (os *OperandStack) PopRef() *Object {
 	os.writePtr--
 	ref := os.slots[os.writePtr].ref
 	os.slots[os.writePtr].ref = nil // GC
 	return ref
 }
 
-func (os *OperandStack) PushSlot(slot java.Slot) {
+func (os *OperandStack) PushSlot(slot Slot) {
 	os.slots[os.writePtr] = slot
 	os.writePtr++
 }
 
-func (os *OperandStack) PopSlot() java.Slot {
+func (os *OperandStack) PopSlot() Slot {
 	os.writePtr--
 	return os.slots[os.writePtr]
 }

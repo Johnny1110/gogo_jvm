@@ -281,3 +281,11 @@ func (c *ConstantNameAndTypeInfo) String() string {
 func (c *ConstantNameAndTypeInfo) Tag() ConstantTag {
 	return CONSTANT_NameAndType
 }
+
+func (c *ConstantNameAndTypeInfo) NameIndex() uint16 {
+	return c.nameIndex
+}
+
+func (c *ConstantNameAndTypeInfo) DescriptorIndex() uint16 {
+	return c.descriptorIndex
+}
