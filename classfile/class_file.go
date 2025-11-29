@@ -1,6 +1,9 @@
 package classfile
 
-import "fmt"
+import (
+	"fmt"
+	"github.com/Johnny1110/gogo_jvm/common"
+)
 
 const HOLY_MAGIC = 0xCAFEBABE
 
@@ -115,19 +118,19 @@ func (cf *ClassFile) AccessFlags() uint16 {
 }
 
 func (cf *ClassFile) IsPublic() bool {
-	return cf.accessFlags&ACC_PUBLIC != 0
+	return cf.accessFlags&common.ACC_PUBLIC != 0
 }
 
 func (cf *ClassFile) IsFinal() bool {
-	return cf.accessFlags&ACC_FINAL != 0
+	return cf.accessFlags&common.ACC_FINAL != 0
 }
 
 func (cf *ClassFile) IsInterface() bool {
-	return cf.accessFlags&INTERFACE != 0
+	return cf.accessFlags&common.INTERFACE != 0
 }
 
 func (cf *ClassFile) IsAbstract() bool {
-	return cf.accessFlags&ACC_ABSTRACT != 0
+	return cf.accessFlags&common.ACC_ABSTRACT != 0
 }
 
 // SourceFileAttribute

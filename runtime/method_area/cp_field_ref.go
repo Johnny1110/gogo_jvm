@@ -1,6 +1,8 @@
-package heap
+package method_area
 
-import "github.com/Johnny1110/gogo_jvm/classfile"
+import (
+	"github.com/Johnny1110/gogo_jvm/classfile"
+)
 
 // FieldRef 字段引用
 // 例如：getstatic System.out → 需要解析 out 字段
@@ -9,7 +11,7 @@ type FieldRef struct {
 	field *Field // 解析後的字段（緩存）
 }
 
-func newFieldRef(cp *RuntimeConstantPool, refInfo *classfile.ConstantFieldRefInfo) *FieldRef {
+func NewFieldRef(cp *RuntimeConstantPool, refInfo *classfile.ConstantFieldRefInfo) *FieldRef {
 	ref := &FieldRef{}
 	ref.cp = cp
 	ref.copyMemberRefInfo(&refInfo.ConstantMemberRefInfo)
@@ -33,8 +35,8 @@ func (r *FieldRef) resolveFieldRef() {
 }
 
 func lookupField(c *Class, name, descriptor string) *Field {
-	for _, field := range c.fields {
-		if field.name == name && field.descriptor == descriptor {
+	for _, field := range c.Fields() {
+		if field.Name() == name && field.Descriptor() == descriptor {
 			return field
 		}
 	}

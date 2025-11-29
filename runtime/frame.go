@@ -1,7 +1,8 @@
 package runtime
 
 import (
-	"github.com/Johnny1110/gogo_jvm/rtda/heap"
+	"github.com/Johnny1110/gogo_jvm/runtime/method_area"
+	"github.com/Johnny1110/gogo_jvm/runtime/rtcore"
 )
 
 // Frame java:
@@ -28,11 +29,11 @@ import (
 // └────────────────────────────────────────┘
 type Frame struct {
 	lower        *Frame // previous frame (caller frame)
-	localVars    heap.Slots
+	localVars    rtcore.Slots
 	operandStack *OperandStack
 	thread       *Thread
 	nextPC       int
-	method       *heap.Method
+	method       *method_area.Method
 }
 
 // NewFrame create new Frame
@@ -45,7 +46,7 @@ func NewFrame(thread *Thread, maxLocals, maxStack uint16) *Frame {
 	}
 }
 
-func NewFrameWithMethod(thread *Thread, method *heap.Method) *Frame {
+func NewFrameWithMethod(thread *Thread, method *method_area.Method) *Frame {
 	return &Frame{
 		thread:       thread,
 		method:       method,
@@ -54,7 +55,7 @@ func NewFrameWithMethod(thread *Thread, method *heap.Method) *Frame {
 	}
 }
 
-func (f *Frame) LocalVars() heap.Slots {
+func (f *Frame) LocalVars() rtcore.Slots {
 	return f.localVars
 }
 
@@ -86,4 +87,4 @@ func (f *Frame) RevertNextPC() {
 	f.nextPC = f.thread.PC()
 }
 
-func (f *Frame) Method() *heap.Method { return f.method }
+func (f *Frame) Method() *method_area.Method { return f.method }

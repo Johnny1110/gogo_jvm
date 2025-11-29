@@ -1,5 +1,7 @@
 package classfile
 
+import "github.com/Johnny1110/gogo_jvm/common"
+
 // MemberInfo represent field and method.
 // in a class, field and method java are the same.
 // - access_flags     : access flag
@@ -47,51 +49,51 @@ func (m *MemberInfo) AccessFlags() uint16 {
 }
 
 func (m *MemberInfo) IsPublic() bool {
-	return m.accessFlags&ACC_PUBLIC != 0
+	return m.accessFlags&common.ACC_PUBLIC != 0
 }
 
 func (m *MemberInfo) IsPrivate() bool {
-	return m.accessFlags&ACC_PRIVATE != 0
+	return m.accessFlags&common.ACC_PRIVATE != 0
 }
 
 func (m *MemberInfo) IsProtected() bool {
-	return m.accessFlags&ACC_PROTECTED != 0
+	return m.accessFlags&common.ACC_PROTECTED != 0
 }
 
 func (m *MemberInfo) IsStatic() bool {
-	return m.accessFlags&ACC_STATIC != 0
+	return m.accessFlags&common.ACC_STATIC != 0
 }
 
 func (m *MemberInfo) IsFinal() bool {
-	return m.accessFlags&ACC_FINAL != 0
+	return m.accessFlags&common.ACC_FINAL != 0
 }
 
 func (m *MemberInfo) IsSynchronized() bool {
-	return m.accessFlags&ACC_SYNCHRONIZED != 0
+	return m.accessFlags&common.ACC_SYNCHRONIZED != 0
 }
 
 func (m *MemberInfo) IsVolatile() bool {
-	return m.accessFlags&ACC_VOLATILE != 0
+	return m.accessFlags&common.ACC_VOLATILE != 0
 }
 
 func (m *MemberInfo) IsTransient() bool {
-	return m.accessFlags&ACC_TRANSIENT != 0
+	return m.accessFlags&common.ACC_TRANSIENT != 0
 }
 
 func (m *MemberInfo) IsNative() bool {
-	return m.accessFlags&ACC_NATIVE != 0
+	return m.accessFlags&common.ACC_NATIVE != 0
 }
 
 func (m *MemberInfo) IsAbstract() bool {
-	return m.accessFlags&ACC_ABSTRACT != 0
+	return m.accessFlags&common.ACC_ABSTRACT != 0
 }
 
 func (m *MemberInfo) IsSynthetic() bool {
-	return m.accessFlags&ACC_SYNTHETIC != 0
+	return m.accessFlags&common.ACC_SYNTHETIC != 0
 }
 
 func (m *MemberInfo) IsEnum() bool {
-	return m.accessFlags&ACC_ENUM != 0
+	return m.accessFlags&common.ACC_ENUM != 0
 }
 
 // Get Code attribute (method's bytecode)

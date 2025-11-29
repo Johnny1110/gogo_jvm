@@ -1,4 +1,4 @@
-package heap
+package method_area
 
 import (
 	"github.com/Johnny1110/gogo_jvm/classfile"
@@ -10,8 +10,8 @@ type InterfaceMethodRef struct {
 	method *Method
 }
 
-// newInterfaceMethodRef create ref from ClassFile
-func newInterfaceMethodRef(cp *RuntimeConstantPool, refInfo *classfile.ConstantInterfaceMethodRefInfo) *InterfaceMethodRef {
+// NewInterfaceMethodRef create ref from ClassFile
+func NewInterfaceMethodRef(cp *RuntimeConstantPool, refInfo *classfile.ConstantInterfaceMethodRefInfo) *InterfaceMethodRef {
 	ref := &InterfaceMethodRef{}
 	ref.cp = cp
 	ref.copyMemberRefInfo(&refInfo.ConstantMemberRefInfo)
@@ -52,8 +52,8 @@ func (r *InterfaceMethodRef) ResolvedClass() *Class {
 // lookupInterfaceMethod find method
 func lookupInterfaceMethod(iface *Class, name, descriptor string) *Method {
 	// 在當前接口查找
-	for _, method := range iface.methods {
-		if method.name == name && method.descriptor == descriptor {
+	for _, method := range iface.Methods() {
+		if method.Name() == name && method.Descriptor() == descriptor {
 			return method
 		}
 	}

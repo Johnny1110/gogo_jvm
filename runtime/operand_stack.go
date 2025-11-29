@@ -1,20 +1,20 @@
 package runtime
 
 import (
-	"github.com/Johnny1110/gogo_jvm/rtda/heap"
+	"github.com/Johnny1110/gogo_jvm/runtime/rtcore"
 	"math"
 )
 
 type OperandStack struct {
 	writePtr uint // equals to current stack element count
-	slots    []heap.Slot
+	slots    []rtcore.Slot
 }
 
 // NewOperandStack crate stack with max size
 func NewOperandStack(maxStack uint16) *OperandStack {
 	if maxStack > 0 {
 		return &OperandStack{
-			slots:    make([]heap.Slot, maxStack),
+			slots:    make([]rtcore.Slot, maxStack),
 			writePtr: 0, // init writer pointer
 		}
 	}
@@ -76,24 +76,24 @@ func (os *OperandStack) PopDouble() float64 {
 	return math.Float64frombits(bits)
 }
 
-func (os *OperandStack) PushRef(Ref *heap.Object) {
+func (os *OperandStack) PushRef(Ref interface{}) {
 	os.slots[os.writePtr].Ref = Ref
 	os.writePtr++
 }
 
-func (os *OperandStack) PopRef() *heap.Object {
+func (os *OperandStack) PopRef() interface{} {
 	os.writePtr--
 	Ref := os.slots[os.writePtr].Ref
 	os.slots[os.writePtr].Ref = nil // GC
 	return Ref
 }
 
-func (os *OperandStack) PushSlot(slot heap.Slot) {
+func (os *OperandStack) PushSlot(slot rtcore.Slot) {
 	os.slots[os.writePtr] = slot
 	os.writePtr++
 }
 
-func (os *OperandStack) PopSlot() heap.Slot {
+func (os *OperandStack) PopSlot() rtcore.Slot {
 	os.writePtr--
 	return os.slots[os.writePtr]
 }
@@ -120,7 +120,7 @@ func (os *OperandStack) PopBoolean() bool {
 
 func (os *OperandStack) Clear() {
 	os.writePtr = 0 // reset write pointer
-	// clean slot.Ref for GC
+	// clean rtcore.Ref for GC
 	for i := range os.slots {
 		os.slots[i].Ref = nil
 	}

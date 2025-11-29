@@ -1,11 +1,11 @@
 package runtime
 
-import "github.com/Johnny1110/gogo_jvm/rtda/heap"
+import "github.com/Johnny1110/gogo_jvm/runtime/rtcore"
 
 // NewLocalVars LocalVars must be pre-allocate, size is defined in class file.
-func NewLocalVars(maxLocals uint16) heap.Slots {
+func NewLocalVars(maxLocals uint16) rtcore.Slots {
 	if maxLocals > 0 {
-		return make(heap.Slots, maxLocals)
+		return make(rtcore.Slots, maxLocals)
 	}
 	return nil
 }

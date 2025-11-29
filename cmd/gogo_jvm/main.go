@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/Johnny1110/gogo_jvm/interpreter"
-	"github.com/Johnny1110/gogo_jvm/rtda/heap"
+	"github.com/Johnny1110/gogo_jvm/runtime/method_area"
 	"io/ioutil"
 	"os"
 )
@@ -36,7 +36,7 @@ func main() {
 	fmt.Println("============================================")
 
 	// 創建 ClassLoader
-	loader := heap.NewClassLoader(classPath)
+	loader := method_area.NewClassLoader(classPath)
 
 	// 加載類
 	class := loader.LoadClass(className)

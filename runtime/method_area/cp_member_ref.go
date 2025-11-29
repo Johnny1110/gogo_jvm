@@ -1,4 +1,4 @@
-package heap
+package method_area
 
 import "github.com/Johnny1110/gogo_jvm/classfile"
 

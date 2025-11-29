@@ -5,8 +5,9 @@ import (
 	"github.com/Johnny1110/gogo_jvm/instructions"
 	"github.com/Johnny1110/gogo_jvm/instructions/base"
 	"github.com/Johnny1110/gogo_jvm/instructions/base/opcodes"
-	"github.com/Johnny1110/gogo_jvm/rtda/heap"
 	"github.com/Johnny1110/gogo_jvm/runtime"
+	"github.com/Johnny1110/gogo_jvm/runtime/method_area"
+	"github.com/Johnny1110/gogo_jvm/runtime/rtcore"
 	"os"
 )
 
@@ -16,7 +17,7 @@ import (
 // maxStack: max size of opStack
 // args: method args (if exists)
 // debug: display debug message info
-func Interpret(method *heap.Method, debug bool) {
+func Interpret(method *method_area.Method, debug bool) {
 	// 1. create thread
 	thread := runtime.NewThread()
 
@@ -92,7 +93,7 @@ func printDebug(pc int, inst base.Instruction, frame *runtime.Frame) {
 	printLocalVars(frame.LocalVars())
 }
 
-func printLocalVars(vars heap.Slots) {
+func printLocalVars(vars rtcore.Slots) {
 	fmt.Printf("* LocarVars=%v \n", vars)
 }
 

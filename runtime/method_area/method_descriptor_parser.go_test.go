@@ -1,4 +1,4 @@
-package heap
+package method_area
 
 import (
 	"fmt"

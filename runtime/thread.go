@@ -1,7 +1,7 @@
 package runtime
 
 import (
-	"github.com/Johnny1110/gogo_jvm/rtda/heap"
+	"github.com/Johnny1110/gogo_jvm/runtime/method_area"
 )
 
 const DEFAULT_STACK_SIZE = 1024
@@ -66,6 +66,6 @@ func (t *Thread) NewFrame(maxLocals, maxStack uint16) *Frame {
 	return NewFrame(t, maxLocals, maxStack)
 }
 
-func (t *Thread) NewFrameWithMethod(method *heap.Method) *Frame {
+func (t *Thread) NewFrameWithMethod(method *method_area.Method) *Frame {
 	return NewFrameWithMethod(t, method)
 }

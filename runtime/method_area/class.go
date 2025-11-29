@@ -1,6 +1,10 @@
-package heap
+package method_area
 
-import "github.com/Johnny1110/gogo_jvm/classfile"
+import (
+	"github.com/Johnny1110/gogo_jvm/classfile"
+	"github.com/Johnny1110/gogo_jvm/common"
+	"github.com/Johnny1110/gogo_jvm/runtime/rtcore"
+)
 
 // Class 運行時類結構
 // 這是 ClassFile 在 Method Area 中的運行時表示
@@ -26,9 +30,9 @@ type Class struct {
 	loader            *ClassLoader         // 加載此類的 ClassLoader
 	superClass        *Class               // 父類引用（解析後）
 	interfaces        []*Class             // 接口引用列表（解析後）
-	instanceSlotCount uint                 // 實例變量佔用的 slot 數量
-	staticSlotCount   uint                 // 類變量佔用的 slot 數量
-	staticVars        Slots                // 靜態變量（類變量）
+	instanceSlotCount uint                 // 實例變量佔用的 rtcore 數量
+	staticSlotCount   uint                 // 類變量佔用的 rtcore 數量
+	staticVars        rtcore.Slots         // 靜態變量（類變量）
 }
 
 // newClass 從 ClassFile 創建 Class
@@ -54,19 +58,19 @@ func (c *Class) Fields() []*Field                   { return c.fields }
 func (c *Class) Methods() []*Method                 { return c.methods }
 func (c *Class) Loader() *ClassLoader               { return c.loader }
 func (c *Class) SuperClass() *Class                 { return c.superClass }
-func (c *Class) StaticVars() Slots                  { return c.staticVars }
+func (c *Class) StaticVars() rtcore.Slots           { return c.staticVars }
 func (c *Class) AccessFlags() uint16                { return c.accessFlags }
 
 // =============== Access Flags ===============
 
-func (c *Class) IsPublic() bool     { return c.accessFlags&ACC_PUBLIC != 0 }
-func (c *Class) IsFinal() bool      { return c.accessFlags&ACC_FINAL != 0 }
-func (c *Class) IsSuper() bool      { return c.accessFlags&ACC_SUPER != 0 }
-func (c *Class) IsInterface() bool  { return c.accessFlags&ACC_INTERFACE != 0 }
-func (c *Class) IsAbstract() bool   { return c.accessFlags&ACC_ABSTRACT != 0 }
-func (c *Class) IsSynthetic() bool  { return c.accessFlags&ACC_SYNTHETIC != 0 }
-func (c *Class) IsAnnotation() bool { return c.accessFlags&ACC_ANNOTATION != 0 }
-func (c *Class) IsEnum() bool       { return c.accessFlags&ACC_ENUM != 0 }
+func (c *Class) IsPublic() bool     { return c.accessFlags&common.ACC_PUBLIC != 0 }
+func (c *Class) IsFinal() bool      { return c.accessFlags&common.ACC_FINAL != 0 }
+func (c *Class) IsSuper() bool      { return c.accessFlags&common.ACC_SUPER != 0 }
+func (c *Class) IsInterface() bool  { return c.accessFlags&common.ACC_INTERFACE != 0 }
+func (c *Class) IsAbstract() bool   { return c.accessFlags&common.ACC_ABSTRACT != 0 }
+func (c *Class) IsSynthetic() bool  { return c.accessFlags&common.ACC_SYNTHETIC != 0 }
+func (c *Class) IsAnnotation() bool { return c.accessFlags&common.ACC_ANNOTATION != 0 }
+func (c *Class) IsEnum() bool       { return c.accessFlags&common.ACC_ENUM != 0 }
 
 // =============== Method Lookup ===============
 
@@ -100,4 +104,8 @@ func (c *Class) GetMethod(name, descriptor string) *Method {
 // GetStaticMethod 公開版本
 func (c *Class) GetStaticMethod(name, descriptor string) *Method {
 	return c.getStaticMethod(name, descriptor)
+}
+
+func (c *Class) InstanceSlotCount() uint {
+	return c.instanceSlotCount
 }

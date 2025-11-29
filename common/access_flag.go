@@ -1,4 +1,4 @@
-package heap
+package common
 
 const (
 	ACC_PUBLIC       = 0x0001 // public

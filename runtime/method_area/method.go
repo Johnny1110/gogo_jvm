@@ -1,6 +1,9 @@
-package heap
+package method_area
 
-import "github.com/Johnny1110/gogo_jvm/classfile"
+import (
+	"github.com/Johnny1110/gogo_jvm/classfile"
+	"github.com/Johnny1110/gogo_jvm/common"
+)
 
 // Method 運行時方法結構
 //
@@ -18,7 +21,7 @@ type Method struct {
 	maxStack     uint16 // 操作數棧最大深度
 	maxLocals    uint16 // 局部變量表大小
 	code         []byte // 方法字節碼
-	argSlotCount uint   // 參數佔用的 slot 數量
+	argSlotCount uint   // 參數佔用的 rtcore 數量
 }
 
 // newMethods 從 ClassFile 的 MemberInfo 創建 Method 列表
@@ -50,7 +53,7 @@ func (m *Method) copyAttributes(cfMethod *classfile.MemberInfo) {
 	}
 }
 
-// calcArgSlotCount 計算參數佔用的 slot 數量
+// calcArgSlotCount 計算參數佔用的 rtcore 數量
 // 根據方法描述符解析參數類型
 // 例如：(II)V → 2 個 int → 2 slots
 //
@@ -60,12 +63,12 @@ func (m *Method) calcArgSlotCount() {
 	parsedDescriptor := parseMethodDescriptor(m.descriptor)
 	for _, paramType := range parsedDescriptor.parameterTypes {
 		m.argSlotCount++
-		// long 和 double 佔 2 個 slot
+		// long 和 double 佔 2 個 rtcore
 		if paramType == "J" || paramType == "D" {
 			m.argSlotCount++
 		}
 	}
-	// 非靜態方法需要額外一個 slot 存 this
+	// 非靜態方法需要額外一個 rtcore 存 this
 	if !m.IsStatic() {
 		m.argSlotCount++
 	}
@@ -84,17 +87,17 @@ func (m *Method) AccessFlags() uint16 { return m.accessFlags }
 
 // =============== Access Flags ===============
 
-func (m *Method) IsPublic() bool       { return m.accessFlags&ACC_PUBLIC != 0 }
-func (m *Method) IsPrivate() bool      { return m.accessFlags&ACC_PRIVATE != 0 }
-func (m *Method) IsProtected() bool    { return m.accessFlags&ACC_PROTECTED != 0 }
-func (m *Method) IsStatic() bool       { return m.accessFlags&ACC_STATIC != 0 }
-func (m *Method) IsFinal() bool        { return m.accessFlags&ACC_FINAL != 0 }
-func (m *Method) IsSynchronized() bool { return m.accessFlags&ACC_SYNCHRONIZED != 0 }
-func (m *Method) IsBridge() bool       { return m.accessFlags&ACC_BRIDGE != 0 }
-func (m *Method) IsVarargs() bool      { return m.accessFlags&ACC_VARARGS != 0 }
-func (m *Method) IsNative() bool       { return m.accessFlags&ACC_NATIVE != 0 }
-func (m *Method) IsAbstract() bool     { return m.accessFlags&ACC_ABSTRACT != 0 }
-func (m *Method) IsStrict() bool       { return m.accessFlags&ACC_STRICT != 0 }
+func (m *Method) IsPublic() bool       { return m.accessFlags&common.ACC_PUBLIC != 0 }
+func (m *Method) IsPrivate() bool      { return m.accessFlags&common.ACC_PRIVATE != 0 }
+func (m *Method) IsProtected() bool    { return m.accessFlags&common.ACC_PROTECTED != 0 }
+func (m *Method) IsStatic() bool       { return m.accessFlags&common.ACC_STATIC != 0 }
+func (m *Method) IsFinal() bool        { return m.accessFlags&common.ACC_FINAL != 0 }
+func (m *Method) IsSynchronized() bool { return m.accessFlags&common.ACC_SYNCHRONIZED != 0 }
+func (m *Method) IsBridge() bool       { return m.accessFlags&common.ACC_BRIDGE != 0 }
+func (m *Method) IsVarargs() bool      { return m.accessFlags&common.ACC_VARARGS != 0 }
+func (m *Method) IsNative() bool       { return m.accessFlags&common.ACC_NATIVE != 0 }
+func (m *Method) IsAbstract() bool     { return m.accessFlags&common.ACC_ABSTRACT != 0 }
+func (m *Method) IsStrict() bool       { return m.accessFlags&common.ACC_STRICT != 0 }
 
 // =============== Helper ===============
 

@@ -1,13 +1,16 @@
-package heap
+package method_area
 
-import "github.com/Johnny1110/gogo_jvm/classfile"
+import (
+	"github.com/Johnny1110/gogo_jvm/classfile"
+	"github.com/Johnny1110/gogo_jvm/common"
+)
 
 type Field struct {
 	accessFlags     uint16
 	name            string
 	descriptor      string
 	class           *Class // belongs to
-	slotId          uint   // index in slot
+	slotId          uint   // index in rtcore
 	constValueIndex uint   // ConstantValue attributes index (for static final)
 }
 
@@ -46,15 +49,15 @@ func (f *Field) AccessFlags() uint16 { return f.accessFlags }
 
 // =============== Access Flags ===============
 
-func (f *Field) IsPublic() bool    { return f.accessFlags&classfile.ACC_PUBLIC != 0 }
-func (f *Field) IsPrivate() bool   { return f.accessFlags&classfile.ACC_PRIVATE != 0 }
-func (f *Field) IsProtected() bool { return f.accessFlags&classfile.ACC_PROTECTED != 0 }
-func (f *Field) IsStatic() bool    { return f.accessFlags&classfile.ACC_STATIC != 0 }
-func (f *Field) IsFinal() bool     { return f.accessFlags&classfile.ACC_FINAL != 0 }
-func (f *Field) IsVolatile() bool  { return f.accessFlags&classfile.ACC_VOLATILE != 0 }
-func (f *Field) IsTransient() bool { return f.accessFlags&classfile.ACC_TRANSIENT != 0 }
-func (f *Field) IsSynthetic() bool { return f.accessFlags&classfile.ACC_SYNTHETIC != 0 }
-func (f *Field) IsEnum() bool      { return f.accessFlags&classfile.ACC_ENUM != 0 }
+func (f *Field) IsPublic() bool    { return f.accessFlags&common.ACC_PUBLIC != 0 }
+func (f *Field) IsPrivate() bool   { return f.accessFlags&common.ACC_PRIVATE != 0 }
+func (f *Field) IsProtected() bool { return f.accessFlags&common.ACC_PROTECTED != 0 }
+func (f *Field) IsStatic() bool    { return f.accessFlags&common.ACC_STATIC != 0 }
+func (f *Field) IsFinal() bool     { return f.accessFlags&common.ACC_FINAL != 0 }
+func (f *Field) IsVolatile() bool  { return f.accessFlags&common.ACC_VOLATILE != 0 }
+func (f *Field) IsTransient() bool { return f.accessFlags&common.ACC_TRANSIENT != 0 }
+func (f *Field) IsSynthetic() bool { return f.accessFlags&common.ACC_SYNTHETIC != 0 }
+func (f *Field) IsEnum() bool      { return f.accessFlags&common.ACC_ENUM != 0 }
 
 // isLongOrDouble take 2 slots
 func (f *Field) isLongOrDouble() bool {

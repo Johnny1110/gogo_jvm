@@ -1,4 +1,4 @@
-package heap
+package rtcore
 
 import (
 	"math"
@@ -15,11 +15,11 @@ type Slot struct {
 
 	// ref store reference type (pointer)
 	// GC need to know the object references, to iterate
-	Ref *Object
+	Ref interface{}
 }
 
-// JVM defined long/double, should take slot[n] and slot[n+1]
-// and also should read slot[n] and slot[n+1]
+// JVM defined long/double, should take rtcore[n] and rtcore[n+1]
+// and also should read rtcore[n] and rtcore[n+1]
 
 type Slots []Slot
 
@@ -82,11 +82,11 @@ func (s Slots) GetDouble(index uint) float64 {
 
 // =============== Ref ===============
 
-func (s Slots) SetRef(index uint, ref *Object) {
+func (s Slots) SetRef(index uint, ref interface{}) {
 	s[index].Ref = ref
 }
 
-func (s Slots) GetRef(index uint) *Object {
+func (s Slots) GetRef(index uint) interface{} {
 	return s[index].Ref
 }
 
@@ -101,7 +101,7 @@ func (s Slots) GetSlot(index uint) Slot {
 }
 
 // GetThis get this ref
-// for Object methods, slot[0] always be this
+// for Object methods, rtcore[0] always be this
 func (s Slots) GetThis() interface{} {
 	return s.GetRef(0)
 }

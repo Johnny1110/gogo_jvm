@@ -1,4 +1,4 @@
-package heap
+package method_area
 
 import (
 	"github.com/Johnny1110/gogo_jvm/classfile"
@@ -62,16 +62,16 @@ func newConstantPool(class *Class, cfCp classfile.ConstantPool) *RuntimeConstant
 			consts[i] = stringInfo.String()
 		case *classfile.ConstantClassInfo:
 			classInfo := cpInfo.(*classfile.ConstantClassInfo)
-			consts[i] = newClassRef(rtCp, classInfo.Name())
+			consts[i] = NewClassRef(rtCp, classInfo.Name())
 		case *classfile.ConstantFieldRefInfo:
 			fieldRefInfo := cpInfo.(*classfile.ConstantFieldRefInfo)
-			consts[i] = newFieldRef(rtCp, fieldRefInfo)
+			consts[i] = NewFieldRef(rtCp, fieldRefInfo)
 		case *classfile.ConstantMethodRefInfo:
 			methodRefInfo := cpInfo.(*classfile.ConstantMethodRefInfo)
-			consts[i] = newMethodRef(rtCp, methodRefInfo)
+			consts[i] = NewMethodRef(rtCp, methodRefInfo)
 		case *classfile.ConstantInterfaceMethodRefInfo:
 			methodRefInfo := cpInfo.(*classfile.ConstantInterfaceMethodRefInfo)
-			consts[i] = newInterfaceMethodRef(rtCp, methodRefInfo)
+			consts[i] = NewInterfaceMethodRef(rtCp, methodRefInfo)
 			// Utf8 and NameAndType are not required to put in runtime constant pool, they are used by others.
 		}
 	}

@@ -1,4 +1,4 @@
-package heap
+package method_area
 
 // ClassRef 類引用
 // 例如：new Calculator → 需要解析 Calculator 類
@@ -6,7 +6,7 @@ type ClassRef struct {
 	SymRef
 }
 
-func newClassRef(cp *RuntimeConstantPool, className string) *ClassRef {
+func NewClassRef(cp *RuntimeConstantPool, className string) *ClassRef {
 	ref := &ClassRef{}
 	ref.cp = cp
 	ref.className = className

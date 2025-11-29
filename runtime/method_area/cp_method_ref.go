@@ -1,6 +1,8 @@
-package heap
+package method_area
 
-import "github.com/Johnny1110/gogo_jvm/classfile"
+import (
+	"github.com/Johnny1110/gogo_jvm/classfile"
+)
 
 // MethodRef 方法引用
 // 例如：invokestatic Calculator.add → 需要解析 add 方法
@@ -10,7 +12,7 @@ type MethodRef struct {
 }
 
 // newMethodRef 從 ClassFile 創建方法引用
-func newMethodRef(cp *RuntimeConstantPool, refInfo *classfile.ConstantMethodRefInfo) *MethodRef {
+func NewMethodRef(cp *RuntimeConstantPool, refInfo *classfile.ConstantMethodRefInfo) *MethodRef {
 	ref := &MethodRef{}
 	ref.cp = cp
 	ref.copyMemberRefInfo(&refInfo.ConstantMemberRefInfo)
@@ -54,8 +56,8 @@ func lookupMethod(c *Class, name, descriptor string) *Method {
 }
 
 func lookupMethodInClass(c *Class, name, descriptor string) *Method {
-	for _, method := range c.methods {
-		if method.name == name && method.descriptor == descriptor {
+	for _, method := range c.Methods() {
+		if method.Name() == name && method.Descriptor() == descriptor {
 			return method
 		}
 	}

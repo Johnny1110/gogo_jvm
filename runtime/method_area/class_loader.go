@@ -1,8 +1,9 @@
-package heap
+package method_area
 
 import (
 	"fmt"
 	"github.com/Johnny1110/gogo_jvm/classfile"
+	"github.com/Johnny1110/gogo_jvm/runtime/rtcore"
 	"io/ioutil"
 )
 
@@ -135,7 +136,7 @@ func prepare(class *Class) {
 	allocAndInitStaticVars(class)
 }
 
-// calcInstanceFieldSlotIds calculate instance fileds slot ID
+// calcInstanceFieldSlotIds calculate instance fileds rtcore ID
 func calcInstanceFieldSlotIds(class *Class) {
 	slotId := uint(0)
 	// from parent
@@ -154,7 +155,7 @@ func calcInstanceFieldSlotIds(class *Class) {
 	class.instanceSlotCount = slotId
 }
 
-// calcStaticFieldSlotIds calculate static fields slot ID
+// calcStaticFieldSlotIds calculate static fields rtcore ID
 func calcStaticFieldSlotIds(class *Class) {
 	slotId := uint(0)
 	for _, field := range class.fields {
@@ -171,6 +172,6 @@ func calcStaticFieldSlotIds(class *Class) {
 
 // allocAndInitStaticVars allocate and init static vars
 func allocAndInitStaticVars(class *Class) {
-	class.staticVars = NewSlots(class.staticSlotCount)
+	class.staticVars = rtcore.NewSlots(class.staticSlotCount)
 	// TODO: 初始化 static final 常量
 }
