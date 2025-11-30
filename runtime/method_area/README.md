@@ -13,13 +13,17 @@
 ## 重要核心組成
 
 * [ClassLoader](class_loader.go) -> 負責將 class 完整載入 (從 classfile bytecode 開始解析)
+
 * [RuntimeConstantPool](constant_pool.go) -> 運行時常量池 (每一個 class 都有一個自己專用，用於存放 class constant)
-* [Class](class.go) -> Class 的實例，被 ClassLoader 載入完畢後的 classfile 就變成它，並存在 ClassLoader 裡面 (同一個類只會被載入一次)
-* [Field](field.go) -> Class 的 field 實例
-* [Method](method.go) -> Class 的 method 實例
-* [ClassRef](cp_class_ref.go) -> 指向 Class 實例的參考
-* [FieldRef](cp_field_ref.go) -> 指向 Field 實例的參考
-* [MethodRef](cp_method_ref.go) -> 指向 Method 實例的參考
+  * [ClassRef](cp_class_ref.go) -> 指向 Class 實例的直接引用 (RuntimeConstantPool 專用)
+  * [FieldRef](cp_field_ref.go) -> 指向 Field 實例的直接引用 (RuntimeConstantPool 專用)
+  * [MethodRef](cp_method_ref.go) -> 指向 Method 實例的直接引用 (RuntimeConstantPool 專用)
+  * [InterfaceMethodRef.go](cp_interface_method_ref.go) -> 指向 Method 實例的直接引用 (RuntimeConstantPool 專用)
+
+* [Class](rtma_class.go) -> Class 的實例，被 ClassLoader 載入完畢後的 classfile 就變成它，並存在 ClassLoader 裡面 (同一個類只會被載入一次)
+* [Field](rtma_field.go) -> Class 的 field 實例
+* [Method](rtma_method.go) -> Class 的 method 實例
+
 * [MethodDescriptor](method_descriptor_parser.go) -> 方法的 descriptor 解析，將純字面量解構成資料結構。
 
 <br>
@@ -28,13 +32,37 @@
 接下來的重點就是逐步拆解每一個重要的組成單元，看看他們是如何組在一起就能拼湊出 JVM Method Area 的。
 
 <br>
+
+---
+
 <br>
 
 ## ClassLoader 類別加載器
 
 ClassLoader 是 JVM 中負責 載入 class 檔案 到記憶體並建立 Class 物件的核心元件。
-
 它知道去哪裡找 .class，怎麼讀、怎麼驗證、怎麼放到 JVM 裡。
+
+<br>
+
+### 類加載流程：
+```
+ ┌─────────────────────────────────────────────────────────┐
+ │  Loading → Linking → Initialization                     │
+ │                                                         │
+ │  Loading:                                               │
+ │    - 讀取 .class 文件                                    │
+ │    - 解析成 ClassFile                                   │
+ │    - 轉換成 Class                                       │
+ │                                                         │
+ │  Linking:                                               │
+ │    - Verification: 驗證字節碼（簡化跳過）                   │
+ │    - Preparation: 為靜態變量分配空間                       │
+ │    - Resolution: 符號引用解析（懶加載）                     │
+ │                                                         │
+ │  Initialization:                                        │
+ │    - 執行 <clinit> 方法（靜態初始化）                       │
+ └─────────────────────────────────────────────────────────┘
+```
 
 **ClassLoader 的主要任務**
 
@@ -52,7 +80,8 @@ ClassLoader 是 JVM 中負責 載入 class 檔案 到記憶體並建立 Class �
    * 透過 classfile 建立 RuntimeConstantPool，分配靜態變數空間等。
 
 4. 建立 java.lang.Class 物件
-
+   
+   * 保證類的唯一性（同一個類只加載一次）
    * 這個物件是 Class 在 JVM 內的 metadata (其實就放在 ClassLoader 內的一個 map 裏做緩存)。
 
 <br>
@@ -132,6 +161,9 @@ func allocAndInitVars(class *Class) {
 ```
 
 <br>
+
+---
+
 <br>
 
 ## RuntimeConstantPool 運行時常量池
@@ -145,7 +177,7 @@ __每個 Class 在 JVM 裡都有自己的 runtime constant pool。__
 
 ```
  ┌────────────────────────────────────────────────────────┐
- │  ClassFileConstantPool（Compile）             │
+ │  ClassFileConstantPool（Compile）                       │
  │  #1 Methodref → class=#2, nameAndType=#3               │
  │  #2 Class → name=#4                                    │
  │  #3 NameAndType → name=#5, desc=#6                     │
@@ -155,7 +187,7 @@ __每個 Class 在 JVM 裡都有自己的 runtime constant pool。__
  └────────────────────────────────────────────────────────┘
                         ↓ parse
  ┌────────────────────────────────────────────────────────┐
- │  RumtimeConstantPool                                 │
+ │  RumtimeConstantPool                                   │
  │  #1 MethodRef → pointing to Calculator.add()           │
  └────────────────────────────────────────────────────────┘
 ```
@@ -165,7 +197,7 @@ __每個 Class 在 JVM 裡都有自己的 runtime constant pool。__
 ```go
 type RuntimeConstantPool struct {
    class  *Class        // 所屬的 class
-   consts []Constant    // 常量表
+   consts []Constant    // 常量表，裡面可以存直接引用或者 int long float double 等
 }
 ````
 
@@ -179,9 +211,87 @@ type RuntimeConstantPool struct {
 * Utf8 與 NameAndType 類型的 `ConstantInfo` 不需要處理，因為他們在 `MemberConstantInfo` 轉換階段已經被利用完，沒有剩餘價值了。
 
 <br>
+
+### 符號引用 (ClassFileConstantPool) vs 直接引用 (RuntimeConstantPool)
+
+這是 JVM 規範中的核心概念：
+
+```
+編譯時（ClassFile）                    運行時（解析後）
+┌─────────────────────────┐           ┌─────────────────────────┐
+│ ClassFileConstantPool   │           │ RuntimeConstantPool     │
+│ #1 Methodref            │           │ #1 MethodRef            │
+│    class=#2             │    →      │    method ──────────────┼──→ Method 對象
+│    nameAndType=#3       │           │                         │    (內存地址)
+│ #2 Class                │           │ #2 ClassRef             │
+│    name=#4              │    →      │    class ───────────────┼──→ Class 對象
+│ #3 NameAndType          │           │                         │
+│    name=#5              │           │                         │
+│    descriptor=#6        │           │                         │
+│ #4 Utf8 "Calculator"    │           │                         │
+│ #5 Utf8 "add"           │           │                         │
+│ #6 Utf8 "(II)I"         │           │                         │
+└─────────────────────────┘           └─────────────────────────┘
+```
+
+* 符號引用：字符串形式的引用（"Calculator", "add", "(II)I"）
+* 直接引用：內存中的指針（*Method, *Class）
+
+<br>
+
+---
+
+<br>
+
+## ClassRef (Class 直接引用)
+
+用於 `new`、`checkcast`、`instanceof` 等指令。
+
+```
+Class -> RuntimeConstantPool
+                   | 
+                   └--> * ClassRef
+                   └--> * FieldRef
+                   └--> * MethodRef
+```
+
+<br>
+
+__ClassRef 直接引用__ 指向一個 Class，使用 lazy loading 機制。
+
+JVM 並不會在一開始就完整載入所有 class，先持有一個參考，當真正需要調用到該 Class 時，才會真正使用 ClassLoader 開始載入並緩存到 ClassLoader 中。
+
+<br>
+<br>
+
+## FieldRef (Field 直接引用)
+
+__FieldRef 直接引用__ 指向一個 Field，使用 lazy loading 機制。
+
+FieldRef 從 `classfile.ConstantFieldRefInfo` 解析得到 `name` 與 `descriptor`。
+
+當第一次執行 `ResolvedField()` 時，會需要利用 `name` 與 `descriptor` 在所屬的 Class 找尋對應的 Field
+
+<br>
+<br>
+
+## MethodRef (MethodRef 直接引用)
+
+__MethodRef 直接引用__ 指向一個 MethodRef，使用 lazy loading 機制。
+
+MethodRef 從 `classfile.ConstantFieldRefInfo` 解析得到 `name` 與 `descriptor`。
+
+當第一次執行 `ResolvedField()` 時，會需要利用 `name` 與 `descriptor` 在所屬的 Class 找尋對應的 Field
+
+<br>
+
+---
+
 <br>
 
 ## Class
+
+ClassFile 被 ClassLoader 載入的實例化 Class，被存放在方法區 (ClassLoader) 內。
 
 ```
  ClassFile（編譯時）    →    Class（運行時）
@@ -196,14 +306,111 @@ type RuntimeConstantPool struct {
  └─────────────────┘        └─────────────────┘
 ```
 
+看一下 Class 內完整的內容
+
+```go
+type Class struct {
+	accessFlags       uint16
+	name              string // className (ex: java/lang/Object)
+	superClassName    string
+	interfaceNames    []string
+	constantPool      *RuntimeConstantPool // ConstantPool - Runtime
+	fields            []*Field
+	methods           []*Method
+	loader            *ClassLoader // 加載此類的 ClassLoader
+	superClass        *Class       // parent class ref
+	interfaces        []*Class     // interface refs
+	instanceSlotCount uint         // 實例變量佔用的 slot 數量
+	staticSlotCount   uint         // 類變量佔用的 slot 數量
+	instanceVars      rtcore.Slots // class's non-static vars
+	staticVars        rtcore.Slots // class's static vars
+}
+```
+
 <br>
 <br>
+
+## Field
+
+Class 的 Field 實例，包含在 Class 內存於方法區中。
+
+```go
+type Field struct {
+	accessFlags     uint16
+	name            string
+	descriptor      string
+	class           *Class // belongs to
+	slotId          uint   // index in slot
+	constValueIndex uint   // ConstantValue attributes index (for static final) could be found in class's RuntimeConstantPool
+}
+```
+
 <br>
 <br>
+
+## Method
+
+Class 的 Method 實例，包含在 Class 內存於方法區中。
+
+```go
+// Method in Class
+//
+// including:
+// - method signature (name & descriptor)
+// - access flags
+// - bytecode
+// - max Stack size
+// - max LocalVars table size
+// - method input params count (actually is slots count)
+type Method struct {
+	accessFlags  uint16
+	name         string
+	descriptor   string
+	class        *Class
+	maxStack     uint16
+	maxLocals    uint16
+	code         []byte
+	argSlotCount uint
+}
+```
+
 <br>
+
+比較重要的點 `calcArgSlotCount()`:
+
+* 需要根據 `descriptor` 來計算 argSlotCount。
+* 如果該方法是非靜態方法，第一個 argSlot 預設都是 `this`，自動多加一個 slot 數量。
+
+```go
+// calcArgSlotCount calculate params take slots count
+// based on Descriptor
+// ex: (II)V → 2 int → 2 slots
+// ex: (DD)V → 2 double → 4 slots (double take 2 slots)
+// ex: (JD)V → 1 long + 1 double → 4 slots
+// ex: (Ljava/lang/String;I)V → 1 ref + 1 int → 2 slots
+func (m *Method) calcArgSlotCount() {
+	parsedDescriptor := parseMethodDescriptor(m.descriptor)
+	for _, paramType := range parsedDescriptor.parameterTypes {
+		m.argSlotCount++
+		// long & double take 2 slots
+		if paramType == "J" || paramType == "D" {
+			m.argSlotCount++
+		}
+	}
+
+	// non-static method first slot store this(object) reference, so we + 1
+	if !m.IsStatic() {
+		m.argSlotCount++
+	}
+}
+```
+
 <br>
+
+---
+
 <br>
-<br>
+
 
 ## MethodDescriptor 方法描述符解析結果
 
@@ -241,38 +448,12 @@ V - void      L類名; - 引用類型    [ - 數組
 
 <br>
 
-## ClassLoader 類加載器
-
-### 職責：
-1. 根據類名找到 .class 文件
-2. 解析 ClassFile
-3. 轉換為運行時 Class 結構
-4. 存入 Method Area（classMap）
-5. 保證類的唯一性（同一個類只加載一次）
+---
 
 <br>
 
-### 類加載流程：
-```
- ┌─────────────────────────────────────────────────────────┐
- │  Loading → Linking → Initialization                     │
- │                                                         │
- │  Loading:                                               │
- │    - 讀取 .class 文件                                    │
- │    - 解析成 ClassFile                                   │
- │    - 轉換成 Class                                       │
- │                                                         │
- │  Linking:                                               │
- │    - Verification: 驗證字節碼（簡化跳過）                   │
- │    - Preparation: 為靜態變量分配空間                       │
- │    - Resolution: 符號引用解析（懶加載）                     │
- │                                                         │
- │  Initialization:                                        │
- │    - 執行 <clinit> 方法（靜態初始化）                       │
- └─────────────────────────────────────────────────────────┘
-```
 
-## 執行流程圖解
+## `invokestatic` 執行流程圖解
 
 當執行 `invokestatic StaticCall.add` 時：
 
@@ -335,7 +516,6 @@ invokestatic #1
 │   r.class = c              // 緩存                      │
 │                                                         │
 └─────────────────────────────────────────────────────────┘
-
 ```
 
 <br>

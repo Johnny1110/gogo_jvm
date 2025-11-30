@@ -60,6 +60,7 @@ func (c *Class) Loader() *ClassLoader               { return c.loader }
 func (c *Class) SuperClass() *Class                 { return c.superClass }
 func (c *Class) StaticVars() rtcore.Slots           { return c.staticVars }
 func (c *Class) AccessFlags() uint16                { return c.accessFlags }
+func (c *Class) InstanceSlotCount() uint            { return c.instanceSlotCount }
 
 // =============== Access Flags ===============
 
@@ -74,12 +75,12 @@ func (c *Class) IsEnum() bool       { return c.accessFlags&common.ACC_ENUM != 0 
 
 // =============== Method Lookup ===============
 
-// GetMainMethod 獲取 main 方法
+// GetMainMethod get `public static void main([]String args) {}`
 func (c *Class) GetMainMethod() *Method {
 	return c.getStaticMethod("main", "([Ljava/lang/String;)V")
 }
 
-// getStaticMethod 獲取靜態方法
+// getStaticMethod get static method
 func (c *Class) getStaticMethod(name, descriptor string) *Method {
 	for _, method := range c.methods {
 		if method.IsStatic() && method.name == name && method.descriptor == descriptor {
@@ -89,23 +90,23 @@ func (c *Class) getStaticMethod(name, descriptor string) *Method {
 	return nil
 }
 
-// GetMethod 獲取方法（包含繼承查找，暫時簡化）
+// GetMethod get method (including parent and grandparent...)
 func (c *Class) GetMethod(name, descriptor string) *Method {
-	// 先在當前類查找
+	// try to find in current class
 	for _, method := range c.methods {
 		if method.name == name && method.descriptor == descriptor {
 			return method
 		}
 	}
-	// TODO: 在父類查找（繼承）
+
+	// try to find in parent and grandparent...
+	if c.superClass != nil {
+		return c.superClass.GetMethod(name, descriptor)
+	}
+
 	return nil
 }
 
-// GetStaticMethod 公開版本
 func (c *Class) GetStaticMethod(name, descriptor string) *Method {
 	return c.getStaticMethod(name, descriptor)
-}
-
-func (c *Class) InstanceSlotCount() uint {
-	return c.instanceSlotCount
 }

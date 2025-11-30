@@ -5,26 +5,27 @@ import (
 	"github.com/Johnny1110/gogo_jvm/common"
 )
 
-// Method 運行時方法結構
+// Method in Class
 //
-// 方法是執行的核心單位，包含：
-// - 方法簽名（名稱 + 描述符）
-// - 訪問標誌
-// - 字節碼
-// - 操作數棧大小
-// - 局部變量表大小
+// including:
+// - method signature (name & descriptor)
+// - access flags
+// - bytecode
+// - max Stack size
+// - max LocalVars table size
+// - method input params count (actually is slots count)
 type Method struct {
 	accessFlags  uint16
 	name         string
 	descriptor   string
-	class        *Class // 所屬類
-	maxStack     uint16 // 操作數棧最大深度
-	maxLocals    uint16 // 局部變量表大小
-	code         []byte // 方法字節碼
-	argSlotCount uint   // 參數佔用的 rtcore 數量
+	class        *Class
+	maxStack     uint16
+	maxLocals    uint16
+	code         []byte
+	argSlotCount uint
 }
 
-// newMethods 從 ClassFile 的 MemberInfo 創建 Method 列表
+// newMethods create from classfile
 func newMethods(class *Class, cfMethods []*classfile.MemberInfo) []*Method {
 	methods := make([]*Method, len(cfMethods))
 	for i, cfMethod := range cfMethods {
@@ -44,7 +45,7 @@ func newMethod(class *Class, cfMethod *classfile.MemberInfo) *Method {
 	return method
 }
 
-// copyAttributes 複製 Code 屬性
+// copyAttributes copy from classfile.CodeAttribute
 func (m *Method) copyAttributes(cfMethod *classfile.MemberInfo) {
 	if codeAttr := cfMethod.CodeAttribute(); codeAttr != nil {
 		m.maxStack = codeAttr.MaxStack()
@@ -53,22 +54,23 @@ func (m *Method) copyAttributes(cfMethod *classfile.MemberInfo) {
 	}
 }
 
-// calcArgSlotCount 計算參數佔用的 rtcore 數量
-// 根據方法描述符解析參數類型
-// 例如：(II)V → 2 個 int → 2 slots
-//
-//	(JD)V → 1 個 long + 1 個 double → 4 slots
-//	(Ljava/lang/String;I)V → 1 個引用 + 1 個 int → 2 slots
+// calcArgSlotCount calculate params take slots count
+// based on Descriptor
+// ex: (II)V → 2 int → 2 slots
+// ex: (DD)V → 2 double → 4 slots (double take 2 slots)
+// ex: (JD)V → 1 long + 1 double → 4 slots
+// ex: (Ljava/lang/String;I)V → 1 ref + 1 int → 2 slots
 func (m *Method) calcArgSlotCount() {
 	parsedDescriptor := parseMethodDescriptor(m.descriptor)
 	for _, paramType := range parsedDescriptor.parameterTypes {
 		m.argSlotCount++
-		// long 和 double 佔 2 個 rtcore
+		// long & double take 2 slots
 		if paramType == "J" || paramType == "D" {
 			m.argSlotCount++
 		}
 	}
-	// 非靜態方法需要額外一個 rtcore 存 this
+
+	// non-static method first slot store this(object) reference, so we + 1
 	if !m.IsStatic() {
 		m.argSlotCount++
 	}
@@ -101,7 +103,7 @@ func (m *Method) IsStrict() bool       { return m.accessFlags&common.ACC_STRICT 
 
 // =============== Helper ===============
 
-// IsPSVM 是否是 public static void main(String[] args)
+// IsPSVM check is public static void main(String[] args)
 func (m *Method) IsPSVM() bool {
 	return m.IsPublic() && m.IsStatic() &&
 		m.name == "main" && m.descriptor == "([Ljava/lang/String;)V"

@@ -10,8 +10,8 @@ type Field struct {
 	name            string
 	descriptor      string
 	class           *Class // belongs to
-	slotId          uint   // index in rtcore
-	constValueIndex uint   // ConstantValue attributes index (for static final)
+	slotId          uint   // index in slot
+	constValueIndex uint   // ConstantValue attributes index (for static final) could be found in class's RuntimeConstantPool
 }
 
 func (f *Field) copyAttributes(cfFiledInfo *classfile.MemberInfo) {

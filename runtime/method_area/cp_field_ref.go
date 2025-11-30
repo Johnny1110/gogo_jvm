@@ -4,11 +4,10 @@ import (
 	"github.com/Johnny1110/gogo_jvm/classfile"
 )
 
-// FieldRef 字段引用
-// 例如：getstatic System.out → 需要解析 out 字段
+// FieldRef
 type FieldRef struct {
 	MemberRef
-	field *Field // 解析後的字段（緩存）
+	field *Field // resolved field (cached)
 }
 
 func NewFieldRef(cp *RuntimeConstantPool, refInfo *classfile.ConstantFieldRefInfo) *FieldRef {
@@ -26,20 +25,24 @@ func (r *FieldRef) ResolvedField() *Field {
 }
 
 func (r *FieldRef) resolveFieldRef() {
-	c := r.ResolvedClass()
-	field := lookupField(c, r.name, r.descriptor)
+	class := r.ResolvedClass()
+	field := lookupField(class, r.name, r.descriptor)
 	if field == nil {
 		panic("java.lang.NoSuchFieldError: " + r.name)
 	}
 	r.field = field
 }
 
-func lookupField(c *Class, name, descriptor string) *Field {
-	for _, field := range c.Fields() {
-		if field.Name() == name && field.Descriptor() == descriptor {
+func lookupField(class *Class, fieldName, fieldDescriptor string) *Field {
+	for _, field := range class.Fields() {
+		if field.Name() == fieldName && field.Descriptor() == fieldDescriptor {
 			return field
 		}
 	}
-	// TODO: 在接口和父類中查找
+
+	if class.superClass != nil {
+		return lookupField(class.superClass, fieldName, fieldDescriptor)
+	}
+
 	return nil
 }

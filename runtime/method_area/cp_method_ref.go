@@ -18,7 +18,7 @@ func NewMethodRef(cp *RuntimeConstantPool, refInfo *classfile.ConstantMethodRefI
 	return ref
 }
 
-// ResolvedMethod 解析方法引用（這是 invokestatic 的核心！）
+// ResolvedMethod lazy loading
 func (r *MethodRef) ResolvedMethod() *Method {
 	if r.method == nil { // using cache, lazy load.
 		r.resolveMethodRef()
@@ -50,7 +50,11 @@ func lookupMethod(c *Class, methodName, methodDescriptor string) *Method {
 	if method != nil {
 		return method
 	}
-	// TODO: find in super class.
+
+	if c.superClass != nil {
+		return lookupMethod(c.superClass, methodName, methodDescriptor)
+	}
+
 	return nil
 }
 

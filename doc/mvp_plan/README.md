@@ -76,9 +76,21 @@ gogo_jvm/
 │   ├── frame.go           // 棧幀
 │   ├── local_vars.go      // 局部變量表
 │   ├── operand_stack.go   // 操作數棧
-│   └── heap/
-│       ├── object.go      // 對象表示
-│       └── class.go       // 類元數據
+│   ├── trcore/
+│   │   └── slot.go        // 定義 Slot 與 Slots 資料結構
+│   │
+│   ├── heap/
+│   │   └── object.go      // 對象表示
+│   │ 
+│   └──method_area/
+│        ├── class_loader.go      
+│        ├── constant_pool.go  // runtime constant pool 
+│        ├── rtma_class.go     // method-area class
+│        ├── rtma_field.go     // method-area field
+│        ├── rtma_method.go    // method-area method
+│        ├── cp_class_ref.go   // constant pool class 直接引用
+│        ├── cp_field_ref.go   // constant pool field 直接引用
+│        └── cp_method_ref.go  // constant pool method 直接引用
 ```
 
 **關鍵設計決策：**

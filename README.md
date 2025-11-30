@@ -11,17 +11,30 @@ Using GoLang to implement a simple JVM
 
 <br>
 
+## MVP plan
+
 * [MVP plan](doc/mvp_plan)
-  * Phase - 1：classfile module [(✔️)](classfile)
-  * Phase - 2：runtime module [(⚠️)](runtime) - Missing Heap and Method Area.
-  * Phase - 3：instructions module [(✔️)](instructions)
-  * Phase - 4：interpreter module [(⏳)](interpreter)
-  * Phase - 5：classpath/classloader module (⏳)
-  * Phase - 6：function call (⏳)
+
+<br>
+<br>
+
+## Structure
 
 <br>
 
-### Docs:
+1. [JVM Entry](cmd/gogo_jvm)
+2. [Classfile](classfile)
+3. [JVM Runtime Data Area](runtime)
+   * [Method-Area](runtime/method_area)
+   * [Heap](runtime/heap)
+   * [Slot](runtime/rtcore)
+4. [instructions](instructions)
+5. [interpreter](interpreter)
 
-* classfile: [link](classfile)
+
+
+### Tips:
+
+* Java Constant Pools: [link](doc/tips/constant_pool.md)
+* Java Method Descriptor: [link](doc/tips/descriptor.md)
 

@@ -51,12 +51,16 @@ func (r *InterfaceMethodRef) ResolvedClass() *Class {
 
 // lookupInterfaceMethod find method
 func lookupInterfaceMethod(iface *Class, name, descriptor string) *Method {
-	// 在當前接口查找
+	// find in current class
 	for _, method := range iface.Methods() {
 		if method.Name() == name && method.Descriptor() == descriptor {
 			return method
 		}
 	}
-	// TODO: 在父接口中查找
+
+	if iface.superClass != nil {
+		return lookupInterfaceMethod(iface.superClass, name, descriptor)
+	}
+
 	return nil
 }
