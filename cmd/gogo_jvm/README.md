@@ -152,6 +152,7 @@ public class Fibonacci {
 
 * 需要完善的模組：
   * /runtime/heap/object.go
+  * `slotId` 在 ClassLoader.prepare() 階段計算還未完成，需要補齊
 
 * 測試目標：
 
