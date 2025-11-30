@@ -4,73 +4,68 @@ import (
 	"fmt"
 	"github.com/Johnny1110/gogo_jvm/interpreter"
 	"github.com/Johnny1110/gogo_jvm/runtime/method_area"
-	"io/ioutil"
 	"os"
 )
 
 // ============================================================
-// Gogo JVM - Phase 2.3
+// Gogo JVM v0.2.3
 // ============================================================
-//
-// 執行流程：
-// 1. 讀取 .class 文件
-// 2. 使用 ClassLoader 加載類
-// 3. 找到 main 方法
-// 4. 執行解釋器
-
 func main() {
 	if len(os.Args) < 2 {
+		// first arg is java
 		printUsage()
 		os.Exit(1)
 	}
-
 	classFilePath := os.Args[1]
 	debug := len(os.Args) > 2 && os.Args[2] == "-debug"
 
-	// 獲取類路徑（.class 文件所在目錄）
+	// get class path (.class file's dir）
 	classPath := getClassPath(classFilePath)
 	className := getClassName(classFilePath)
 
-	fmt.Printf("ClassPath: %s\n", classPath)
-	fmt.Printf("ClassName: %s\n", className)
-	fmt.Println("============================================")
+	if debug {
+		fmt.Println("============================================")
+		fmt.Printf("ClassPath: %s\n", classPath)
+		fmt.Printf("ClassName: %s\n", className)
+		fmt.Println("============================================")
+	}
 
-	// 創建 ClassLoader
+	// create ClassLoader
 	loader := method_area.NewClassLoader(classPath)
 
-	// 加載類
+	// let ClassLoader load class
 	class := loader.LoadClass(className)
 
-	// 找到 main 方法
+	// find main()
 	mainMethod := class.GetMainMethod()
 	if mainMethod == nil {
-		fmt.Println("Error: No main method found!")
+		fmt.Println("Error: No main method found")
 		fmt.Println("Main method signature must be: public static void main(String[] args)")
 		os.Exit(1)
 	}
 
-	fmt.Printf("\n=== Executing %s.main() ===\n\n", className)
-
-	// 執行
+	// start run
 	interpreter.Interpret(mainMethod, debug)
 
-	fmt.Println("\n=== Execution completed ===")
+	fmt.Println("GOGO JVM exit")
 }
 
-// getClassPath 從文件路徑獲取類路徑
+// getClassPath
 func getClassPath(filePath string) string {
-	// 找到最後一個 / 的位置
+	// find last '/' position
 	for i := len(filePath) - 1; i >= 0; i-- {
 		if filePath[i] == '/' || filePath[i] == '\\' {
 			return filePath[:i]
 		}
 	}
+
+	// if input path is like "TestLoopSum.class", the return class path will be "."
 	return "."
 }
 
-// getClassName 從文件路徑獲取類名
+// getClassName
 func getClassName(filePath string) string {
-	// 找到文件名
+	// find dir name
 	start := 0
 	for i := len(filePath) - 1; i >= 0; i-- {
 		if filePath[i] == '/' || filePath[i] == '\\' {
@@ -80,7 +75,7 @@ func getClassName(filePath string) string {
 	}
 	name := filePath[start:]
 
-	// 移除 .class 後綴
+	// remove ".class" suffix
 	if len(name) > 6 && name[len(name)-6:] == ".class" {
 		name = name[:len(name)-6]
 	}
@@ -95,9 +90,4 @@ func printUsage() {
 	fmt.Println("Examples:")
 	fmt.Println("  gogo_jvm SimpleAdd.class")
 	fmt.Println("  gogo_jvm SimpleAdd.class -debug")
-}
-
-// readClassFile 讀取類文件（備用，如果不用 ClassLoader）
-func readClassFile(path string) ([]byte, error) {
-	return ioutil.ReadFile(path)
 }

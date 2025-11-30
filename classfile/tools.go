@@ -5,8 +5,8 @@ import (
 	"strings"
 )
 
-// getUtf8 get UTF8 String from ConstantPool
-func getUtf8(cp ConstantPool, index uint16) string {
+// getUtf8 get UTF8 String from ClassFileConstantPool
+func getUtf8(cp ClassFileConstantPool, index uint16) string {
 	if utf8Info, ok := cp[index].(*ConstantUtf8Info); ok {
 		return utf8Info.str
 	}
@@ -119,7 +119,7 @@ func join(strs []string, sep string) string {
 	return result
 }
 
-func printConstantPool(pool ConstantPool) {
+func printConstantPool(pool ClassFileConstantPool) {
 	fmt.Printf("\n%s\n", strings.Repeat("=", 100))
 	fmt.Printf("CONSTANT POOL (Total: %d entries, Index: 1-%d)\n", len(pool)-1, len(pool)-1)
 	fmt.Printf("%s\n", strings.Repeat("=", 100))
@@ -206,21 +206,21 @@ func printDoubleInfo(c *ConstantDoubleInfo) {
 }
 
 // Class 引用
-func printClassInfo(c *ConstantClassInfo, pool ConstantPool) {
+func printClassInfo(c *ConstantClassInfo, pool ClassFileConstantPool) {
 	className := c.Name()
 	fmt.Printf("%-20s name_index=#%-3d -> \"%s\"\n",
 		"Class", c.nameIndex, className)
 }
 
 // String 常量
-func printStringInfo(c *ConstantStringInfo, pool ConstantPool) {
+func printStringInfo(c *ConstantStringInfo, pool ClassFileConstantPool) {
 	str := getUtf8(pool, c.stringIndex)
 	fmt.Printf("%-20s string_index=#%-3d -> \"%s\"\n",
 		"String", c.stringIndex, str)
 }
 
 // 字段引用
-func printFieldrefInfo(c *ConstantFieldRefInfo, pool ConstantPool, idx int) {
+func printFieldrefInfo(c *ConstantFieldRefInfo, pool ClassFileConstantPool, idx int) {
 	className, name, descriptor := pool.getMemberRef(idx)
 	fmt.Printf("%-20s class=#%-3d, name_type=#%-3d\n",
 		"Fieldref", c.classIndex, c.nameAndTypeIndex)
@@ -228,7 +228,7 @@ func printFieldrefInfo(c *ConstantFieldRefInfo, pool ConstantPool, idx int) {
 }
 
 // 方法引用
-func printMethodrefInfo(c *ConstantMethodRefInfo, pool ConstantPool, idx int) {
+func printMethodrefInfo(c *ConstantMethodRefInfo, pool ClassFileConstantPool, idx int) {
 	className, name, descriptor := pool.getMemberRef(idx)
 	fmt.Printf("%-20s class=#%-3d, name_type=#%-3d\n",
 		"Methodref", c.classIndex, c.nameAndTypeIndex)
@@ -236,7 +236,7 @@ func printMethodrefInfo(c *ConstantMethodRefInfo, pool ConstantPool, idx int) {
 }
 
 // 接口方法引用
-func printInterfaceMethodrefInfo(c *ConstantInterfaceMethodRefInfo, pool ConstantPool, idx int) {
+func printInterfaceMethodrefInfo(c *ConstantInterfaceMethodRefInfo, pool ClassFileConstantPool, idx int) {
 	className, name, descriptor := pool.getMemberRef(idx)
 	fmt.Printf("%-20s class=#%-3d, name_type=#%-3d\n",
 		"InterfaceMethodref", c.classIndex, c.nameAndTypeIndex)
@@ -244,7 +244,7 @@ func printInterfaceMethodrefInfo(c *ConstantInterfaceMethodRefInfo, pool Constan
 }
 
 // 名稱和類型
-func printNameAndTypeInfo(c *ConstantNameAndTypeInfo, pool ConstantPool) {
+func printNameAndTypeInfo(c *ConstantNameAndTypeInfo, pool ClassFileConstantPool) {
 	name := getUtf8(pool, c.nameIndex)
 	descriptor := getUtf8(pool, c.descriptorIndex)
 	fmt.Printf("%-20s name=#%-3d, desc=#%-3d\n",
@@ -253,7 +253,7 @@ func printNameAndTypeInfo(c *ConstantNameAndTypeInfo, pool ConstantPool) {
 }
 
 // PrintConstantPoolWithReferences 打印常量池及其引用關係圖
-func PrintConstantPoolWithReferences(pool ConstantPool) {
+func PrintConstantPoolWithReferences(pool ClassFileConstantPool) {
 	printConstantPool(pool)
 
 	// 打印引用關係圖
@@ -308,7 +308,7 @@ func PrintConstantPoolWithReferences(pool ConstantPool) {
 }
 
 // PrintConstantPoolSummary 打印常量池統計摘要
-func PrintConstantPoolSummary(pool ConstantPool) {
+func PrintConstantPoolSummary(pool ClassFileConstantPool) {
 	counts := make(map[string]int)
 
 	for idx := 1; idx < len(pool); idx++ {
@@ -358,7 +358,7 @@ func PrintConstantPoolSummary(pool ConstantPool) {
 }
 
 // estimatePoolSize 估算常量池佔用的內存大小
-func estimatePoolSize(pool ConstantPool) int {
+func estimatePoolSize(pool ClassFileConstantPool) int {
 	size := 0
 
 	for idx := 1; idx < len(pool); idx++ {
@@ -400,7 +400,7 @@ func estimatePoolSize(pool ConstantPool) int {
 }
 
 // GetConstantPoolEntryInfo 獲取指定索引的常量池項詳細信息
-func GetConstantPoolEntryInfo(pool ConstantPool, index int) string {
+func GetConstantPoolEntryInfo(pool ClassFileConstantPool, index int) string {
 	if index == 0 || int(index) >= len(pool) {
 		return fmt.Sprintf("Invalid index: %d", index)
 	}

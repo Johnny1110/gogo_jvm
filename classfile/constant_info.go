@@ -13,7 +13,7 @@ type ConstantInfo interface {
 	Tag() ConstantTag
 }
 
-func readConstantInfo(reader *ClassReader, cp ConstantPool) ConstantInfo {
+func readConstantInfo(reader *ClassReader, cp ClassFileConstantPool) ConstantInfo {
 	tagUint8 := reader.readU1()
 	if tag, err := uint8ToTag(tagUint8); err == nil {
 		info := newConstantInfo(tag, cp)
@@ -27,7 +27,7 @@ func readConstantInfo(reader *ClassReader, cp ConstantPool) ConstantInfo {
 	}
 }
 
-func newConstantInfo(tag ConstantTag, cp ConstantPool) ConstantInfo {
+func newConstantInfo(tag ConstantTag, cp ClassFileConstantPool) ConstantInfo {
 	switch tag {
 	case CONSTANT_Utf8:
 		return &ConstantUtf8Info{}
@@ -166,7 +166,7 @@ func (c *ConstantDoubleInfo) Value() float64 {
 
 // ConstantClassInfo Class Constant
 type ConstantClassInfo struct {
-	cp        ConstantPool
+	cp        ClassFileConstantPool
 	nameIndex uint16 // point to UTF8 constants
 }
 
@@ -188,7 +188,7 @@ func (c *ConstantClassInfo) Tag() ConstantTag {
 
 // ConstantStringInfo String constants
 type ConstantStringInfo struct {
-	cp          ConstantPool
+	cp          ClassFileConstantPool
 	stringIndex uint16
 }
 
@@ -206,7 +206,7 @@ func (c *ConstantStringInfo) Tag() ConstantTag {
 
 // ConstantMemberRefInfo Member Ref constants (fields and methods)
 type ConstantMemberRefInfo struct {
-	cp               ConstantPool
+	cp               ClassFileConstantPool
 	classIndex       uint16
 	nameAndTypeIndex uint16
 }

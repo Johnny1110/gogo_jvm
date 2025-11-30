@@ -4,14 +4,14 @@ import (
 	"github.com/Johnny1110/gogo_jvm/classfile"
 )
 
-// ConstantPool runtime constant pool
+// ClassFileConstantPool runtime constant pool
 //
-// ClassFile's ConstantPool is static symbol ref (just string stuff)
-// Runtime's ConstantPool convert static symbol ref to direct ref (to a actual method / field)
+// ClassFile's ClassFileConstantPool is static symbol ref (just string stuff)
+// Runtime's ClassFileConstantPool convert static symbol ref to direct ref (to a actual method / field)
 //
 // symbol ref vs direct ref：
 // ┌────────────────────────────────────────────────────────┐
-// │  ClassFile ConstantPool（Compile）                      │
+// │  ClassFile ClassFileConstantPool（Compile）                      │
 // │  #1 Methodref → class=#2, nameAndType=#3               │
 // │  #2 Class → name=#4                                    │
 // │  #3 NameAndType → name=#5, desc=#6                    │
@@ -33,8 +33,8 @@ type RuntimeConstantPool struct {
 	consts []Constant
 }
 
-// newConstantPool create RuntimeConstantPool from classfile.ConstantPool
-func newConstantPool(class *Class, cfCp classfile.ConstantPool) *RuntimeConstantPool {
+// newConstantPool create RuntimeConstantPool from classfile.ClassFileConstantPool
+func newConstantPool(class *Class, cfCp classfile.ClassFileConstantPool) *RuntimeConstantPool {
 	cpCount := len(cfCp)
 	consts := make([]Constant, cpCount)
 	rtCp := &RuntimeConstantPool{class: class, consts: consts}

@@ -13,14 +13,14 @@ type ClassFile struct {
 	magic        uint32 // magic number: 0xCAFEBABE, for classify .class file (4 bytes)
 	minorVersion uint16
 	majorVersion uint16
-	constantPool ConstantPool    // constants pool
-	accessFlags  uint16          // class access flags
-	thisClass    uint16          // this class index (pointing to constantPool)
-	superClass   uint16          // super class index
-	interfaces   []uint16        // implemented interfaces index
-	fields       []*MemberInfo   // fields table
-	methods      []*MemberInfo   // methods table
-	attributes   []AttributeInfo // attributes table
+	constantPool ClassFileConstantPool // constants pool
+	accessFlags  uint16                // class access flags
+	thisClass    uint16                // this class index (pointing to constantPool)
+	superClass   uint16                // super class index
+	interfaces   []uint16              // implemented interfaces index
+	fields       []*MemberInfo         // fields table
+	methods      []*MemberInfo         // methods table
+	attributes   []AttributeInfo       // attributes table
 }
 
 // Parse parse class file
@@ -109,7 +109,7 @@ func (cf *ClassFile) Methods() []*MemberInfo {
 	return cf.methods
 }
 
-func (cf *ClassFile) ConstantPool() ConstantPool {
+func (cf *ClassFile) ConstantPool() ClassFileConstantPool {
 	return cf.constantPool
 }
 
@@ -169,7 +169,7 @@ func (cf *ClassFile) String() string {
 	return fmt.Sprintf(`ClassFile {
 	Magic: %X
 	Version: %d.%d
-	ConstantPool: %d items
+	ClassFileConstantPool: %d items
 	AccessFlags: 0x%04X
 	ThisClass: %s
 	SuperClass: %s

@@ -9,14 +9,14 @@ import "github.com/Johnny1110/gogo_jvm/common"
 // - descriptor_index : descriptor in constants pool
 // - attributes       : attributes list
 type MemberInfo struct {
-	cp              ConstantPool
+	cp              ClassFileConstantPool
 	accessFlags     uint16
 	nameIndex       uint16
 	descriptorIndex uint16
 	attributes      []AttributeInfo // could contains: Code, ConstantValue, Exceptions, SourceFile, LineNumberTable, LocalVariableTable
 }
 
-func readMembers(reader *ClassReader, cp ConstantPool) []*MemberInfo {
+func readMembers(reader *ClassReader, cp ClassFileConstantPool) []*MemberInfo {
 	memberCount := reader.readU2()
 	members := make([]*MemberInfo, memberCount)
 	for i := range members {
@@ -25,7 +25,7 @@ func readMembers(reader *ClassReader, cp ConstantPool) []*MemberInfo {
 	return members
 }
 
-func readMember(reader *ClassReader, cp ConstantPool) *MemberInfo {
+func readMember(reader *ClassReader, cp ClassFileConstantPool) *MemberInfo {
 	return &MemberInfo{
 		cp:              cp,
 		accessFlags:     reader.readU2(),

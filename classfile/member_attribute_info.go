@@ -6,7 +6,7 @@ package classfile
 // AttributeInfo attribute interface
 type AttributeInfo interface{}
 
-func readAttributes(reader *ClassReader, cp ConstantPool) []AttributeInfo {
+func readAttributes(reader *ClassReader, cp ClassFileConstantPool) []AttributeInfo {
 	attributesCount := reader.readU2()
 	attributes := make([]AttributeInfo, attributesCount)
 	for i := range attributes {
@@ -15,7 +15,7 @@ func readAttributes(reader *ClassReader, cp ConstantPool) []AttributeInfo {
 	return attributes
 }
 
-func readAttribute(reader *ClassReader, cp ConstantPool) AttributeInfo {
+func readAttribute(reader *ClassReader, cp ClassFileConstantPool) AttributeInfo {
 	attrNameIndex := reader.readU2()
 	attrName := getUtf8(cp, attrNameIndex)
 	attrLength := reader.readU4()
@@ -36,7 +36,7 @@ func readAttribute(reader *ClassReader, cp ConstantPool) AttributeInfo {
 	return attrInfo
 }
 
-func newAttributeInfo(attrName string, attrLength uint32, cp ConstantPool) AttributeInfo {
+func newAttributeInfo(attrName string, attrLength uint32, cp ClassFileConstantPool) AttributeInfo {
 	switch attrName {
 	case "Code":
 		return &CodeAttribute{cp: cp}
@@ -64,7 +64,7 @@ type UnparsedAttribute struct {
 
 // CodeAttribute
 type CodeAttribute struct {
-	cp             ConstantPool
+	cp             ClassFileConstantPool
 	maxStack       uint16
 	maxLocals      uint16
 	code           []byte
@@ -130,7 +130,7 @@ func (e *ExceptionsAttribute) readInfo(reader *ClassReader) {
 
 // SourceFileAttribute
 type SourceFileAttribute struct {
-	cp              ConstantPool
+	cp              ClassFileConstantPool
 	sourceFileIndex uint16
 }
 
