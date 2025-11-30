@@ -13,10 +13,10 @@ type INVOKE_STATIC struct {
 }
 
 func (i *INVOKE_STATIC) Execute(frame *runtime.Frame) {
-	// 1. get runtime CP from current frame
+	// 1. get RuntimeConstantPool from current frame
 	cp := frame.Method().Class().ConstantPool()
 
-	// 2. get method reference
+	// 2. get method reference, index is target methodRef index which is already loaded in RuntimeConstantPool.
 	methodRef := cp.GetConstant(i.Index).(*method_area.MethodRef)
 
 	// 3. parse method ref, get target method
@@ -27,9 +27,7 @@ func (i *INVOKE_STATIC) Execute(frame *runtime.Frame) {
 		panic("java.lang.IncompatibleClassChangeError")
 	}
 
-	// 5. TODO: 類初始化（<clinit>）
-	// 如果類還沒初始化，需要先執行 <clinit>
-	// MVP 階段暫時跳過
+	// 5. TODO: 類初始化（<clinit>，如果類還沒初始化，需要先執行 <clinit> MVP 階段暫時跳過
 
 	// 6. call method
 	InvokeMethod(frame, resolvedMethod)

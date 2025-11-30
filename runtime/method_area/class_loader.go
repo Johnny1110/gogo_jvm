@@ -9,7 +9,7 @@ import (
 
 type ClassLoader struct {
 	classPath string            // .class files dir
-	classMap  map[string]*Class // loaded classes（Method Area）
+	classMap  map[string]*Class // loaded classes（Method Area）- key: className
 }
 
 // NewClassLoader create class loader
@@ -22,28 +22,28 @@ func NewClassLoader(classPath string) *ClassLoader {
 
 // LoadClass load class
 // name: class's full name, like "java/lang/Object" or "Calculator"
-func (loader *ClassLoader) LoadClass(name string) *Class {
+func (loader *ClassLoader) LoadClass(name string, debug bool) *Class {
 	// 1. check is loaded or not, return cache.
 	if class, ok := loader.classMap[name]; ok {
 		return class
 	}
 
 	// 2. load class
-	return loader.loadNonArrayClass(name)
+	return loader.loadNonArrayClass(name, debug)
 }
 
 // loadNonArrayClass load non array class
-func (loader *ClassLoader) loadNonArrayClass(name string) *Class {
+func (loader *ClassLoader) loadNonArrayClass(name string, debug bool) *Class {
 	// 1. read .class
-	data, err := loader.readClass(name)
+	classBytecode, err := loader.readClass(name)
 	if err != nil {
 		panic("java.lang.ClassNotFoundException: " + name)
 	}
 
-	// 2. parse ClassFile
-	class := loader.defineClass(data)
+	// 2. parse ClassFile bytecode to class object
+	class := loader.defineClass(classBytecode, debug)
 
-	// 3. do link（Linking）
+	// 3. do link（Verification and Preparation）
 	link(class)
 
 	fmt.Printf("[ClassLoader] Loaded: %s\n", name)
@@ -69,26 +69,30 @@ func (loader *ClassLoader) readClass(name string) ([]byte, error) {
 }
 
 // defineClass define class (create Class from bytecode)
-func (loader *ClassLoader) defineClass(data []byte) *Class {
+func (loader *ClassLoader) defineClass(data []byte, debug bool) *Class {
 	// 1. parse ClassFile
 	cf, err := classfile.Parse(data)
 	if err != nil {
 		panic("java.lang.ClassFormatError: " + err.Error())
 	}
 
-	classfile.Debug(cf, true)
+	if debug {
+		classfile.Debug(cf, true)
+	}
 
-	// 2. turn classfile to Class
+	// 2. convert classfile to Class object
 	class := newClass(cf)
+	// make class linked with this ClassLoader
 	class.loader = loader
 
 	// 3. load super class
 	loader.resolveSuperClass(class)
-
 	// 4. load interface
 	loader.resolveInterfaces(class)
 
-	// 5. store into Method Area
+	// after step 3 and 4, all interfaces and parent, grandparent will be loaded into this ClassLoader
+
+	// 5. store into Method Area (this class will never be load again)
 	loader.classMap[class.name] = class
 
 	return class
@@ -96,9 +100,9 @@ func (loader *ClassLoader) defineClass(data []byte) *Class {
 
 // resolveSuperClass load super class
 func (loader *ClassLoader) resolveSuperClass(class *Class) {
-	// TODO: MVP phase -> skip this
+	// TODO: MVP phase -> skip this (currently we don't need extends)
 	//if class.name != "java/lang/Object" && class.superClassName != "" {
-	//	// recursive
+	//	// recursive load parent class
 	//	class.superClass = class.loader.LoadClass(class.superClassName)
 	//}
 }
@@ -109,7 +113,7 @@ func (loader *ClassLoader) resolveInterfaces(class *Class) {
 	if interfaceCount > 0 {
 		class.interfaces = make([]*Class, interfaceCount)
 		for i, ifaceName := range class.interfaceNames {
-			class.interfaces[i] = class.loader.LoadClass(ifaceName)
+			class.interfaces[i] = class.loader.LoadClass(ifaceName, false)
 		}
 	}
 }
@@ -123,7 +127,7 @@ func link(class *Class) {
 	prepare(class)
 }
 
-// verify Verification
+// verify Verification check bytecode, prevent jvm from crash
 func verify(class *Class) {
 	// TODO: 字節碼驗證 MVP 階段跳過
 }
@@ -133,10 +137,10 @@ func verify(class *Class) {
 func prepare(class *Class) {
 	calcInstanceFieldSlotIds(class)
 	calcStaticFieldSlotIds(class)
-	allocAndInitStaticVars(class)
+	allocAndInitVars(class)
 }
 
-// calcInstanceFieldSlotIds calculate instance fileds rtcore ID
+// calcInstanceFieldSlotIds calculate instance fields slot ID
 func calcInstanceFieldSlotIds(class *Class) {
 	slotId := uint(0)
 	// from parent
@@ -152,10 +156,11 @@ func calcInstanceFieldSlotIds(class *Class) {
 			}
 		}
 	}
+
 	class.instanceSlotCount = slotId
 }
 
-// calcStaticFieldSlotIds calculate static fields rtcore ID
+// calcStaticFieldSlotIds calculate static fields slot ID
 func calcStaticFieldSlotIds(class *Class) {
 	slotId := uint(0)
 	for _, field := range class.fields {
@@ -170,8 +175,9 @@ func calcStaticFieldSlotIds(class *Class) {
 	class.staticSlotCount = slotId
 }
 
-// allocAndInitStaticVars allocate and init static vars
-func allocAndInitStaticVars(class *Class) {
+// allocAndInitVars allocate and init static & non-static vars
+func allocAndInitVars(class *Class) {
+	class.instanceVars = rtcore.NewSlots(class.instanceSlotCount)
 	class.staticVars = rtcore.NewSlots(class.staticSlotCount)
 	// TODO: 初始化 static final 常量
 }

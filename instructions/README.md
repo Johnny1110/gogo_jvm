@@ -377,7 +377,7 @@ func branch(frame *runtime.Frame, offset int) {
 <br>
 <br>
 
-### NVOKE_STATIC 調用靜態方法
+### INVOKE_STATIC 調用靜態方法
 
 opcode = 0xB8
 
@@ -397,6 +397,32 @@ opcode = 0xB8
 例子：invokestatic Calculator.add(II)I
 
 ```
+  invokestatic #1  (調用 Calculator.add)
+  │
+  ▼
+  MethodRef.ResolvedMethod() // 加載 add() 法
+  │
+  ├─ 1. ResolvedClass() → 加載 Calculator 類
+  │
+  ├─ 2. 檢查不是接口
+  │
+  └─ 3. lookupMethod("add", "(II)I")
+  │
+  └─ 在 Calculator.methods 中查找
+  │
+  ▼
+  返回 Method 對象
+```
+
+<br>
+
+這裡我想著重補充一個概念，上面提到 __從調用者的操作數棧彈出參數，放入新棧幀的局部變量表__。
+
+* 在 `Method` 中我們可以由 `argSlotCount` 參數得知 invoke 該方法時需要傳遞多少參數。
+* 在先前的計算中，理應把需要傳入目標方法得參數們 (slots) 都照順序押入 stack 中。
+* 在建立 newFrame 時，就需要把參數 pop 出來，倒著放進 newFrame 的 LocalVars 中。
+
+```
 調用前：                      調用後：
  ┌─────────────┐              ┌─────────────┐
  │ main Frame  │              │  add Frame  │ ← 新的當前幀
@@ -406,6 +432,36 @@ opcode = 0xB8
                               │ main Frame  │
                               │ stack: []   │
                               └─────────────┘
+```
+
+<br>
+
+source code: 
+```go
+// InvokeMethod call method common func
+// usage: invokestatic, invokevirtual
+func InvokeMethod(invokerFrame *runtime.Frame, method *method_area.Method) {
+	// 1, get current thread
+	thread := invokerFrame.Thread()
+
+	// 2. create a new frame (represent new method)
+	newFrame := thread.NewFrameWithMethod(method)
+	thread.PushFrame(newFrame)
+
+	// 3. pass vars, we can know how many params should pass in by method.ArgSlotCount()
+	argSlotCount := int(method.ArgSlotCount())
+	if argSlotCount > 0 {
+		for i := argSlotCount - 1; i >= 0; i-- {
+			// the passing var will be standby in invokerFrame's stack.
+			// pop it from invokerFrame's stack
+			slot := invokerFrame.OperandStack().PopSlot()
+			// put into newFrame's LocalVars
+			newFrame.LocalVars().SetSlot(uint(i), slot)
+		}
+	}
+
+	// no need to reset PC, new frame nextPC will be default 0
+}
 ```
 
 <br>

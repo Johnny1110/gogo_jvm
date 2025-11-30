@@ -6,43 +6,43 @@ import (
 	"github.com/Johnny1110/gogo_jvm/runtime/rtcore"
 )
 
-// Class 運行時類結構
-// 這是 ClassFile 在 Method Area 中的運行時表示
+// Class instant in runtime method area
 //
-// ClassFile（編譯時）    →    Class（運行時）
+// ClassFile（Compile）   →    Class（Runtime）
 // ┌─────────────────┐        ┌─────────────────┐
-// │ constantPool    │   →    │ constantPool    │  運行時常量池
+// │ constantPool    │   →    │ constantPool    │  RuntimeConstantPool
 // │ accessFlags     │   →    │ accessFlags     │
-// │ thisClass       │   →    │ name            │  直接存類名
-// │ superClass      │   →    │ superClass      │  指向父類 Class
-// │ interfaces      │   →    │ interfaces      │  指向接口 Class[]
-// │ fields          │   →    │ fields          │  運行時字段
-// │ methods         │   →    │ methods         │  運行時方法
+// │ thisClass       │   →    │ name            │  class name
+// │ superClass      │   →    │ superClass      │  ref to super Class
+// │ interfaces      │   →    │ interfaces      │  ref to interface Class[]
+// │ fields          │   →    │ fields          │  runtime fields
+// │ methods         │   →    │ methods         │  runtime methods
 // └─────────────────┘        └─────────────────┘
 type Class struct {
 	accessFlags       uint16
-	name              string               // 類名（全限定名，如 java/lang/Object）
-	superClassName    string               // 父類名
-	interfaceNames    []string             // 接口名列表
-	constantPool      *RuntimeConstantPool // 運行時常量池
-	fields            []*Field             // 字段列表
-	methods           []*Method            // 方法列表
-	loader            *ClassLoader         // 加載此類的 ClassLoader
-	superClass        *Class               // 父類引用（解析後）
-	interfaces        []*Class             // 接口引用列表（解析後）
-	instanceSlotCount uint                 // 實例變量佔用的 rtcore 數量
-	staticSlotCount   uint                 // 類變量佔用的 rtcore 數量
-	staticVars        rtcore.Slots         // 靜態變量（類變量）
+	name              string // className (ex: java/lang/Object)
+	superClassName    string
+	interfaceNames    []string
+	constantPool      *RuntimeConstantPool // ConstantPool Runtime
+	fields            []*Field
+	methods           []*Method
+	loader            *ClassLoader // 加載此類的 ClassLoader
+	superClass        *Class       // parent class ref
+	interfaces        []*Class     // interface refs
+	instanceSlotCount uint         // 實例變量佔用的 slot 數量
+	staticSlotCount   uint         // 類變量佔用的 slot 數量
+	instanceVars      rtcore.Slots // class's non-static vars
+	staticVars        rtcore.Slots // class's static vars
 }
 
-// newClass 從 ClassFile 創建 Class
+// newClass create Class from classfile.ClassFile
 func newClass(cf *classfile.ClassFile) *Class {
 	c := &Class{}
 	c.accessFlags = cf.AccessFlags()
 	c.name = cf.ClassName()
 	c.superClassName = cf.SuperClassName()
 	c.interfaceNames = cf.InterfaceNames()
-	c.constantPool = newConstantPool(c, cf.ConstantPool())
+	c.constantPool = newRuntimeConstantPool(c, cf.ConstantPool())
 	c.fields = newFields(c, cf.Fields())
 	c.methods = newMethods(c, cf.Methods())
 	return c

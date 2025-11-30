@@ -33,8 +33,8 @@ type RuntimeConstantPool struct {
 	consts []Constant
 }
 
-// newConstantPool create RuntimeConstantPool from classfile.ClassFileConstantPool
-func newConstantPool(class *Class, cfCp classfile.ClassFileConstantPool) *RuntimeConstantPool {
+// newRuntimeConstantPool create RuntimeConstantPool from classfile.ClassFileConstantPool
+func newRuntimeConstantPool(class *Class, cfCp classfile.ClassFileConstantPool) *RuntimeConstantPool {
 	cpCount := len(cfCp)
 	consts := make([]Constant, cpCount)
 	rtCp := &RuntimeConstantPool{class: class, consts: consts}

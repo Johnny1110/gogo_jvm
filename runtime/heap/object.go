@@ -14,7 +14,7 @@ type Object struct {
 }
 
 // NewObject create new object
-// TODO: completed in Phase-2.4
+// TODO: completed in v0.2.4
 func NewObject(class *method_area.Class) *Object {
 	return &Object{
 		class:  class,

@@ -12,11 +12,6 @@ import (
 )
 
 // Interpret Bytecode interpret
-// code: bytecode - from Code Attributes
-// maxLocals: size of LocalVars
-// maxStack: max size of opStack
-// args: method args (if exists)
-// debug: display debug message info
 func Interpret(method *method_area.Method, debug bool) {
 	// 1. create thread
 	thread := runtime.NewThread()
@@ -43,7 +38,7 @@ func loop(thread *runtime.Thread, debug bool) {
 		// get current frame
 		frame := thread.CurrentFrame()
 
-		// get bytecode from frame
+		// get bytecode from frame's method
 		bytecode := frame.Method().Code()
 
 		// calculate PC
@@ -60,7 +55,7 @@ func loop(thread *runtime.Thread, debug bool) {
 			fmt.Printf("Error parsing instruction: %s\n", err)
 			os.Exit(1)
 		}
-		instruction.FetchOperands(reader) // fetch index, offset if required
+		instruction.FetchOperands(reader) // fetch (index, offset) if required
 		frame.SetNextPC(reader.PC())      // update PC (to next instruction)
 
 		if debug {
@@ -71,12 +66,14 @@ func loop(thread *runtime.Thread, debug bool) {
 		instruction.Execute(frame)
 	}
 
-	fmt.Println("================================================================")
-	fmt.Println("@@ Thread's JVMFrameStack is empty before exist LocalVarsTable:")
-	for i, slot := range mainMethodFrame.LocalVars() {
-		fmt.Printf("Slot - %d:\n", i)
-		fmt.Printf("\t num: %v \n", slot.Num)
-		fmt.Printf("\t reference: %v \n", slot.Ref)
+	if debug {
+		fmt.Println("================================================================")
+		fmt.Println("GOGO JVM: Thread's JVMFrameStack is empty before exist LocalVarsTable:")
+		for i, slot := range mainMethodFrame.LocalVars() {
+			fmt.Printf("Slot - %d:\n", i)
+			fmt.Printf("\t num: %v \n", slot.Num)
+			fmt.Printf("\t reference: %v \n", slot.Ref)
+		}
 	}
 }
 

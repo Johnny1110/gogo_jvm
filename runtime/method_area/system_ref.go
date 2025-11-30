@@ -21,7 +21,7 @@ func (r *SymRef) resolveClassRef() {
 	// 獲取當前類的 ClassLoader
 	d := r.cp.Class()
 	// 用 ClassLoader 加載目標類
-	c := d.Loader().LoadClass(r.className)
+	c := d.Loader().LoadClass(r.className, false)
 	// TODO: 訪問權限檢查
 	r.class = c
 }

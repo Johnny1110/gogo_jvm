@@ -8,10 +8,10 @@ import (
 // InvokeMethod call method common func
 // usage: invokestatic, invokevirtual
 func InvokeMethod(invokerFrame *runtime.Frame, method *method_area.Method) {
-	// 1, get thread
+	// 1, get current thread
 	thread := invokerFrame.Thread()
 
-	// 2. create a new frame
+	// 2. create a new frame (represent new method)
 	newFrame := thread.NewFrameWithMethod(method)
 	thread.PushFrame(newFrame)
 

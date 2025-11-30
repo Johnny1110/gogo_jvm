@@ -34,7 +34,7 @@ func main() {
 	loader := method_area.NewClassLoader(classPath)
 
 	// let ClassLoader load class
-	class := loader.LoadClass(className)
+	class := loader.LoadClass(className, debug)
 
 	// find main()
 	mainMethod := class.GetMainMethod()

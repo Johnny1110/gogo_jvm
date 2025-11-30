@@ -2,25 +2,25 @@ package method_area
 
 import "github.com/Johnny1110/gogo_jvm/classfile"
 
-// MemberRef 成員引用基類（字段和方法的共同基礎）
+// MemberRef base ref for all FieldRef and MethodRef
 type MemberRef struct {
 	SymRef
-	name       string // 成員名
-	descriptor string // 描述符
+	name       string
+	descriptor string
 }
 
-// copyMemberRefInfo 從 ClassFile 複製成員引用信息
+// copyMemberRefInfo copy into from ClassFile
 func (r *MemberRef) copyMemberRefInfo(refInfo *classfile.ConstantMemberRefInfo) {
 	r.className = refInfo.ClassName()
 	r.name, r.descriptor = refInfo.NameAndDescriptor()
 }
 
-// Name 獲取成員名
+// Name getter
 func (r *MemberRef) Name() string {
 	return r.name
 }
 
-// Descriptor 獲取描述符
+// Descriptor getter
 func (r *MemberRef) Descriptor() string {
 	return r.descriptor
 }
