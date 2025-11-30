@@ -328,6 +328,72 @@ type Class struct {
 ```
 
 <br>
+
+### Phase - v0.2.4 新增:
+
+1. `NewObject()` 封裝了物件建立邏輯                               
+   - 自動使用 instanceSlotCount                                
+   - 自動傳遞 class 引用給 Object                              
+                                                                 
+2. `initStarted` 變量追蹤初始化狀態                                   
+   - 確保 <clinit> 只執行一次                                  
+   - MVP 簡化：不處理多執行緒競爭                               
+                                                                 
+3. `GetField()` 支援繼承查找                                      
+   - 先在當前類別找                                            
+   - 找不到就往父類找                                          
+                                                                 
+4. 類型檢查方法為未來 instanceof/checkcast 準備
+
+<br>
+
+**為什麼 Class 需要 NewObject() 方法 ?**
+
+當執行 `new Counter()` 時：
+
+1. `new` 指令從 RuntimeConstantPool 取得 ClassRef                               
+2. 解析得到 Counter 類別的 *Class                              
+3. 需要知道 Counter 物件需要多少個 slots → 這個資訊在 Class.instanceSlotCount 裡                     
+4. 呼叫 class.NewObject() 建立物件
+
+<br>
+
+**Class.NewObject() 的職責：**
+
+- instanceSlotCount（物件需要的欄位數）
+- 自動把 class 引用傳給 Object
+
+<br>
+
+**為什麼需要追蹤初始化狀態 ?**
+
+Java 類別有嚴格的初始化規則：
+
+```java
+class Counter {                                                
+	static int count = 10;      // 靜態變數初始化              
+	static {                    // 靜態初始化區塊              
+		count = count + 5;                                     
+	}                                                          
+}   
+```
+
+編譯器會產生 <clinit> 方法：
+
+- 初始化 static 變數
+- 執行 static {} 區塊
+
+JVM 規範要求：
+
+1. 類別只能初始化一次
+2. 初始化必須在以下時機觸發：
+    - new 建立物件
+    - 存取靜態欄位 (getstatic/putstatic)
+    - 呼叫靜態方法 (invokestatic)
+    - 子類初始化時，父類要先初始化
+
+
+
 <br>
 
 ## Field
