@@ -83,6 +83,7 @@ func (f *Frame) Lower() *Frame {
 }
 
 // RevertNextPC revert PC to current instruction
+// Usages: new/getstatic/putstatic/invokestatic
 func (f *Frame) RevertNextPC() {
 	f.nextPC = f.thread.PC()
 }
