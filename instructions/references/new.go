@@ -14,7 +14,7 @@ import (
 // 3. check class (not interface or abs)
 // 4. make sure already inited
 // 5. class.NewObject()
-// 6. push into stack
+// 6. push object's ref into stack
 type NEW struct {
 	base.Index16Instruction
 }
@@ -46,7 +46,7 @@ func (n *NEW) Execute(frame *runtime.Frame) {
 	// 5. class.NewObject()
 	object := class.NewObject()
 
-	// 6. push into stack
+	// 6. push object's ref into stack
 	frame.OperandStack().PushRef(object)
 }
 

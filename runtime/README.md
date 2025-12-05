@@ -287,6 +287,23 @@ actorial(5) -> factorial(4) -> factorial(3) ...
 
 <br>
 
+### v.0.2.5 補充
+
+* `RevertNextPC()`
+  
+  當執行 `new/getstatic/putstatic/invokestatic` 時，如果發現目標 class 沒有執行過 `<clinit>` 初始化靜態區塊：
+
+  1. call `RevertNextPC()` 方法讓當前指令在下一輪重新執行
+  2. 先去執行 `<clinit>` 初始化類別
+  3. `<clinit>` 執行完後，回到這條指令重新執行
+  
+   原理：
+  * `thread.PC()` 記錄的是當前指令的起始位置。
+  * `frame.nextPC` 記錄的是下一條指令的位置（已經讀取完 OprandsCode）。
+  * `RevertNextPC()` 把 `nextPC` 設置回 `thread.PC()`，這樣下次又重新執行一次。
+
+<br>
+
 設計考量（為未來擴展預留）：
 
 * method: 後續會加入方法引用，用於獲取類信息、常量池等
