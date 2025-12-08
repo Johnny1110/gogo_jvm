@@ -1,6 +1,7 @@
 package heap
 
 import (
+	"fmt"
 	"github.com/Johnny1110/gogo_jvm/runtime/rtcore"
 )
 
@@ -41,6 +42,7 @@ type Object struct {
 // this func only alloc space, not executing constructor
 // the object's constructor is calling by `invokespecial` <init>
 func NewObject(class interface{}, slotCount uint) *Object {
+	fmt.Println("[NewObject] class:", class, ", slotCount:", slotCount)
 	return &Object{
 		class:  class,
 		fields: rtcore.NewSlots(slotCount),

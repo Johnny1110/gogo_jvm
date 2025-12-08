@@ -21,7 +21,7 @@ func (g *GETSTATIC) Execute(frame *runtime.Frame) {
 	// 1. get const pool
 	rtcp := frame.Method().Class().ConstantPool()
 	// 2. get field from rtcp
-	fieldRef := rtcp.GetConstant(g.Index).(method_area.FieldRef)
+	fieldRef := rtcp.GetConstant(g.Index).(*method_area.FieldRef)
 	// 3. load field
 	field := fieldRef.ResolvedField()
 	// 4. get class (if field resolved, class should already be resolved also)
