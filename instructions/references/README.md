@@ -183,6 +183,103 @@ return
 所有這些指令都會檢查 `class.InitStarted()`，如果為 false 則先執行 `<clinit>`。
 
 <br>
+<br>
+
+## 方法呼叫
+
+<br>
+
+### `invokespecial` vs `invokevirtual`
+
+
+| 指令名稱       | Opcode | 功能描述                                   |
+|----------------|--------|--------------------------------------------|
+| invokespecial  | 0xB7   | 呼叫建構子 `<init>`、私有方法、`super.xxx()` |
+| invokevirtual  | 0xB6   | 呼叫實例方法（動態綁定，支援多型）          |
+
+<br>
+
+**`invokespecial`: 靜態綁定 (編譯時決定)**
+
+根據 MethodRef 指定的類別查找方法，用於：
+
+* 建構子 <init>
+* 私有方法 (private)                       
+* 父類方法 (super.xxx())
+
+<br>
+
+**`invokevirtual`: 動態綁定 (執行時決定)**
+
+根據物件的實際類型查找方法，這就是多型的實現原理。
+
+```java
+    ...
+    Animal a = new Dog();
+    a.speak();  // 呼叫 Dog.speak()，不是 Animal.speak()
+```
+
+<br>
+
+**建構子呼叫流程**
+
+```java
+Counter c = new Counter();
+```
+
+編譯：
+
+```go
+new                 // 1. 建立 Counter 物件，推入參考
+dup                 // 2. 複製參考（一份給建構子，一份存變數）
+invokespecial       // 3. 呼叫 Counter.<init>()
+astore_1            // 4. 存入 locals[1]
+```
+
+<br>
+
+執行時的棧變化：
+
+```
+                 new          dup             invokespecial    astore_1
+                  ↓            ↓                  ↓               ↓
+Stack:  []  →  [ref]  →  [ref,ref]  →  [ref]  →  []
+                                         ↑
+                                    建構子消耗一個
+                                    初始化物件欄位
+```
+
+<br>
+
+**多型的實現原理**
+
+```java
+class Animal {
+    void speak() { System.out.println("..."); }
+}
+
+class Dog extends Animal {
+    void speak() { System.out.println("Woof!"); }
+}
+
+// 執行時
+Animal a = new Dog();
+a.speak();  // invokevirtual
+```
+
+`invokevirtual` 的查找過程：
+
+1. 從操作數棧取得 objectRef                                     
+2. 取得物件的實際類型：obj.Class() → Dog                        
+3. 從 Dog 開始向上查找 speak() 方法                            
+   - Dog 有 speak()？有！→ 呼叫 Dog.speak()                  
+4. 如果 Dog 沒有，會繼續往 Animal 查找
+
+這就是為什麼輸出 "Woof!" 而不是 "..."
+
+
+<br>
+<br>
 
 ## 錯誤處理
 
