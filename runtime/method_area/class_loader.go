@@ -135,9 +135,9 @@ func verify(class *Class) {
 // prepare Preparation
 // allocate space for static const
 func prepare(class *Class) {
-	calcInstanceFieldSlotIds(class)
-	calcStaticFieldSlotIds(class)
-	allocAndInitVars(class)
+	calcInstanceFieldSlotIds(class) // for object
+	calcStaticFieldSlotIds(class)   // for class
+	allocAndInitStaticVars(class)   // only init static, instant will be alloc when create object
 }
 
 // calcInstanceFieldSlotIds calculate instance fields slot ID
@@ -163,6 +163,7 @@ func calcInstanceFieldSlotIds(class *Class) {
 // calcStaticFieldSlotIds calculate static fields slot ID
 func calcStaticFieldSlotIds(class *Class) {
 	slotId := uint(0)
+	// why not include parent class ? -> find tips in heap/README.md (為什麼類別的 static field slot ID 計算時不需要考慮婦類別？)
 	for _, field := range class.fields {
 		if field.IsStatic() {
 			field.slotId = slotId
@@ -175,9 +176,8 @@ func calcStaticFieldSlotIds(class *Class) {
 	class.staticSlotCount = slotId
 }
 
-// allocAndInitVars allocate and init static & non-static vars
-func allocAndInitVars(class *Class) {
-	class.instanceVars = rtcore.NewSlots(class.instanceSlotCount)
+// allocAndInitStaticVars allocate and init static-vars
+func allocAndInitStaticVars(class *Class) {
 	class.staticVars = rtcore.NewSlots(class.staticSlotCount)
 	// TODO: 初始化 static final 常量
 }

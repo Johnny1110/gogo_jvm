@@ -13,6 +13,7 @@
 ## 重要核心組成
 
 * [ClassLoader](class_loader.go) -> 負責將 class 完整載入 (從 classfile bytecode 開始解析)
+  * tip-1: [為什麼類別的 static field slot ID 計算時不需要考慮婦類別？](../../doc/tips/class_loader_cal_field_slot_id.md)
 
 * [RuntimeConstantPool](constant_pool.go) -> 運行時常量池 (每一個 class 都有一個自己專用，用於存放 class constant)
   * [ClassRef](cp_class_ref.go) -> 指向 Class 實例的直接引用 (RuntimeConstantPool 專用)

@@ -32,7 +32,6 @@ type Class struct {
 	interfaces        []*Class     // interface refs
 	instanceSlotCount uint         // 實例變量佔用的 slot 數量
 	staticSlotCount   uint         // 類變量佔用的 slot 數量
-	instanceVars      rtcore.Slots // class's non-static vars
 	staticVars        rtcore.Slots // class's static vars
 
 	// initStarted mark is this class already starting init, make sure <clinit> only do once
