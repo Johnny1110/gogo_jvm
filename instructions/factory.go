@@ -9,6 +9,7 @@ import (
 	"github.com/Johnny1110/gogo_jvm/instructions/loads"
 	"github.com/Johnny1110/gogo_jvm/instructions/math"
 	"github.com/Johnny1110/gogo_jvm/instructions/references"
+	"github.com/Johnny1110/gogo_jvm/instructions/stack"
 	"github.com/Johnny1110/gogo_jvm/instructions/stores"
 )
 
@@ -18,6 +19,7 @@ import (
 
 // !!: 預先建立好的 instructions 都是無狀態的，不可以把帶狀態 (index, offset) 的指令建立單例
 var (
+	// ============ Constants ============
 	nop         = &constants.NOP{}
 	aconst_null = &constants.ACONST_NULL{}
 	iconst_m1   = &constants.ICONST_M1{}
@@ -34,76 +36,96 @@ var (
 	fconst_2    = &constants.FCONST_2{}
 	dconst_0    = &constants.DCONST_0{}
 	dconst_1    = &constants.DCONST_1{}
-	iload_0     = &loads.ILOAD_0{}
-	iload_1     = &loads.ILOAD_1{}
-	iload_2     = &loads.ILOAD_2{}
-	iload_3     = &loads.ILOAD_3{}
-	lload_0     = &loads.LLOAD_0{}
-	lload_1     = &loads.LLOAD_1{}
-	lload_2     = &loads.LLOAD_2{}
-	lload_3     = &loads.LLOAD_3{}
-	fload_0     = &loads.FLOAD_0{}
-	fload_1     = &loads.FLOAD_1{}
-	fload_2     = &loads.FLOAD_2{}
-	fload_3     = &loads.FLOAD_3{}
-	dload_0     = &loads.DLOAD_0{}
-	dload_1     = &loads.DLOAD_1{}
-	dload_2     = &loads.DLOAD_2{}
-	dload_3     = &loads.DLOAD_3{}
-	aload_0     = &loads.ALOAD_0{}
-	aload_1     = &loads.ALOAD_1{}
-	aload_2     = &loads.ALOAD_2{}
-	aload_3     = &loads.ALOAD_3{}
-	istore_0    = &stores.ISTORE_0{}
-	istore_1    = &stores.ISTORE_1{}
-	istore_2    = &stores.ISTORE_2{}
-	istore_3    = &stores.ISTORE_3{}
-	lstore_0    = &stores.LSTORE_0{}
-	lstore_1    = &stores.LSTORE_1{}
-	lstore_2    = &stores.LSTORE_2{}
-	lstore_3    = &stores.LSTORE_3{}
-	fstore_0    = &stores.FSTORE_0{}
-	fstore_1    = &stores.FSTORE_1{}
-	fstore_2    = &stores.FSTORE_2{}
-	fstore_3    = &stores.FSTORE_3{}
-	dstore_0    = &stores.DSTORE_0{}
-	dstore_1    = &stores.DSTORE_1{}
-	dstore_2    = &stores.DSTORE_2{}
-	dstore_3    = &stores.DSTORE_3{}
-	astore_0    = &stores.ASTORE_0{}
-	astore_1    = &stores.ASTORE_1{}
-	astore_2    = &stores.ASTORE_2{}
-	astore_3    = &stores.ASTORE_3{}
-	iadd        = &math.IADD{}
-	ladd        = &math.LADD{}
-	fadd        = &math.FADD{}
-	dadd        = &math.DADD{}
-	isub        = &math.ISUB{}
-	lsub        = &math.LSUB{}
-	fsub        = &math.FSUB{}
-	dsub        = &math.DSUB{}
-	imul        = &math.IMUL{}
-	lmul        = &math.LMUL{}
-	fmul        = &math.FMUL{}
-	dmul        = &math.DMUL{}
-	idiv        = &math.IDIV{}
-	ldiv        = &math.LDIV{}
-	fdiv        = &math.FDIV{}
-	ddiv        = &math.DDIV{}
-	irem        = &math.IREM{}
-	lrem        = &math.LREM{}
-	frem        = &math.FREM{}
-	drem        = &math.DREM{}
-	ineg        = &math.INEG{}
-	lneg        = &math.LNEG{}
-	fneg        = &math.FNEG{}
-	dneg        = &math.DNEG{}
-	ireturn     = &control.IRETURN{}
-	lreturn     = &control.LRETURN{}
-	freturn     = &control.FRETURN{}
-	dreturn     = &control.DRETURN{}
-	areturn     = &control.ARETURN{}
-	_return     = &control.RETURN{}
+
+	// ============ Loads ============
+	iload_0 = &loads.ILOAD_0{}
+	iload_1 = &loads.ILOAD_1{}
+	iload_2 = &loads.ILOAD_2{}
+	iload_3 = &loads.ILOAD_3{}
+	lload_0 = &loads.LLOAD_0{}
+	lload_1 = &loads.LLOAD_1{}
+	lload_2 = &loads.LLOAD_2{}
+	lload_3 = &loads.LLOAD_3{}
+	fload_0 = &loads.FLOAD_0{}
+	fload_1 = &loads.FLOAD_1{}
+	fload_2 = &loads.FLOAD_2{}
+	fload_3 = &loads.FLOAD_3{}
+	dload_0 = &loads.DLOAD_0{}
+	dload_1 = &loads.DLOAD_1{}
+	dload_2 = &loads.DLOAD_2{}
+	dload_3 = &loads.DLOAD_3{}
+	aload_0 = &loads.ALOAD_0{}
+	aload_1 = &loads.ALOAD_1{}
+	aload_2 = &loads.ALOAD_2{}
+	aload_3 = &loads.ALOAD_3{}
+
+	// ============ Stores ============
+	istore_0 = &stores.ISTORE_0{}
+	istore_1 = &stores.ISTORE_1{}
+	istore_2 = &stores.ISTORE_2{}
+	istore_3 = &stores.ISTORE_3{}
+	lstore_0 = &stores.LSTORE_0{}
+	lstore_1 = &stores.LSTORE_1{}
+	lstore_2 = &stores.LSTORE_2{}
+	lstore_3 = &stores.LSTORE_3{}
+	fstore_0 = &stores.FSTORE_0{}
+	fstore_1 = &stores.FSTORE_1{}
+	fstore_2 = &stores.FSTORE_2{}
+	fstore_3 = &stores.FSTORE_3{}
+	dstore_0 = &stores.DSTORE_0{}
+	dstore_1 = &stores.DSTORE_1{}
+	dstore_2 = &stores.DSTORE_2{}
+	dstore_3 = &stores.DSTORE_3{}
+	astore_0 = &stores.ASTORE_0{}
+	astore_1 = &stores.ASTORE_1{}
+	astore_2 = &stores.ASTORE_2{}
+	astore_3 = &stores.ASTORE_3{}
+
+	// ============ Stack ============
+	pop     = &stack.POP{}
+	pop2    = &stack.POP2{}
+	dup     = &stack.DUP{}
+	dup_x1  = &stack.DUP_X1{}
+	dup_x2  = &stack.DUP_X2{}
+	dup2    = &stack.DUP2{}
+	dup2_x1 = &stack.DUP2_X1{}
+	dup2_x2 = &stack.DUP2_X2{}
+	swap    = &stack.SWAP{}
+
+	// ============ Math ============
+
+	iadd = &math.IADD{}
+	ladd = &math.LADD{}
+	fadd = &math.FADD{}
+	dadd = &math.DADD{}
+	isub = &math.ISUB{}
+	lsub = &math.LSUB{}
+	fsub = &math.FSUB{}
+	dsub = &math.DSUB{}
+	imul = &math.IMUL{}
+	lmul = &math.LMUL{}
+	fmul = &math.FMUL{}
+	dmul = &math.DMUL{}
+	idiv = &math.IDIV{}
+	ldiv = &math.LDIV{}
+	fdiv = &math.FDIV{}
+	ddiv = &math.DDIV{}
+	irem = &math.IREM{}
+	lrem = &math.LREM{}
+	frem = &math.FREM{}
+	drem = &math.DREM{}
+	ineg = &math.INEG{}
+	lneg = &math.LNEG{}
+	fneg = &math.FNEG{}
+	dneg = &math.DNEG{}
+
+	// ============ Control / Return ============
+	ireturn = &control.IRETURN{}
+	lreturn = &control.LRETURN{}
+	freturn = &control.FRETURN{}
+	dreturn = &control.DRETURN{}
+	areturn = &control.ARETURN{}
+	_return = &control.RETURN{}
 )
 
 // NewInstruction return instruction based on input opcodes
@@ -251,6 +273,26 @@ func NewInstruction(opcode byte) (base.Instruction, error) {
 	case opcodes.ASTORE_3:
 		return astore_3, nil
 
+	// Stack Instructions
+	case opcodes.POP:
+		return pop, nil
+	case opcodes.POP2:
+		return pop2, nil
+	case opcodes.DUP:
+		return dup, nil
+	case opcodes.DUP_X1:
+		return dup_x1, nil
+	case opcodes.DUP_X2:
+		return dup_x2, nil
+	case opcodes.DUP2:
+		return dup2, nil
+	case opcodes.DUP2_X1:
+		return dup2_x1, nil
+	case opcodes.DUP2_X2:
+		return dup2_x2, nil
+	case opcodes.SWAP:
+		return swap, nil
+
 	// // math instructions
 	case opcodes.IADD:
 		return iadd, nil
@@ -352,6 +394,22 @@ func NewInstruction(opcode byte) (base.Instruction, error) {
 		return areturn, nil
 	case opcodes.RETURN:
 		return _return, nil
+
+	// References Instructions
+
+	// Object Creation
+	case opcodes.NEW:
+		return &references.NEW{}, nil // 有操作數，每次新建
+
+	// Field Access
+	case opcodes.GETSTATIC:
+		return &references.GETSTATIC{}, nil // 有操作數，每次新建
+	case opcodes.PUTSTATIC:
+		return &references.PUTSTATIC{}, nil // 有操作數，每次新建
+	case opcodes.GETFIELD:
+		return &references.GETFIELD{}, nil // 有操作數，每次新建
+	case opcodes.PUTFIELD:
+		return &references.PUTFIELD{}, nil // 有操作數，每次新建
 
 	// invoke
 	case opcodes.INVOKESTATIC:

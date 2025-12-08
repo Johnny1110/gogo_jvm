@@ -58,26 +58,6 @@ func (n *NEW) Opcode() uint8 {
 // Class Init
 // ============================================================
 
-// InitClass
-// execute <clinit> method (if class have it)
-//
-// init order：
-// 1. parent class's <clinit>
-// 2. this class's <clinit>
-//
-// this func will create a new Frame to execute <clinit>
-// we need call RevertNextPC() let interpreor do this `new` again after init
-func InitClass(thread *runtime.Thread, class *method_area.Class) {
-	// mark class is doing init
-	class.StartInit()
-
-	// call <clinit>
-	scheduleClinit(thread, class)
-
-	// init parents (recursive until all parents are init)
-	initSuperClass(thread, class)
-}
-
 // scheduleClinit settle <clinit> (if exist) method to a new Frame
 func scheduleClinit(thread *runtime.Thread, class *method_area.Class) {
 	clinit := class.GetClinitMethod()
