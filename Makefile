@@ -5,7 +5,7 @@ GOCLEAN=$(GOCMD) clean
 GOTEST=$(GOCMD) test
 GOGET=$(GOCMD) get
 GOMOD=$(GOCMD) mod
-BINARY_NAME=java
+BINARY_NAME=gogo_jvm
 BINARY_PATH=./bin/$(BINARY_NAME)
 
 # Default target
