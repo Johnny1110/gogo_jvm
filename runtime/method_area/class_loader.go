@@ -163,7 +163,7 @@ func calcInstanceFieldSlotIds(class *Class) {
 // calcStaticFieldSlotIds calculate static fields slot ID
 func calcStaticFieldSlotIds(class *Class) {
 	slotId := uint(0)
-	// why not include parent class ? -> find tips in heap/README.md (為什麼類別的 static field slot ID 計算時不需要考慮婦類別？)
+	// why not include parent class ? -> find tips in heap/README.md (為什麼類別的 static field slot ID 計算時不需要考慮父類別？)
 	for _, field := range class.fields {
 		if field.IsStatic() {
 			field.slotId = slotId

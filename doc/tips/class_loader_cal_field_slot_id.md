@@ -1,4 +1,4 @@
-# 為什麼類別的 static field slot ID 計算時不需要考慮婦類別？
+# 為什麼類別的 static field slot ID 計算時不需要考慮父類別？
 
 <br>
 

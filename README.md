@@ -37,4 +37,5 @@ Using GoLang to implement a simple JVM
 
 * Java Constant Pools: [link](doc/tips/constant_pool.md)
 * Java Method Descriptor: [link](doc/tips/descriptor.md)
+* ClassLoader: 為什麼類別載入時的 static field slot ID 計算時不需要考慮父類別？: [link](doc/tips/class_loader_cal_field_slot_id.md)
 
