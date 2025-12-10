@@ -250,7 +250,7 @@ class Counter {
 type ArrayObject struct {
     class  *Class
     length int
-    data   interface{}  // []int32, []int64, []float32, []*Object.java 等
+    data   interface{}  // []int32, []int64, []float32, []*Object 等
 }
 ```
 
