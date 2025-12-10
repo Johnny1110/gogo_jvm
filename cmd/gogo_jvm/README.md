@@ -1,4 +1,4 @@
-# GOGO JVM (當前本版 v0.2.3)
+# GOGO JVM (當前本版 v0.2.5)
 
 <br>
 

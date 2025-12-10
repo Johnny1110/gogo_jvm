@@ -37,6 +37,7 @@ func (loader *ClassLoader) loadNonArrayClass(name string, debug bool) *Class {
 	// 1. read .class
 	classBytecode, err := loader.readClass(name)
 	if err != nil {
+		fmt.Printf("read class %s error: %v \n", name, err)
 		panic("java.lang.ClassNotFoundException: " + name)
 	}
 
@@ -100,11 +101,10 @@ func (loader *ClassLoader) defineClass(data []byte, debug bool) *Class {
 
 // resolveSuperClass load super class
 func (loader *ClassLoader) resolveSuperClass(class *Class) {
-	// TODO: MVP phase -> skip this (currently we don't need extends)
-	//if class.name != "java/lang/Object" && class.superClassName != "" {
-	//	// recursive load parent class
-	//	class.superClass = class.loader.LoadClass(class.superClassName)
-	//}
+	if class.name != "java/lang/Object" && class.superClassName != "" {
+		// recursive load parent class
+		class.superClass = class.loader.LoadClass(class.superClassName, false)
+	}
 }
 
 // resolveInterfaces load interface

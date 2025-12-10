@@ -312,7 +312,7 @@ ClassFile 被 ClassLoader 載入的實例化 Class，被存放在方法區 (Clas
 ```go
 type Class struct {
 	accessFlags       uint16
-	name              string // className (ex: java/lang/Object)
+	name              string // className (ex: java/lang/Object.java)
 	superClassName    string
 	interfaceNames    []string
 	constantPool      *RuntimeConstantPool // ConstantPool - Runtime

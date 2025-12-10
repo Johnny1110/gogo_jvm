@@ -100,6 +100,16 @@ func popAndSetFieldValue(stack *runtime.OperandStack, slots rtcore.Slots, slotId
 // checkNotNull check ref is not null
 func checkNotNull(ref interface{}) {
 	if ref == nil {
-		panic("java.lang.NullPointerException")
+		panic("java.class.NullPointerException")
 	}
+}
+
+// isSubClassOf check child is a subclass from parent
+func isSubClassOf(child, parent *method_area.Class) bool {
+	for c := child.SuperClass(); c != nil; c = c.SuperClass() {
+		if c == parent {
+			return true
+		}
+	}
+	return false
 }

@@ -397,23 +397,27 @@ func NewInstruction(opcode byte) (base.Instruction, error) {
 
 	// References Instructions
 
-	// Object Creation
+	// Object.java Creation
 	case opcodes.NEW:
-		return &references.NEW{}, nil // 有操作數，每次新建
+		return &references.NEW{}, nil
 
 	// Field Access
 	case opcodes.GETSTATIC:
-		return &references.GETSTATIC{}, nil // 有操作數，每次新建
+		return &references.GETSTATIC{}, nil
 	case opcodes.PUTSTATIC:
-		return &references.PUTSTATIC{}, nil // 有操作數，每次新建
+		return &references.PUTSTATIC{}, nil
 	case opcodes.GETFIELD:
-		return &references.GETFIELD{}, nil // 有操作數，每次新建
+		return &references.GETFIELD{}, nil
 	case opcodes.PUTFIELD:
-		return &references.PUTFIELD{}, nil // 有操作數，每次新建
+		return &references.PUTFIELD{}, nil
 
 	// invoke
 	case opcodes.INVOKESTATIC:
 		return &references.INVOKE_STATIC{}, nil
+	case opcodes.INVOKEVIRTUAL:
+		return &references.INVOKEVIRTUAL{}, nil
+	case opcodes.INVOKESPECIAL:
+		return &references.INVOKESPECIAL{}, nil
 
 	default:
 		return nop, fmt.Errorf("unsupported opcodes: 0x%02X", opcode)

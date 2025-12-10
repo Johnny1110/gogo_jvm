@@ -146,8 +146,8 @@ const (
 	PUTSTATIC       = 0xB3
 	GETFIELD        = 0xB4
 	PUTFIELD        = 0xB5
-	INVOKEVIRTUAL   = 0xB6 // Phase v0.2.5
-	INVOKESPECIAL   = 0xB7 // Phase v0.2.5
+	INVOKEVIRTUAL   = 0xB6 // v0.2.5
+	INVOKESPECIAL   = 0xB7 // v0.2.5
 	INVOKESTATIC    = 0xB8
 	INVOKEINTERFACE = 0xB9 // Future
 	NEW             = 0xBB
