@@ -7,16 +7,16 @@ import (
 )
 
 // InitClass
-// execute <clinit> method (if class have it)
+// execute <clinit> method (if lang have it)
 //
 // init order：
-// 1. parent class's <clinit>
-// 2. this class's <clinit>
+// 1. parent lang's <clinit>
+// 2. this lang's <clinit>
 //
 // this func will create a new Frame to execute <clinit>
 // we need call RevertNextPC() let interpreor do this `new` again after init
 func InitClass(thread *runtime.Thread, class *method_area.Class) {
-	// mark class is doing init
+	// mark lang is doing init
 	class.StartInit()
 
 	// call <clinit>
@@ -102,4 +102,14 @@ func checkNotNull(ref interface{}) {
 	if ref == nil {
 		panic("java.lang.NullPointerException")
 	}
+}
+
+// isSubClassOf check child is a subclass from parent
+func isSubClassOf(child, parent *method_area.Class) bool {
+	for c := child.SuperClass(); c != nil; c = c.SuperClass() {
+		if c == parent {
+			return true
+		}
+	}
+	return false
 }
