@@ -6,6 +6,7 @@ import (
 	"github.com/Johnny1110/gogo_jvm/instructions/base"
 	"github.com/Johnny1110/gogo_jvm/instructions/base/opcodes"
 	"github.com/Johnny1110/gogo_jvm/runtime"
+	"github.com/Johnny1110/gogo_jvm/runtime/heap"
 	"github.com/Johnny1110/gogo_jvm/runtime/method_area"
 	"github.com/Johnny1110/gogo_jvm/runtime/rtcore"
 	"os"
@@ -59,6 +60,7 @@ func loop(thread *runtime.Thread, debug bool) {
 		frame.SetNextPC(reader.PC())      // update PC (to next instruction)
 
 		if debug {
+			fmt.Println("<--------------------------------------------------------------------------------->")
 			printDebug(pc, instruction, frame)
 		}
 
@@ -70,9 +72,15 @@ func loop(thread *runtime.Thread, debug bool) {
 		fmt.Println("================================================================")
 		fmt.Println("GOGO JVM: Thread's JVMFrameStack is empty before exist LocalVarsTable:")
 		for i, slot := range mainMethodFrame.LocalVars() {
-			fmt.Printf("Slot - %d:\n", i)
-			fmt.Printf("\t num: %v \n", slot.Num)
-			fmt.Printf("\t reference: %v \n", slot.Ref)
+			fmt.Printf("* Slot - %d:\n", i)
+
+			if slot.Ref != nil {
+				fmt.Printf("\t <REF>: %v \n", slot.Ref)
+				fmt.Printf("\t\t\t Field Details: %v \n", slot.Ref.(*heap.Object).Fields())
+			} else {
+				fmt.Printf("\t <NUM>: %v \n", slot.Num)
+			}
+			fmt.Printf("\n")
 		}
 	}
 }
@@ -84,7 +92,7 @@ func printDebug(pc int, inst base.Instruction, frame *runtime.Frame) {
 		opName = fmt.Sprintf("unknown(0x%02X)", inst.Opcode())
 	}
 
-	fmt.Printf("PC:%3d | %-12s | Stack: ", pc, opName)
+	fmt.Printf("method: %s (%s) | PC:%3d | %-12s | Stack: ", frame.Method().Name(), frame.Method().Class().Name(), pc, opName)
 	printStack(frame.OperandStack())
 	fmt.Println()
 	printLocalVars(frame.LocalVars())
@@ -96,6 +104,10 @@ func printLocalVars(vars rtcore.Slots) {
 
 // printStack print stack details
 func printStack(stack *runtime.OperandStack) {
+	if stack == nil {
+		panic("Interpret error, OperandStack is nil!")
+	}
 	currentSize, maxSize := stack.Size()
-	fmt.Printf("[currentSize=%d, maxSize=%d]\n]", currentSize, maxSize)
+	fmt.Printf("[currentSize=%d, maxSize=%d]\n", currentSize, maxSize)
+	fmt.Printf("stack: %v \n", stack)
 }

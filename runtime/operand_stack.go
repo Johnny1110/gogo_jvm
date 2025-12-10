@@ -1,6 +1,7 @@
 package runtime
 
 import (
+	"fmt"
 	"github.com/Johnny1110/gogo_jvm/runtime/rtcore"
 	"math"
 )
@@ -12,13 +13,10 @@ type OperandStack struct {
 
 // NewOperandStack crate stack with max size
 func NewOperandStack(maxStack uint16) *OperandStack {
-	if maxStack > 0 {
-		return &OperandStack{
-			slots:    make([]rtcore.Slot, maxStack),
-			writePtr: 0, // init writer pointer
-		}
+	return &OperandStack{
+		slots:    make([]rtcore.Slot, maxStack),
+		writePtr: 0, // init writer pointer
 	}
-	return nil
 }
 
 func (os *OperandStack) Size() (current, max uint) {
@@ -124,4 +122,8 @@ func (os *OperandStack) Clear() {
 	for i := range os.slots {
 		os.slots[i].Ref = nil
 	}
+}
+
+func (os *OperandStack) String() string {
+	return fmt.Sprintf("writePointer:[%v], stack: %v", os.writePtr, os.slots)
 }

@@ -42,7 +42,7 @@ type Object struct {
 // this func only alloc space, not executing constructor
 // the object's constructor is calling by `invokespecial` <init>
 func NewObject(class interface{}, slotCount uint) *Object {
-	fmt.Println("[NewObject] class:", class, ", slotCount:", slotCount)
+	fmt.Println("@@ Debug - [NewObject] class:", class, ", slotCount:", slotCount)
 	return &Object{
 		class:  class,
 		fields: rtcore.NewSlots(slotCount),
@@ -144,4 +144,8 @@ func CheckNotNull(obj *Object) {
 	if obj == nil {
 		panic("java.lang.NullPointerException")
 	}
+}
+
+func (o *Object) String() string {
+	return fmt.Sprintf("<Object class=%v>", o.class)
 }

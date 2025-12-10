@@ -47,7 +47,7 @@ func (loader *ClassLoader) loadNonArrayClass(name string, debug bool) *Class {
 	// 3. do link（Verification and Preparation）
 	link(class)
 
-	fmt.Printf("[ClassLoader] Loaded: %s\n", name)
+	fmt.Printf("@@ Debug - [ClassLoader] Loaded: %s\n", name)
 	return class
 }
 
