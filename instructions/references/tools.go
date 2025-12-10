@@ -7,16 +7,16 @@ import (
 )
 
 // InitClass
-// execute <clinit> method (if lang have it)
+// execute <clinit> method (if class have it)
 //
 // init order：
-// 1. parent lang's <clinit>
-// 2. this lang's <clinit>
+// 1. parent class's <clinit>
+// 2. this class's <clinit>
 //
 // this func will create a new Frame to execute <clinit>
 // we need call RevertNextPC() let interpreor do this `new` again after init
 func InitClass(thread *runtime.Thread, class *method_area.Class) {
-	// mark lang is doing init
+	// mark class is doing init
 	class.StartInit()
 
 	// call <clinit>
@@ -100,7 +100,7 @@ func popAndSetFieldValue(stack *runtime.OperandStack, slots rtcore.Slots, slotId
 // checkNotNull check ref is not null
 func checkNotNull(ref interface{}) {
 	if ref == nil {
-		panic("java.lang.NullPointerException")
+		panic("java.class.NullPointerException")
 	}
 }
 

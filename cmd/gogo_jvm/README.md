@@ -1,4 +1,4 @@
-# GOGO JVM (當前本版 v0.2.3)
+# GOGO JVM (當前本版 v0.2.5)
 
 <br>
 
@@ -28,13 +28,13 @@
 
 ```go
 type ClassFile struct {
-	magic        uint32 // magic number: 0xCAFEBABE, for classify .lang file (4 bytes)
+	magic        uint32 // magic number: 0xCAFEBABE, for classify .class file (4 bytes)
 	minorVersion uint16
 	majorVersion uint16
 	constantPool ClassFileConstantPool // constants pool
-	accessFlags  uint16                // lang access flags
-	thisClass    uint16                // this lang index (pointing to constantPool)
-	superClass   uint16                // super lang index
+	accessFlags  uint16                // class access flags
+	thisClass    uint16                // this class index (pointing to constantPool)
+	superClass   uint16                // super class index
 	interfaces   []uint16              // implemented interfaces index
 	fields       []*MemberInfo         // fields table
 	methods      []*MemberInfo         // methods table

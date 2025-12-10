@@ -197,7 +197,7 @@ __每個 Class 在 JVM 裡都有自己的 runtime constant pool。__
 
 ```go
 type RuntimeConstantPool struct {
-   class  *Class        // 所屬的 lang
+   class  *Class        // 所屬的 class
    consts []Constant    // 常量表，裡面可以存直接引用或者 int long float double 等
 }
 ````
@@ -319,12 +319,12 @@ type Class struct {
 	fields            []*Field
 	methods           []*Method
 	loader            *ClassLoader // 加載此類的 ClassLoader
-	superClass        *Class       // parent lang ref
+	superClass        *Class       // parent class ref
 	interfaces        []*Class     // interface refs
 	instanceSlotCount uint         // 實例變量佔用的 slot 數量
 	staticSlotCount   uint         // 類變量佔用的 slot 數量
-	instanceVars      rtcore.Slots // lang's non-static vars
-	staticVars        rtcore.Slots // lang's static vars
+	instanceVars      rtcore.Slots // class's non-static vars
+	staticVars        rtcore.Slots // class's static vars
 }
 ```
 
@@ -408,7 +408,7 @@ type Field struct {
 	descriptor      string
 	class           *Class // belongs to
 	slotId          uint   // index in slot
-	constValueIndex uint   // ConstantValue attributes index (for static final) could be found in lang's RuntimeConstantPool
+	constValueIndex uint   // ConstantValue attributes index (for static final) could be found in class's RuntimeConstantPool
 }
 ```
 
