@@ -1,6 +1,7 @@
 package references
 
 import (
+	"fmt"
 	"github.com/Johnny1110/gogo_jvm/runtime"
 	"github.com/Johnny1110/gogo_jvm/runtime/method_area"
 	"github.com/Johnny1110/gogo_jvm/runtime/rtcore"
@@ -29,6 +30,7 @@ func InitClass(thread *runtime.Thread, class *method_area.Class) {
 // InvokeMethod call method common func
 // usage: invokestatic, invokevirtual
 func InvokeMethod(invokerFrame *runtime.Frame, method *method_area.Method) {
+	fmt.Printf("@@ Debug - Trying to InvokeMethod: %s (%s) \n", method.Name(), method.Class().Name())
 	// 1, get current thread
 	thread := invokerFrame.Thread()
 

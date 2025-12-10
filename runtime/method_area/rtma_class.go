@@ -1,10 +1,12 @@
 package method_area
 
 import (
+	"fmt"
 	"github.com/Johnny1110/gogo_jvm/classfile"
 	"github.com/Johnny1110/gogo_jvm/common"
 	"github.com/Johnny1110/gogo_jvm/runtime/heap"
 	"github.com/Johnny1110/gogo_jvm/runtime/rtcore"
+	"strings"
 )
 
 // Class instant in runtime method area
@@ -239,4 +241,105 @@ func (c *Class) IsSubInterfaceOf(target *Class) bool {
 // IsSuperClassOf
 func (c *Class) IsSuperClassOf(other *Class) bool {
 	return other.IsSubClassOf(c)
+}
+
+// String for debug display
+func (c *Class) String() string {
+	if c == nil {
+		return "<nil Class>"
+	}
+
+	var sb strings.Builder
+
+	// Header with class name
+	sb.WriteString("Class { ")
+	sb.WriteString(fmt.Sprintf("  Name: %s ", c.name))
+
+	// Access flags (human readable)
+	sb.WriteString(fmt.Sprintf("  Access: %s ", c.accessFlagsString()))
+
+	// Inheritance hierarchy
+	if c.superClassName != "" {
+		sb.WriteString(fmt.Sprintf("  Extends: %s ", c.superClassName))
+		if c.superClass != nil {
+			sb.WriteString(" ✓")
+		}
+		sb.WriteString("\n")
+	}
+
+	// Interfaces
+	if len(c.interfaceNames) > 0 {
+		sb.WriteString(fmt.Sprintf("  Implements: %d interface(s)", len(c.interfaceNames)))
+		if len(c.interfaces) == len(c.interfaceNames) {
+			sb.WriteString(" ✓")
+		}
+		sb.WriteString("\n")
+		for i, name := range c.interfaceNames {
+			if i >= 3 { // 只顯示前 3 個
+				sb.WriteString(fmt.Sprintf("    ... and %d more ", len(c.interfaceNames)-3))
+				break
+			}
+			sb.WriteString(fmt.Sprintf("    - %s\n", name))
+		}
+	}
+
+	// Fields and Methods summary
+	sb.WriteString(fmt.Sprintf("  \t\t\t Fields:  %d (instance slots: %d, static slots: %d) \n",
+		len(c.fields), c.instanceSlotCount, c.staticSlotCount))
+
+	sb.WriteString(fmt.Sprintf("    \t\t\t Methods: %d ", len(c.methods)))
+	if len(c.methods) > 0 && len(c.methods) <= 5 {
+		for _, method := range c.methods {
+			sb.WriteString(fmt.Sprintf(" - %s ", method.Name()))
+		}
+	} else if len(c.methods) > 5 {
+		for i := 0; i < 3; i++ {
+			sb.WriteString(fmt.Sprintf(" - %s ", c.methods[i].Name()))
+		}
+		sb.WriteString(fmt.Sprintf("    ... and %d more ", len(c.methods)-3))
+	}
+
+	// Runtime status
+	sb.WriteString(fmt.Sprintf("  Constant Pool: %v ", c.constantPool != nil))
+	sb.WriteString(fmt.Sprintf("  Loader: %v ", c.loader != nil))
+	sb.WriteString(fmt.Sprintf("  Init Started: %v ", c.initStarted))
+
+	sb.WriteString("}")
+
+	return sb.String()
+}
+
+func (c *Class) accessFlagsString() string {
+	flags := []string{}
+
+	if c.accessFlags&common.ACC_PUBLIC != 0 {
+		flags = append(flags, "public")
+	}
+	if c.accessFlags&common.ACC_FINAL != 0 {
+		flags = append(flags, "final")
+	}
+	if c.accessFlags&common.ACC_SUPER != 0 {
+		flags = append(flags, "super")
+	}
+	if c.accessFlags&common.ACC_INTERFACE != 0 {
+		flags = append(flags, "interface")
+	}
+	if c.accessFlags&common.ACC_ABSTRACT != 0 {
+		flags = append(flags, "abstract")
+	}
+	if c.accessFlags&common.ACC_SYNTHETIC != 0 {
+		flags = append(flags, "synthetic")
+	}
+	if c.accessFlags&common.ACC_ANNOTATION != 0 {
+		flags = append(flags, "annotation")
+	}
+	if c.accessFlags&common.ACC_ENUM != 0 {
+		flags = append(flags, "enum")
+	}
+
+	if len(flags) == 0 {
+		return fmt.Sprintf("0x%04x", c.accessFlags)
+	}
+
+	return fmt.Sprintf("%s (0x%04x)", strings.Join(flags, " "), c.accessFlags)
 }
