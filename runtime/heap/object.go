@@ -49,74 +49,6 @@ func NewObject(class interface{}, slotCount uint) *Object {
 	}
 }
 
-// =============== Array Constructors ===============
-// Java Array is a Object also, different data type using different array type.
-
-// NewByteArray create []byte or []bool
-func NewByteArray(class interface{}, length int32) *Object {
-	return &Object{
-		class: class,
-		extra: make([]int8, length),
-	}
-}
-
-// NewShortArray create short[] array
-func NewShortArray(class interface{}, length int32) *Object {
-	return &Object{
-		class: class,
-		extra: make([]int16, length),
-	}
-}
-
-// NewIntArray create int[] array
-func NewIntArray(class interface{}, length int32) *Object {
-	return &Object{
-		class: class,
-		extra: make([]int32, length),
-	}
-}
-
-// NewLongArray create long[] array
-func NewLongArray(class interface{}, length int32) *Object {
-	return &Object{
-		class: class,
-		extra: make([]int64, length),
-	}
-}
-
-// NewCharArray create char[] array
-// Java char is 16-bit unsigned
-func NewCharArray(class interface{}, length int32) *Object {
-	return &Object{
-		class: class,
-		extra: make([]uint16, length),
-	}
-}
-
-// NewFloatArray create float[] array
-func NewFloatArray(class interface{}, length int32) *Object {
-	return &Object{
-		class: class,
-		extra: make([]float32, length),
-	}
-}
-
-// NewDoubleArray create double[] array
-func NewDoubleArray(class interface{}, length int32) *Object {
-	return &Object{
-		class: class,
-		extra: make([]float64, length),
-	}
-}
-
-// NewRefArray create ref array (Object[], String[], other class[])
-func NewRefArray(class interface{}, length int32) *Object {
-	return &Object{
-		class: class,
-		extra: make([]*Object, length),
-	}
-}
-
 // =============== Getters ===============
 
 // Class getter
@@ -139,18 +71,6 @@ func (o *Object) Extra() interface{} {
 func (o *Object) SetExtra(extra interface{}) {
 	o.extra = extra
 }
-
-// =============== Array Type Check ===============
-
-// IsArray check is array
-func (o *Object) IsArray() bool {
-	// normal object extra is nil
-	return o.extra != nil
-}
-
-// =============== Array Element Access ===============
-
-// TODO:
 
 // =============== Field Access by SlotId ===============
 
@@ -196,14 +116,13 @@ func (o *Object) SetRefField(slotId uint, ref interface{}) {
 
 // =============== Type Checking ===============
 
-// IsInstanceOf 檢查此物件是否為指定類別的實例
-// 用於 instanceof 指令
+// IsInstanceOf java if (A instanceof B) {...}
 // targetClass: *method_area.Class
 //
 // 判斷規則：
-// 1. 如果 targetClass 是類別：檢查繼承鏈
-// 2. 如果 targetClass 是介面：檢查是否實作
-// 3. 如果是陣列類型：特殊處理（Phase v0.2.6）
+// 1. if targetClass is class: check super
+// 2. if targetClass is interface: check is implemented
+// 3. if array type: 特殊處理
 func (o *Object) IsInstanceOf(targetClass interface{}) bool {
 	// TODO: 實作完整的類型檢查邏輯
 	// 需要在 method_area.Class 上新增輔助方法
