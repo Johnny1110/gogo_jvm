@@ -1,0 +1,186 @@
+# Java 陣列命令
+
+<br>
+
+---
+
+<br>
+
+## JVM 陣列的特殊性
+
+1. 陣列不是由 ClassLoader 從 .class 載入的 → JVM 動態生成陣列類別
+2. 陣列類別的命名規則:
+   ```
+   I        → int[]                                         
+   [D        → double[]                                       
+   [[I       → int[][]                                        
+   [Ljava/lang/String;  → String[]
+   ```
+3. 陣列資料存在 `Object.extra` 欄位
+    * 普通物件：`fields` 存欄位，`extra = nil`
+    * 陣列物件：`fields = nil`，`extra` 存陣列資料
+
+<br>
+
+## 陣列物件的記憶體佈局
+
+```
+Normal Object: 
+┌─────────────────────────────────────────┐
+│ Object                                  │
+├─────────────────────────────────────────┤
+│ class ────────────────────────► Counter │
+│ fields: [slot0, slot1, ...]             │
+│ extra: nil                              │
+└─────────────────────────────────────────┘
+
+Array Object: 
+┌─────────────────────────────────────────┐
+│ Object (Array)                          │
+├─────────────────────────────────────────┤
+│ class ────────────────────────► [I      │
+│ fields: nil                             │
+│ extra: []int32{100, 200, 0, 0, 0}       │
+└─────────────────────────────────────────┘
+```
+
+<br>
+
+## 為什麼不同類型用不同的底層陣列？
+
+```go
+// byte[]/boolean[] → []int8   (1 byte per element)
+// short[]          → []int16  (2 bytes per element)
+// char[]           → []uint16 (2 bytes per element, unsigned)
+// int[]            → []int32  (4 bytes per element)
+// long[]           → []int64  (8 bytes per element)
+// float[]          → []float32
+// double[]         → []float64
+// Object[]         → []*Object
+```
+
+原因: 記憶體效率考量，如果所有陣列都用 []int64，一個 `byte[1000000]` 會浪費 7MB 記憶體。
+
+<br>
+<br>
+
+## 實作的指令
+
+### 建立陣列
+
+| 指令 | Opcode | 說明 |
+|------|--------|------|
+| newarray | 0xBC | 建立基本類型陣列 |
+| anewarray | 0xBD | 建立引用類型陣列 (TODO) |
+| multianewarray | 0xC5 | 建立多維陣列 (TODO) |
+
+<br>
+
+### newarray 的 atype 參數
+
+```
+atype = 4  → boolean[]
+atype = 5  → char[]
+atype = 6  → float[]
+atype = 7  → double[]
+atype = 8  → byte[]
+atype = 9  → short[]
+atype = 10 → int[]
+atype = 11 → long[]
+```
+
+<br>
+
+### 陣列元素存取
+
+| 載入指令 | Opcode | 存入指令 | Opcode | 類型 |
+|----------|--------|----------|--------|------|
+| iaload | 0x2E | iastore | 0x4F | int[] |
+| laload | 0x2F | lastore | 0x50 | long[] |
+| faload | 0x30 | fastore | 0x51 | float[] |
+| daload | 0x31 | dastore | 0x52 | double[] |
+| aaload | 0x32 | aastore | 0x53 | Object[] |
+| baload | 0x33 | bastore | 0x54 | byte[]/boolean[] |
+| caload | 0x34 | castore | 0x55 | char[] |
+| saload | 0x35 | sastore | 0x56 | short[] |
+
+<br>
+
+### 陣列長度
+
+| 指令 | Opcode | 說明 |
+|------|--------|------|
+| arraylength | 0xBE | 取得陣列長度 |
+
+<br>
+<br>
+
+## 指令執行流程
+
+### newarray 執行流程
+
+```
+Stack: [..., count] → [..., arrayref]
+
+步驟：
+1. 從 stack pop 出 count (陣列長度)
+2. 檢查 count >= 0，否則 NegativeArraySizeException
+3. 根據 atype 建立對應類型的陣列
+4. 將陣列引用 push 到 stack
+```
+
+### iaload 執行流程
+
+```
+Stack: [..., arrayref, index] → [..., value]
+
+步驟：
+1. 從 stack pop 出 index
+2. 從 stack pop 出 arrayref
+3. 檢查 arrayref != null，否則 NullPointerException
+4. 檢查 0 <= index < length，否則 ArrayIndexOutOfBoundsException
+5. 取得 arr[index] 的值
+6. 將值 push 到 stack
+```
+
+### iastore 執行流程
+
+```
+Stack: [..., arrayref, index, value] → [...]
+
+步驟：
+1. 從 stack pop 出 value
+2. 從 stack pop 出 index
+3. 從 stack pop 出 arrayref
+4. 檢查 arrayref != null
+5. 檢查 index 合法
+6. 設定 arr[index] = value
+```
+
+<br>
+
+## 編譯範例
+
+```java
+int[] arr = new int[5];
+arr[0] = 100;
+int x = arr[0];
+```
+
+編譯後：
+
+```
+bipush 5          // push 5 (陣列長度)
+newarray int      // 建立 int[5]，結果是陣列引用
+astore_1          // 存入 locals[1]
+
+aload_1           // 載入陣列引用
+iconst_0          // push 0 (索引)
+bipush 100        // push 100 (值)
+iastore           // arr[0] = 100
+
+aload_1           // 載入陣列引用
+iconst_0          // push 0 (索引)
+iaload            // 載入 arr[0]
+istore_2          // x = arr[0]
+```

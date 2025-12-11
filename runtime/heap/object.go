@@ -116,14 +116,13 @@ func (o *Object) SetRefField(slotId uint, ref interface{}) {
 
 // =============== Type Checking ===============
 
-// IsInstanceOf 檢查此物件是否為指定類別的實例
-// 用於 instanceof 指令
+// IsInstanceOf java if (A instanceof B) {...}
 // targetClass: *method_area.Class
 //
 // 判斷規則：
-// 1. 如果 targetClass 是類別：檢查繼承鏈
-// 2. 如果 targetClass 是介面：檢查是否實作
-// 3. 如果是陣列類型：特殊處理（Phase v0.2.6）
+// 1. if targetClass is class: check super
+// 2. if targetClass is interface: check is implemented
+// 3. if array type: 特殊處理
 func (o *Object) IsInstanceOf(targetClass interface{}) bool {
 	// TODO: 實作完整的類型檢查邏輯
 	// 需要在 method_area.Class 上新增輔助方法
@@ -147,5 +146,8 @@ func CheckNotNull(obj *Object) {
 }
 
 func (o *Object) String() string {
+	if o.IsArray() {
+		return fmt.Sprintf("<Array type=%v>", o.ArrayType())
+	}
 	return fmt.Sprintf("<Object class=%v>", o.class)
 }
