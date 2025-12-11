@@ -125,6 +125,29 @@ func (o *Object) ArrayLength() int32 {
 	}
 }
 
+func (o *Object) ArrayType() string {
+	switch arr := o.extra.(type) {
+	case []int8:
+		return "byte/bool"
+	case []int16:
+		return "short"
+	case []int32:
+		return "int"
+	case []int64:
+		return "long"
+	case []uint16: // chars
+		return "char"
+	case []float32:
+		return "float"
+	case []float64:
+		return "double"
+	case []*Object:
+		return "object"
+	default:
+		panic(fmt.Sprintf("Can't get length of array of type %T", arr))
+	}
+}
+
 // =============== Array Getter/Setter ===============
 
 // Bytes ---------------------------------------------

@@ -2,6 +2,7 @@ package instructions
 
 import (
 	"fmt"
+	"github.com/Johnny1110/gogo_jvm/instructions/arrays"
 	"github.com/Johnny1110/gogo_jvm/instructions/base"
 	"github.com/Johnny1110/gogo_jvm/instructions/base/opcodes"
 	"github.com/Johnny1110/gogo_jvm/instructions/constants"
@@ -126,6 +127,25 @@ var (
 	dreturn = &control.DRETURN{}
 	areturn = &control.ARETURN{}
 	_return = &control.RETURN{}
+
+	// ============ Arrays ============
+	iaload      = &arrays.IALOAD{}
+	laload      = &arrays.LALOAD{}
+	faload      = &arrays.FALOAD{}
+	daload      = &arrays.DALOAD{}
+	aaload      = &arrays.AALOAD{}
+	baload      = &arrays.BALOAD{}
+	caload      = &arrays.CALOAD{}
+	saload      = &arrays.SALOAD{}
+	iastore     = &arrays.IASTORE{}
+	lastore     = &arrays.LASTORE{}
+	fastore     = &arrays.FASTORE{}
+	dastore     = &arrays.DASTORE{}
+	aastore     = &arrays.AASTORE{}
+	bastore     = &arrays.BASTORE{}
+	castore     = &arrays.CASTORE{}
+	sastore     = &arrays.SASTORE{}
+	arraylength = &arrays.ARRAYLENGTH{}
 )
 
 // NewInstruction return instruction based on input opcodes
@@ -273,6 +293,41 @@ func NewInstruction(opcode byte) (base.Instruction, error) {
 	case opcodes.ASTORE_3:
 		return astore_3, nil
 
+	// Array Load Instructions
+	case opcodes.IALOAD:
+		return iaload, nil
+	case opcodes.LALOAD:
+		return laload, nil
+	case opcodes.FALOAD:
+		return faload, nil
+	case opcodes.DALOAD:
+		return daload, nil
+	case opcodes.AALOAD:
+		return aaload, nil
+	case opcodes.BALOAD:
+		return baload, nil
+	case opcodes.CALOAD:
+		return caload, nil
+	case opcodes.SALOAD:
+		return saload, nil
+	// Array Store Instructions
+	case opcodes.IASTORE:
+		return iastore, nil
+	case opcodes.LASTORE:
+		return lastore, nil
+	case opcodes.FASTORE:
+		return fastore, nil
+	case opcodes.DASTORE:
+		return dastore, nil
+	case opcodes.AASTORE:
+		return aastore, nil
+	case opcodes.BASTORE:
+		return bastore, nil
+	case opcodes.CASTORE:
+		return castore, nil
+	case opcodes.SASTORE:
+		return sastore, nil
+
 	// Stack Instructions
 	case opcodes.POP:
 		return pop, nil
@@ -293,7 +348,7 @@ func NewInstruction(opcode byte) (base.Instruction, error) {
 	case opcodes.SWAP:
 		return swap, nil
 
-	// // math instructions
+	// math instructions
 	case opcodes.IADD:
 		return iadd, nil
 	case opcodes.LADD:
@@ -397,9 +452,13 @@ func NewInstruction(opcode byte) (base.Instruction, error) {
 
 	// References Instructions
 
-	// Object.java Creation
+	// Object.java Creation / array
 	case opcodes.NEW:
 		return &references.NEW{}, nil
+	case opcodes.NEWARRAY:
+		return &arrays.NEWARRAY{}, nil
+	case opcodes.ARRAYLENGTH:
+		return arraylength, nil
 
 	// Field Access
 	case opcodes.GETSTATIC:

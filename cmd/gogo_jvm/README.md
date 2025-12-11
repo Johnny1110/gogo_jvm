@@ -1,4 +1,4 @@
-# GOGO JVM (當前本版 v0.2.5)
+# GOGO JVM (當前本版 v0.2.6)
 
 <br>
 
@@ -226,7 +226,7 @@ class Counter {
 
 <br>
 
-### Phase v0.2.6：陣列支援 ⌛ (進行中)
+### Phase v0.2.6：陣列支援 ✅️(完成)
 
 目標：支援基本型別陣列和物件陣列
 
@@ -447,7 +447,7 @@ public class TestArray {
 
 <br>
 
-### Phase v0.2.7：Native Method 與 `System.out.println`
+### Phase v0.2.7：Native Method 與 `System.out.println` ⌛ (進行中)
 
 目標：實現最基本的 Native Method 機制，讓程式能輸出結果
 

@@ -76,7 +76,12 @@ func loop(thread *runtime.Thread, debug bool) {
 
 			if slot.Ref != nil {
 				fmt.Printf("\t <REF>: %v \n", slot.Ref)
-				fmt.Printf("\t\t\t Field Details: %v \n", slot.Ref.(*heap.Object).Fields())
+				obj := slot.Ref.(*heap.Object)
+				if obj.IsArray() {
+					fmt.Printf("\t\t\t Array Elements: %v \n", obj.Extra())
+				} else {
+					fmt.Printf("\t\t\t Object Field Details: %v \n", slot.Ref.(*heap.Object).Fields())
+				}
 			} else {
 				fmt.Printf("\t <NUM>: %v \n", slot.Num)
 			}

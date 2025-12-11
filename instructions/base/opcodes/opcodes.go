@@ -76,6 +76,26 @@ const (
 	ASTORE_2 = 0x4D
 	ASTORE_3 = 0x4E
 
+	// ============ Array ============ (v0.2.6)
+	// Load --------------------------
+	IALOAD = 0x2E
+	LALOAD = 0x2F
+	FALOAD = 0x30
+	DALOAD = 0x31
+	AALOAD = 0x32
+	BALOAD = 0x33
+	CALOAD = 0x34
+	SALOAD = 0x35
+	// Store -------------------------
+	IASTORE = 0x4F
+	LASTORE = 0x50
+	FASTORE = 0x51
+	DASTORE = 0x52
+	AASTORE = 0x53
+	BASTORE = 0x54
+	CASTORE = 0x55
+	SASTORE = 0x56
+
 	// ============ Stack ============
 	POP     = 0x57
 	POP2    = 0x58
@@ -151,6 +171,9 @@ const (
 	INVOKESTATIC    = 0xB8
 	INVOKEINTERFACE = 0xB9 // Future
 	NEW             = 0xBB
+	NEWARRAY        = 0xBC // v0.2.6
+	ANEWARRAY       = 0xBD // v0.2.6
+	ARRAYLENGTH     = 0xBE // v0.2.6
 
 	// ============ Extended ============
 	LDC    = 0x12
@@ -185,6 +208,13 @@ var OpcodeNames = map[uint8]string{
 	DSTORE_0: "dstore_0", DSTORE_1: "dstore_1", DSTORE_2: "dstore_2", DSTORE_3: "dstore_3",
 	ASTORE_0: "astore_0", ASTORE_1: "astore_1", ASTORE_2: "astore_2", ASTORE_3: "astore_3",
 
+	// Array Loads & Store
+	IALOAD: "iaload", LALOAD: "laload", FALOAD: "faload", DALOAD: "daload",
+	AALOAD: "aaload", BALOAD: "baload", CALOAD: "caload", SALOAD: "saload",
+
+	IASTORE: "iastore", LASTORE: "lastore", FASTORE: "fastore", DASTORE: "dastore",
+	AASTORE: "aastore", BASTORE: "bastore", CASTORE: "castore", SASTORE: "sastore",
+
 	// Stack
 	POP: "pop", POP2: "pop2",
 	DUP: "dup", DUP_X1: "dup_x1", DUP_X2: "dup_x2",
@@ -216,7 +246,8 @@ var OpcodeNames = map[uint8]string{
 	GETFIELD: "getfield", PUTFIELD: "putfield",
 	INVOKEVIRTUAL: "invokevirtual", INVOKESPECIAL: "invokespecial",
 	INVOKESTATIC: "invokestatic", INVOKEINTERFACE: "invokeinterface",
-	NEW: "new",
+	NEW:      "new",
+	NEWARRAY: "newarray", ANEWARRAY: "anewarray", ARRAYLENGTH: "arraylength",
 
 	// Extended
 	LDC: "ldc", LDC_W: "ldc_w", LDC2_W: "ldc2_w",

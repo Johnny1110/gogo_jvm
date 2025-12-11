@@ -146,5 +146,8 @@ func CheckNotNull(obj *Object) {
 }
 
 func (o *Object) String() string {
+	if o.IsArray() {
+		return fmt.Sprintf("<Array type=%v>", o.ArrayType())
+	}
 	return fmt.Sprintf("<Object class=%v>", o.class)
 }
