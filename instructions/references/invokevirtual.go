@@ -42,7 +42,7 @@ func (i *INVOKEVIRTUAL) Execute(frame *runtime.Frame) {
 		panic("java.lang.NullPointerException")
 	}
 
-	// 6. get object and object's lang
+	// 6. get object and object's class
 	object := objectref.(*heap.Object)
 	actualClass := object.Class().(*method_area.Class)
 
