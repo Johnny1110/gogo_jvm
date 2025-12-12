@@ -150,3 +150,302 @@ gogo_jvm/
 │       └── io/
 │           └── printstream.go # PrintStream.println 的實現
 ```
+
+<br>
+
+需要：
+
+1. 創建模擬的 java/lang/System 類
+2. 創建模擬的 java/io/PrintStream 類
+3. 在 System 類中設置 out 靜態字段 (Hack)
+4. PrintStream.println 標記為 native
+5. 註冊 native 實現
+
+<br>
+
+**v0.2.7** 目標：
+├── 建立 Native Method 框架（策略 A 的基礎設施）
+├── 但用 Hack 方式處理 System.out（避免模擬複雜的類）
+└── 為 v0.2.8+ 的完整實現打下基礎
+
+具體做法：
+1. 創建 native/registry.go（正規框架）
+2. 在 invokevirtual 中檢測特定類/方法組合 (MVP 階段先寫死的，未來優化)
+3. 對於 `System.out.println`，直接調用註冊的 `native` 函數
+4. 不需要真的創建 `System` 和 `PrintStream` 類
+
+<br>
+<br>
+
+## 具體實現細節
+
+1. Method 結構需要的修改
+
+```go
+// runtime/method_area/method.go
+
+type Method struct {
+    // ...  ...
+    
+    // 新增：標記是否為 native 方法
+    // 從 access_flags 中解析：ACC_NATIVE = 0x0100
+    nativeMethod native.NativeMethod  // 緩存已查找的 native 實現
+}
+
+func (m *Method) IsNative() bool {
+    return m.accessFlags & 0x0100 != 0
+}
+```
+
+<br>
+
+2. 解釋器主循環的修改
+
+```go
+// interpreter.go
+
+func (interp *Interpreter) executeMethod(thread *runtime.Thread) {
+    for {
+        frame := thread.CurrentFrame()
+        pc := frame.NextPC()
+        
+        // ... 讀取指令 ...
+        
+        // 執行指令
+        inst.Execute(frame)
+        
+        // 檢查是否需要處理 native 方法
+        // （這部分邏輯會在 invoke 指令中處理）
+    }
+}
+```
+
+<br>
+
+3. invokevirtual 的修改
+
+```go
+// instructions/references/invokevirtual.go
+
+func (i *INVOKEVIRTUAL) Execute(frame *runtime.Frame) {
+    // ... 現有的解析邏輯 ...
+    
+    // 在調用方法前，檢查是否為 native
+    if methodToCall.IsNative() {
+        // 查找並執行 native 實現
+        nativeMethod := native.FindNativeMethod(
+            methodToCall.Class().Name(),
+            methodToCall.Name(),
+            methodToCall.Descriptor(),
+        )
+        
+        if nativeMethod == nil {
+            panic("java.lang.UnsatisfiedLinkError: " + methodToCall.Name())
+        }
+        
+        // 創建 native frame 並執行
+        invokeNativeMethod(frame, methodToCall, nativeMethod)
+        return
+    }
+    
+    // 正常的 bytecode 方法調用
+    InvokeMethod(frame, methodToCall)
+}
+```
+
+<br>
+
+4. Native 方法的參數傳遞
+
+Native 方法也需要一個 Frame 來存放參數：
+
+```go
+// native 方法的 Frame 結構
+//
+// 對於 PrintStream.println(int x)
+// LocalVars 佈局：
+//   [0] = this (PrintStream 引用)
+//   [1] = x (要印的整數)
+//
+// 這與普通方法完全相同
+func invokeNativeMethod(callerFrame *runtime.Frame, method *method_area.Method, nativeFunc native.NativeMethod) {
+    thread := callerFrame.Thread()
+    
+    // 創建一個用於 native 方法的 Frame
+    // 雖然沒有 bytecode，但需要存放參數
+    nativeFrame := thread.NewFrameWithMethod(method)
+    
+    // 從調用者棧中彈出參數，放入 native frame 的 LocalVars
+    argSlotCount := int(method.ArgSlotCount())
+    for i := argSlotCount - 1; i >= 0; i-- {
+        slot := callerFrame.OperandStack().PopSlot()
+        nativeFrame.LocalVars().SetSlot(uint(i), slot)
+    }
+    
+    // 不需要 push frame 到線程棧!!!
+    // native 方法直接執行，不參與 JVM 的棧管理
+    
+    // 執行 native 函數
+    nativeFunc(nativeFrame)
+    
+    // 如果有返回值，需要 push 到調用者的棧
+    // （println 是 void，所以不需要）
+}
+```
+
+<br>
+
+5. PrintStream.println 的實現
+
+略
+
+<br>
+<br>
+
+## 處理 `System.out` 的 Hack
+
+### 問題分析
+
+```go
+System.out.println(42);
+
+getstatic java/lang/System.out  // ← 這裡會嘗試加載 System 類
+```
+
+如果我們沒有模擬 System 類，`getstatic` 會失敗。
+
+
+**Hack 方案**: 攔截 `getstatic`
+
+```go
+// instructions/references/field.go
+
+func (g *GETSTATIC) Execute(frame *runtime.Frame) {
+    // ... 解析 FieldRef ...
+    
+    // === Hack: 特殊處理 System.out ===
+    className := fieldRef.ClassName()
+    fieldName := fieldRef.Name()
+    
+    if className == "java/lang/System" && fieldName == "out" {
+        // 創建一個假的 PrintStream 物件
+        // 其實它不需要有任何真實的字段
+        // 只要 invokevirtual 能識別它是 PrintStream 就好
+        fakePrintStream := createFakePrintStream()
+        frame.OperandStack().PushRef(fakePrintStream)
+        return
+    }
+    
+    // ... 正常的 getstatic 邏輯 ...
+}
+
+func createFakePrintStream() *heap.Object {
+    // 創建一個標記性的物件
+    // 不需要真正的 PrintStream 類結構
+    return &heap.Object{
+        // 用一個特殊標記，讓 invokevirtual 能識別
+        extra: "java/io/PrintStream",  // 借用 extra 字段存類名
+    }
+}
+```
+
+對應的 invokevirtual 修改
+
+```go
+// instructions/references/invokevirtual.go
+
+func (i *INVOKEVIRTUAL) Execute(frame *runtime.Frame) {
+    // ... 解析 MethodRef ...
+    
+    // === Hack: 特殊處理 PrintStream.println ===
+    className := methodRef.ClassName()
+    methodName := methodRef.Name()
+    descriptor := methodRef.Descriptor()
+    
+    if className == "java/io/PrintStream" && methodName == "println" {
+        // 直接調用 native 實現，跳過正常的方法查找
+        nativeMethod := native.FindNativeMethod(className, methodName, descriptor)
+        if nativeMethod != nil {
+            invokeNativeMethodDirectly(frame, descriptor, nativeMethod)
+            return
+        }
+    }
+    
+    // ... 正常的 invokevirtual 邏輯 ...
+}
+
+// 直接調用 native 方法，不需要創建完整的 Frame
+func invokeNativeMethodDirectly(frame *runtime.Frame, descriptor string, nativeMethod native.NativeMethod) {
+    // 根據 descriptor 計算參數數量
+    // (I)V → 1 個 int 參數 + 1 個 this = 2 slots
+    // (J)V → 1 個 long 參數 (2 slots) + 1 個 this = 3 slots
+    
+    // 創建臨時 Frame 存放參數
+    tempFrame := createTempNativeFrame(frame, descriptor)
+    
+    // 執行
+    nativeMethod(tempFrame)
+}
+```
+
+<br>
+<br>
+
+## 測試目標
+
+1. 基本列印：
+```java
+// TestPrintln.java
+public class TestPrintln {
+    public static void main(String[] args) {
+        System.out.println(42);
+        System.out.println(100);
+        System.out.println(-1);
+    }
+}
+```
+
+
+預期輸出：
+```
+42
+100
+-1
+```
+
+<br>
+
+2. 結合計算：
+
+```java
+public class TestPrintlnCalc {
+    public static void main(String[] args) {
+        int a = 10;
+        int b = 20;
+        System.out.println(a + b);  // 30
+        
+        System.out.println(fib(10));  // 55
+    }
+    
+    public static int fib(int n) {
+        if (n <= 1) return n;
+        return fib(n - 1) + fib(n - 2);
+    }
+}
+```
+
+<br>
+
+3. 多種類型
+
+```java
+public class TestPrintlnTypes {
+    public static void main(String[] args) {
+        System.out.println(42);           // int
+        System.out.println(123456789L);   // long
+        System.out.println(3.14159);      // double
+        System.out.println(true);         // boolean
+        System.out.println();             // 空行
+    }
+}
+```
