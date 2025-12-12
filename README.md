@@ -60,7 +60,7 @@ MVP 時期的筆記有些雜亂，移到 MVP Plan Documents 做紀念。
 
 ### v0.2 - MVP JVM Project (Core Engine) ⌛
 
-v0.2 完成後 GOGO JVM 將能執行大部分 Single Thread Java 程式:
+v0.2 目標是讓 GOGO_JVM 能執行大部分 Single-Thread 的 Java 程式。
 
 * ✅️ v0.2.1: [Basic Instructions](doc/version/v0_2/v0_2_1.md)
 * ✅️ v0.2.2: [Simple Runtime Thread](doc/version/v0_2/v0_2_2.md)
@@ -79,7 +79,7 @@ v0.2 完成後 GOGO JVM 將能執行大部分 Single Thread Java 程式:
 
 ### v0.3 - Object Model (Pre-Work for GC/Multi-Thread)
 
-v0.2 完成後 GOGO JVM 將能支援 Class 物件與基本反射，標準物件頭（Mark Word），
+v0.3 目標是能支援 Class 物件與基本反射，標準物件頭 (Mark Word)，
 Reference 類型支援，完整的物件生命週期。後續可以實現多執行緒和 GC。
 
 * ⛔ v0.3.0: [Basic Reflection](doc/version/v0_3/v0_3_0.md)
@@ -92,7 +92,7 @@ Reference 類型支援，完整的物件生命週期。後續可以實現多執�
 
 ### v0.4 - Multi-Thread  (Pre-Work for GC)
 
-v0.4 目標是實現 `java.lang.Thread` 類與基本執行緒管理
+v0.4 目標是實現 `java.lang.Thread` 類與基本執行緒管理。
 
 * ⛔ v0.4.0: [Thread Basic](doc/version/v0_4/v0_4_0.md)
 * ⛔ v0.4.1: [Support `synchronized`](doc/version/v0_4/v0_4_1.md)
@@ -128,7 +128,7 @@ v0.5 深入研究實現各種 GC 演算法
 目標：完整的類加載器層次結構
 
 ```
-學習價值：
+目標：
 ├── 雙親委派模型
 ├── 類的隔離與共享
 ├── 動態類加載
@@ -149,10 +149,10 @@ v0.5 深入研究實現各種 GC 演算法
 **JIT 編譯器**
 
 目前：解釋執行（慢）
-目標：熱點代碼編譯成機器碼（快）
+目標：熱點代碼編譯成機器碼（快） - 理解現代 VM
 
 ```
-學習價值：理解現代 VM
+目標：
 ├── 編譯器後端設計
 ├── 寄存器分配
 ├── 指令選擇
@@ -176,7 +176,7 @@ v0.5 深入研究實現各種 GC 演算法
 目標：實現 JVMTI / JMX 類似功能
 
 ```
-學習價值：
+目標：
 ├── 斷點機制
 ├── 單步執行
 ├── 變數查看
