@@ -30,7 +30,7 @@ func (i *INVOKE_STATIC) Execute(frame *runtime.Frame) {
 	// 5. TODO: 類初始化（<clinit>，如果類還沒初始化，需要先執行 <clinit> MVP 階段暫時跳過
 
 	// 6. call method
-	InvokeMethod(frame, resolvedMethod)
+	invokeMethod(frame, resolvedMethod)
 }
 
 func (is *INVOKE_STATIC) Opcode() uint8 {

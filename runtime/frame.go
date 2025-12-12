@@ -55,6 +55,15 @@ func NewFrameWithMethod(thread *Thread, method *method_area.Method) *Frame {
 	}
 }
 
+// NewNativeFrame create frame for native method, not require to push into JVMStack
+func NewNativeFrame(thread *Thread, maxLocals uint16) *Frame {
+	return &Frame{
+		thread:       thread,
+		localVars:    NewLocalVars(maxLocals),
+		operandStack: nil, // native method don't need op-stack, just run native Go func()
+	}
+}
+
 func (f *Frame) LocalVars() rtcore.Slots {
 	return f.localVars
 }

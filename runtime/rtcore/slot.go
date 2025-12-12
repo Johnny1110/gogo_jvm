@@ -1,6 +1,7 @@
 package rtcore
 
 import (
+	"fmt"
 	"math"
 )
 
@@ -104,4 +105,11 @@ func (s Slots) GetSlot(index uint) Slot {
 // for Object methods, rtcore[0] always be this
 func (s Slots) GetThis() interface{} {
 	return s.GetRef(0)
+}
+
+func (s Slot) String() string {
+	if s.Ref != nil {
+		return fmt.Sprintf("Ref<%T>", s.Ref)
+	}
+	return fmt.Sprintf("Num<%d>", s.Num)
 }
