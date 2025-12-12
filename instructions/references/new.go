@@ -39,7 +39,7 @@ func (n *NEW) Execute(frame *runtime.Frame) {
 		// revert PC, rerun this new inst
 		frame.RevertNextPC()
 		// start init class
-		InitClass(frame.Thread(), class)
+		initClass(frame.Thread(), class)
 		return
 	}
 
@@ -76,6 +76,6 @@ func initSuperClass(thread *runtime.Thread, class *method_area.Class) {
 
 	superClass := class.SuperClass()
 	if superClass != nil && !superClass.InitStarted() {
-		InitClass(thread, superClass)
+		initClass(thread, superClass)
 	}
 }

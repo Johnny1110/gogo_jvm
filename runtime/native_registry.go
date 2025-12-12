@@ -1,18 +1,19 @@
-package native
+package runtime
 
 import (
 	"fmt"
 	"github.com/Johnny1110/gogo_jvm/common"
-	"github.com/Johnny1110/gogo_jvm/runtime"
 )
 
+// ============================================================
 // Native Method Registry
+// ============================================================
 
 // NativeMethod is all native method's signature
 // why need input frame?
 //  1. read args from LocalVars (including this)
 //  2. put return val into caller's op-stack
-type NativeMethod func(frame *runtime.Frame)
+type NativeMethod func(frame *Frame)
 
 // registry Native Method Registry
 // key: className + methodName + descriptor
@@ -36,5 +37,20 @@ func FindNativeMethod(className, methodName, descriptor string) NativeMethod {
 	if method, ok := registry[key]; ok {
 		return method
 	}
+
+	// TODO: 特殊處理: 空的 native 方法
+	// 某些 native 方法在 MVP 階段可以忽略，例如：
+	//   - registerNatives() - JVM 內部初始化用
+	//   - initIDs() - JNI 初始化用
+	// 這些方法對 MVP 階段沒用，先回一個 nil 未來再說
+	if methodName == "registerNatives" || methodName == "initIDs" {
+		return emptyNativeMethod
+	}
+
 	panic(common.NewJavaException(className, fmt.Sprintf("method %s not found", methodName)))
+}
+
+// emptyNativeMethod for MVP Phase: ignore some native methods
+func emptyNativeMethod(frame *Frame) {
+	// do nothing
 }

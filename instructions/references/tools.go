@@ -1,13 +1,13 @@
 package references
 
 import (
-	"fmt"
+	"github.com/Johnny1110/gogo_jvm/common"
 	"github.com/Johnny1110/gogo_jvm/runtime"
 	"github.com/Johnny1110/gogo_jvm/runtime/method_area"
 	"github.com/Johnny1110/gogo_jvm/runtime/rtcore"
 )
 
-// InitClass
+// initClass
 // execute <clinit> method (if class have it)
 //
 // init order：
@@ -16,7 +16,7 @@ import (
 //
 // this func will create a new Frame to execute <clinit>
 // we need call RevertNextPC() let interpreor do this `new` again after init
-func InitClass(thread *runtime.Thread, class *method_area.Class) {
+func initClass(thread *runtime.Thread, class *method_area.Class) {
 	// mark class is doing init
 	class.StartInit()
 
@@ -27,10 +27,9 @@ func InitClass(thread *runtime.Thread, class *method_area.Class) {
 	initSuperClass(thread, class)
 }
 
-// InvokeMethod call method common func
+// invokeMethod call method common func
 // usage: invokestatic, invokevirtual
-func InvokeMethod(invokerFrame *runtime.Frame, method *method_area.Method) {
-	fmt.Printf("@@ Debug - Trying to InvokeMethod: %s (%s) \n", method.Name(), method.Class().Name())
+func invokeMethod(invokerFrame *runtime.Frame, method *method_area.Method) {
 	// 1, get current thread
 	thread := invokerFrame.Thread()
 
@@ -51,6 +50,88 @@ func InvokeMethod(invokerFrame *runtime.Frame, method *method_area.Method) {
 	}
 
 	// no need to reset PC, new frame nextPC will be default 0
+}
+
+// invokeNativeMethod
+// 1. get args from callerFrame
+// 2. put args into a temp LocalVars
+// 3. pass args to native Go func
+// no need a read frame to do native method.
+func invokeNativeMethod(callerFrame *runtime.Frame, nativeMethod runtime.NativeMethod, descriptor string) {
+	// calculate args slot count including this.
+	argSlotCount := calcArgSlotCount(descriptor) + 1 // LocalVars[0] = this, so we need + 1
+
+	// create a temp Frame for store params (not require to push into JVMStack)
+	tempFrame := runtime.NewNativeFrame(callerFrame.Thread(), uint16(argSlotCount))
+
+	// pop args from caller op-stack put into tempFrame's LocalVars
+	stack := callerFrame.OperandStack() // stack: [argN, argN-1, ..., arg1, this]
+	localVars := tempFrame.LocalVars()  // localVars: [this, arg1, ... argN-1, argN]
+
+	// push args into temp LocalVars
+	for i := argSlotCount - 1; i >= 0; i-- { // i := argSlotCount - 1 -> skip this
+		slot := stack.PopSlot()
+		localVars.SetSlot(uint(i), slot)
+	}
+
+	// call native method
+	nativeMethod(tempFrame)
+
+	// TODO: currently we only support void native method
+	// TODO: we should return val if called native method has return val.
+}
+
+// calcArgSlotCount calculate arg count by method descriptor
+// Ex:
+//
+//	()V           → 0
+//	(I)V          → 1 int
+//	(J)V          → 1 long (2 slots)
+//	(II)I         → 2 int (2 slots)
+//	(IJD)V        → int(1) + long(2) + double(2) = 5 slots
+func calcArgSlotCount(descriptor string) int {
+	slotCount := 0
+	i := 1 // skip '('
+
+	// iterate args descriptors
+	for descriptor[i] != ')' {
+		switch descriptor[i] {
+		case 'B', 'C', 'F', 'I', 'S', 'Z':
+			// byte, char, float, int, short, boolean → 1 slot
+			slotCount++
+			i++
+		case 'D', 'J':
+			// double, long → 2 slots
+			slotCount += 2
+			i++
+		case 'L':
+			// Object Ref: Ljava/lang/String;
+			slotCount++
+			for descriptor[i] != ';' {
+				i++
+			}
+			i++ // skip ';'
+		case '[':
+			// array
+			slotCount++
+			// skip array element type
+			for descriptor[i] == '[' {
+				i++ // skip '['
+			}
+
+			if descriptor[i] == 'L' { // Is Object Type
+				for descriptor[i] != ';' {
+					i++ // skip obj type
+				}
+				i++ // skip ';'
+			} else { // Is Basic Type
+				i++
+			}
+		default:
+			panic(common.NewJavaException("", "Calculate method arg slot count failed, unknown descriptor type: "+string(descriptor[i])))
+		}
+	}
+	return slotCount
 }
 
 // pushFieldValue according to descriptor, copy val from slots and put into stack

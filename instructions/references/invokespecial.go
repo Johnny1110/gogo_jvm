@@ -68,7 +68,7 @@ func (i *INVOKESPECIAL) Execute(frame *runtime.Frame) {
 	}
 
 	// 9. invoke method
-	InvokeMethod(frame, methodToCall)
+	invokeMethod(frame, methodToCall)
 }
 
 func (i *INVOKESPECIAL) Opcode() uint8 {

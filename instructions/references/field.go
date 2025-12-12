@@ -22,14 +22,26 @@ func (g *GETSTATIC) Execute(frame *runtime.Frame) {
 	rtcp := frame.Method().Class().ConstantPool()
 	// 2. get field from rtcp
 	fieldRef := rtcp.GetConstant(g.Index).(*method_area.FieldRef)
+
+	// ============================================================
+	// Hack: handle native (TODO: revamp this in future)
+	// temp solution for getstatic java/lang/System.out
+	// because we don't have rt.jar, can not load real System class
+	// even though we have System class, it is very complicate to init.
+	// ============================================================
+	if hacked_get_static(frame, fieldRef) {
+		return
+	}
+	// ============================================================
+
 	// 3. load field
 	field := fieldRef.ResolvedField()
 	// 4. get class (if field resolved, class should already be resolved also)
 	class := field.Class()
 	// 5. check class <clinit>
 	if !class.InitStarted() {
-		frame.RevertNextPC() // do it again after InitClass.
-		InitClass(frame.Thread(), class)
+		frame.RevertNextPC() // do it again after initClass.
+		initClass(frame.Thread(), class)
 		return
 	}
 	// 6. check static
@@ -45,6 +57,19 @@ func (g *GETSTATIC) Execute(frame *runtime.Frame) {
 
 	// 8. push val into stack
 	pushFieldValue(stack, staticVarSlots, slotId, descriptor)
+}
+
+// hacked_get_static Hack solution: getstatic native method. return false if not get certain fields.
+func hacked_get_static(frame *runtime.Frame, fieldRef *method_area.FieldRef) bool {
+	className := fieldRef.ClassName()
+	fieldName := fieldRef.Name()
+
+	if className == "java/lang/System" && (fieldName == "out" || fieldName == "err") {
+		mockPrintStream := &heap.Object{} // mock a junk object
+		frame.OperandStack().PushRef(mockPrintStream)
+		return true
+	}
+	return false
 }
 
 func (g *GETSTATIC) Opcode() uint8 {
@@ -77,7 +102,7 @@ func (p *PUTSTATIC) Execute(frame *runtime.Frame) {
 	// 5. do <clinit> if required
 	if !class.InitStarted() {
 		frame.RevertNextPC()
-		InitClass(frame.Thread(), class)
+		initClass(frame.Thread(), class)
 		return
 	}
 

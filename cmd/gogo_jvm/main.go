@@ -5,10 +5,13 @@ import (
 	"github.com/Johnny1110/gogo_jvm/interpreter"
 	"github.com/Johnny1110/gogo_jvm/runtime/method_area"
 	"os"
+
+	// import native package for trigger init() (register all native methods)
+	_ "github.com/Johnny1110/gogo_jvm/native"
 )
 
 // ============================================================
-// Gogo JVM v0.2.3
+// Gogo JVM v0.2.7
 // ============================================================
 func main() {
 	if len(os.Args) < 2 {
