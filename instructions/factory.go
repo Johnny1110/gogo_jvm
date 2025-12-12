@@ -188,6 +188,12 @@ func NewInstruction(opcode byte) (base.Instruction, error) {
 		return &constants.BIPUSH{}, nil
 	case opcodes.SIPUSH:
 		return &constants.SIPUSH{}, nil
+	case opcodes.LDC:
+		return &constants.LDC{}, nil
+	case opcodes.LDC_W:
+		return &constants.LDC_W{}, nil
+	case opcodes.LDC2_W:
+		return &constants.LDC2_W{}, nil
 
 	// load instructions
 	case opcodes.ILOAD:
