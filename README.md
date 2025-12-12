@@ -11,13 +11,6 @@ Using GoLang to implement a simple JVM
 
 <br>
 
-## MVP plan
-
-* [MVP plan](doc/mvp_plan)
-
-<br>
-<br>
-
 ## Structure
 
 <br>
