@@ -3,6 +3,7 @@ package references
 import (
 	"github.com/Johnny1110/gogo_jvm/common"
 	"github.com/Johnny1110/gogo_jvm/runtime"
+	"github.com/Johnny1110/gogo_jvm/runtime/heap"
 	"github.com/Johnny1110/gogo_jvm/runtime/method_area"
 	"github.com/Johnny1110/gogo_jvm/runtime/rtcore"
 )
@@ -195,4 +196,67 @@ func isSubClassOf(child, parent *method_area.Class) bool {
 		}
 	}
 	return false
+}
+
+// ============================================================
+// isInstanceOf - core check isInstance func
+// ============================================================
+// declare:  S = object's type, T = target class
+// situation-1: S is normal class
+//   - T is normal class: S == T or S is T's subclass
+//   - T is interface: S implements T
+//
+// situation-2: S is Array type
+//   - T is Object: true（all array is a kind of Object）
+//   - T is Cloneable: true（JLS Standard）
+//   - T is Serializable: true （JLS Standard）
+//   - T 是 Array type TC[]: S element can pass to TC
+//   - otherwise: false
+func isInstanceOf(targetObject *heap.Object, targetClass *method_area.Class) bool {
+
+	if targetObject.IsArray() { // handle situation-2:  S is Array type
+		return isArrayInstanceOf(targetObject, targetClass)
+	}
+
+	targetObjectClass := targetObject.Class()
+
+	if targetObjectClass != nil { // handle situation-1: S is normal class
+		// using Class's IsAssignableFrom()
+		S := targetObjectClass.(*method_area.Class)
+		return targetClass.IsAssignableFrom(S) // targetClass = S
+	}
+
+	return false
+}
+
+// isArrayInstanceOf
+// - int[] instanceof Object → true
+// - int[] instanceof Cloneable → true
+// - int[] instanceof Serializable → true
+// - String[] instanceof Object[] → true (class String extends Object)
+// - int[] instanceof Object[] → false (java basic type is not extended from Object)
+func isArrayInstanceOf(arrObject *heap.Object, targetClass *method_area.Class) bool {
+	targetClassName := targetClass.Name()
+
+	// int[] instanceof Object → true
+	if targetClassName == "java/lang/Object" {
+		return true
+	}
+	// int[] instanceof Cloneable → true
+	if targetClassName == "java/lang/Cloneable" {
+		return true
+	}
+	// int[] instanceof Serializable → true
+	if targetClassName == "java/io/Serializable" {
+		return true
+	}
+
+	// TODO: 完整實現需要陣列類型系統支援 等後續逐步優化
+	if arrObject.Class() != nil { // TODO: 短解，我在建立 Object Array 時候會把 element type (class) 放菜 object.class 內
+		arrClass := arrObject.Class().(*method_area.Class)
+		return targetClass.IsAssignableFrom(arrClass)
+	}
+
+	return false
+
 }

@@ -172,8 +172,11 @@ const (
 	INVOKEINTERFACE = 0xB9 // Future
 	NEW             = 0xBB
 	NEWARRAY        = 0xBC // v0.2.6
-	ANEWARRAY       = 0xBD // v0.2.6
+	ANEWARRAY       = 0xBD // v0.2.8
 	ARRAYLENGTH     = 0xBE // v0.2.6
+	CHECKCAST       = 0xC0 // v0.2.8
+	INSTANCEOF      = 0xC1 // v0.2.8
+	MULTIANEWARRAY  = 0xC5 // TODO
 
 	// ============ Extended ============
 	LDC    = 0x12
@@ -247,7 +250,8 @@ var OpcodeNames = map[uint8]string{
 	INVOKEVIRTUAL: "invokevirtual", INVOKESPECIAL: "invokespecial",
 	INVOKESTATIC: "invokestatic", INVOKEINTERFACE: "invokeinterface",
 	NEW:      "new",
-	NEWARRAY: "newarray", ANEWARRAY: "anewarray", ARRAYLENGTH: "arraylength",
+	NEWARRAY: "newarray", ANEWARRAY: "anewarray", MULTIANEWARRAY: "multianewarray", ARRAYLENGTH: "arraylength",
+	INSTANCEOF: "instanceof", CHECKCAST: "checkcast",
 
 	// Extended
 	LDC: "ldc", LDC_W: "ldc_w", LDC2_W: "ldc2_w",
