@@ -252,7 +252,7 @@ func isArrayInstanceOf(arrObject *heap.Object, targetClass *method_area.Class) b
 	}
 
 	// TODO: 完整實現需要陣列類型系統支援 等後續逐步優化
-	if arrObject.Class() != nil { // TODO: currently I won't set a class to a array object.
+	if arrObject.Class() != nil { // TODO: 短解，我在建立 Object Array 時候會把 element type (class) 放菜 object.class 內
 		arrClass := arrObject.Class().(*method_area.Class)
 		return targetClass.IsAssignableFrom(arrClass)
 	}

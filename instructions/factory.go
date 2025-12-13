@@ -463,6 +463,8 @@ func NewInstruction(opcode byte) (base.Instruction, error) {
 		return &references.NEW{}, nil
 	case opcodes.NEWARRAY:
 		return &arrays.NEWARRAY{}, nil
+	case opcodes.ANEWARRAY:
+		return &arrays.ANEWARRAY{}, nil
 	case opcodes.ARRAYLENGTH:
 		return arraylength, nil
 	case opcodes.INSTANCEOF:
