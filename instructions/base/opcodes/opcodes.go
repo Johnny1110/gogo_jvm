@@ -174,6 +174,8 @@ const (
 	NEWARRAY        = 0xBC // v0.2.6
 	ANEWARRAY       = 0xBD // v0.2.6
 	ARRAYLENGTH     = 0xBE // v0.2.6
+	CHECKCAST       = 0xC0 // v0.2.8
+	INSTANCEOF      = 0xC1 // v0.2.8
 
 	// ============ Extended ============
 	LDC    = 0x12
@@ -248,6 +250,7 @@ var OpcodeNames = map[uint8]string{
 	INVOKESTATIC: "invokestatic", INVOKEINTERFACE: "invokeinterface",
 	NEW:      "new",
 	NEWARRAY: "newarray", ANEWARRAY: "anewarray", ARRAYLENGTH: "arraylength",
+	INSTANCEOF: "instanceof", CHECKCAST: "checkcast",
 
 	// Extended
 	LDC: "ldc", LDC_W: "ldc_w", LDC2_W: "ldc2_w",

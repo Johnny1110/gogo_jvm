@@ -465,6 +465,10 @@ func NewInstruction(opcode byte) (base.Instruction, error) {
 		return &arrays.NEWARRAY{}, nil
 	case opcodes.ARRAYLENGTH:
 		return arraylength, nil
+	case opcodes.INSTANCEOF:
+		return &references.INSTANCEOF{}, nil
+	case opcodes.CHECKCAST:
+		return &references.CHECKCAST{}, nil
 
 	// Field Access
 	case opcodes.GETSTATIC:

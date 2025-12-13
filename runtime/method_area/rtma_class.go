@@ -187,7 +187,7 @@ func (c *Class) GetField(name, descriptor string, isStatic bool) *Field {
 // IsAssignableFrom 檢查 other 是否可以賦值給 this
 // ex: this = other is legal or not
 // Rules：
-// 1. same clas: true
+// 1. same class: true
 // 2. other is this subclass: true
 // 3. this is interface, other implements this: true
 func (c *Class) IsAssignableFrom(other *Class) bool {
