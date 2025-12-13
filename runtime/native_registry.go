@@ -2,7 +2,6 @@ package runtime
 
 import (
 	"fmt"
-	"github.com/Johnny1110/gogo_jvm/common"
 )
 
 // ============================================================
@@ -47,7 +46,7 @@ func FindNativeMethod(className, methodName, descriptor string) NativeMethod {
 		return emptyNativeMethod
 	}
 
-	panic(common.NewJavaException(className, fmt.Sprintf("method %s not found", methodName)))
+	return nil
 }
 
 // emptyNativeMethod for MVP Phase: ignore some native methods
