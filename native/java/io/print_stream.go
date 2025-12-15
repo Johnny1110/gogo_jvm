@@ -3,6 +3,7 @@ package io
 import (
 	"fmt"
 	"github.com/Johnny1110/gogo_jvm/runtime"
+	"github.com/Johnny1110/gogo_jvm/runtime/heap"
 )
 
 // PrintStream.println implementation
@@ -21,8 +22,8 @@ func init() {
 	runtime.Register("java/io/PrintStream", "println", "(J)V", printlnLong)
 	runtime.Register("java/io/PrintStream", "println", "(F)V", printlnFloat)
 	runtime.Register("java/io/PrintStream", "println", "(D)V", printlnDouble)
-	// TODO: String require String support first
-	// native.Register("java/io/PrintStream", "println", "(Ljava/lang/String;)V", printlnString)
+	// v0.2.9 supported - string print
+	runtime.Register("java/io/PrintStream", "println", "(Ljava/lang/String;)V", printlnString)
 }
 
 // ============================================================
@@ -135,21 +136,34 @@ func printlnDouble(frame *runtime.Frame) {
 }
 
 // ============================================================
-// TODO: println(String) - 印字串
+// println(String) - print String Object
 // ============================================================
-// 這個需要等我們實現 String 物件的處理後才能完成
-// 目前的挑戰：
-//  1. Java String 是一個物件，內部有 char[] 陣列
-//  2. 需要從 String 物件中提取 char[]
-//  3. 將 char[] 轉換成 Go string
+// Java: System.out.println("Hello");
+// Descriptor: (Ljava/lang/String;)V
+//
+// LocalVars:
+//
+//	[0] = this (PrintStream Ref)
+//	[1] = String Object Ref
+//
+// String Object Structure (MVP):
+// ┌─────────────────────────────┐
+// │ String Object               │
+// ├─────────────────────────────┤
+// │ extra → char[] Object       │
+// │           ↓                 │
+// │    []uint16 (UTF-16 data)   │
+// └─────────────────────────────┘
 func printlnString(frame *runtime.Frame) {
-	//ref := frame.LocalVars().GetRef(1)
-	//if ref == nil {
-	//	fmt.Println("null")
-	//	return
-	//}
-	//jStr := ref.(*heap.Object)
-	//goStr := StringToGoString(jStr) // TODO
-	//fmt.Println(goStr)
-	fmt.Println("(X) printlnString not support right now.")
+	strRef := frame.LocalVars().GetRef(1)
+
+	if strRef == nil {
+		fmt.Println("null")
+		return
+	}
+
+	strObject := strRef.(*heap.Object)
+	goStr := heap.GoString(strObject)
+
+	fmt.Println(goStr)
 }
