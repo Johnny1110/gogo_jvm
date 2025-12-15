@@ -108,20 +108,3 @@ func _ldc(frame *runtime.Frame, index uint) {
 		panic("java.lang.ClassFormatError: ldc with unknown constant type")
 	}
 }
-
-// ============================================================
-// internString - Simplify
-// ============================================================
-// 在真實 JVM 中，字串駐留是一個重要的優化: (TODO)
-//   - 相同內容的字串只創建一個物件
-//   - 所有引用都指向同一個物件
-//   - 節省記憶體，加快比較速度
-//
-// MVP 階段的簡化實現：
-//   - 創建一個特殊的物件，將 Go string 存在 extra 字段
-//   - 不做真正的駐留（每次都創建新物件）
-func internString(goStr string) *heap.Object {
-	obj := &heap.Object{}
-	obj.SetExtra(goStr)
-	return obj
-}
