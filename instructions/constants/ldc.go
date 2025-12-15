@@ -11,8 +11,9 @@ import (
 )
 
 // ============================================================
-// String Pool - for string interning
+// LDC - Load Constant
 // ============================================================
+// LDC load constnat from RuntimeConstantPool into OpStack
 
 // LDC Load Constant，opcode = 0x12
 // format: ldc index
@@ -79,7 +80,7 @@ func (l *LDC2_W) Opcode() uint8 {
 // ConstantPool const type:
 // - int32 -> push
 // - float32 -> push
-// - string -> TODO: using go string right now, change to String Object in future
+// - string -> v0.2.9 supported, using internString() create String Object
 // - *ClassRef -> for Foo.class TODO: Reflection
 func _ldc(frame *runtime.Frame, index uint) {
 	rtcp := frame.Method().Class().ConstantPool()
@@ -92,20 +93,17 @@ func _ldc(frame *runtime.Frame, index uint) {
 	case float32:
 		stack.PushFloat(val)
 	case string:
-		// In real JVM, String constant need: (TODO)
-		// 1. create a java.lang.String Object
-		// 2. store string into Object's char[]
-		// 3. String Interning
-		// IN MVP Phase: simplify
-		// we push nil ignore it
-		javaStr := internString(val)
-		stack.PushRef(javaStr)
+		// ldc #N (N pointing to a CONSTANT_String in rtcp - RuntimeConstantPool)
+		// rtcp will return a Go string (UTF-8)
+		// using heap.InternString() get java string reference and return.
+		javaStrObj := heap.InternString(val)
+		stack.PushRef(javaStrObj)
 	case *method_area.ClassRef:
 		// usage: Class<?> c = String.class;
-		// In real JVM, Class constant need: (TODO)
+		// In real JVM, Class constant need: (TODO v0.3.x)
 		// return java.lang.Class Object
 		// IN MVP Phase: simplify
-		panic("java.lang.ClassFormatError: ldc with Class constant not supported")
+		panic("java.lang.ClassFormatError: ldc with Class constant not supported, will be done in v0.3.x")
 	default:
 		panic("java.lang.ClassFormatError: ldc with unknown constant type")
 	}

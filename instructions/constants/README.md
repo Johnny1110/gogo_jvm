@@ -76,6 +76,22 @@ String s = "Hello";        // 字串
 | ldc2_w    | 0x14   | 載入常量池項目（2 byte 索引，值佔 2 slots）    |
 
 <br>
+
+<br>
+
+### 可載入的常量類型
+
+| 類型         | 說明                                   |
+|--------------|----------------------------------------|
+| `int`        | 整數常量，push `int`                   |
+| `float`      | 浮點數常量，push `float`               |
+| `String`     | 字串常量，push `String` 物件參考       |
+| `Class`      | 類別常量（反射用），push `Class` 參考  |
+| `MethodType` | 方法型別（Java 7+）                    |
+| `MethodHandle` | 方法句柄（Java 7+）                 |
+
+
+<br>
 <br>
 
 ### MVP 階段的限制
