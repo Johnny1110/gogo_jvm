@@ -164,34 +164,100 @@ slotId 在 ClassLoader.prepare() 階段計算：
 
 <br>
 
-## 未來擴展
+---
 
-### Phase v0.2.6：陣列支援
+<br>
 
-陣列也是物件，但有特殊結構：
+## 字串駐留 (String Interning, string_pool.go) — JVM 的記憶體優化
 
-```go
-// 陣列物件使用 extra 存放元素
-arr := NewObject(intArrayClass, 0)  // fields 不需要
-arr.SetExtra(make([]int32, length)) // 元素存在 extra
+### **什麼是字串駐留？**
+
+```java
+String s1 = "Hello";
+String s2 = "Hello";
+String s3 = new String("Hello");
+
+System.out.println(s1 == s2);  // true  (同一個物件)
+System.out.println(s1 == s3);  // false (不同物件)
+System.out.println(s1.equals(s3));  // true (內容相同)
 ```
 
-### GC 支援預留
+### **String Pool (字串池)**
 
-Object 結構已經為未來的垃圾回收預留了擴展空間：
-
-```go
-// 未來可能新增的欄位
-type Object struct {
-    class    interface{}
-    fields   rtcore.Slots
-    extra    interface{}
-    // markBit  uint8       // GC 標記位
-    // hashCode int32       // 物件 hash code 快取
-    // monitor  *Monitor    // synchronized 鎖
-}
+```
+┌─────────────────────────────────────────────────────────────────┐
+│ JVM String Pool                                                 │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│   s1 ─────────┐                                                 │
+│               ▼                                                 │
+│         ┌─────────────┐                                         │
+│         │ String obj  │  ← Pool 中的唯一 "Hello"                 │
+│         │ "Hello"     │                                         │
+│         └─────────────┘                                         │
+│               ▲                                                 │
+│   s2 ─────────┘                                                 │
+│                                                                 │
+│                                                                 │
+│   s3 ─────────► ┌─────────────┐                                 │
+│                 │ String obj  │  ← Heap 中的新物件                │
+│                 │ "Hello"     │    (不在 Pool 中)                │
+│                 └─────────────┘                                 │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
+<br>
+
+### **為什麼需要字串駐留？**
+
+場景: 大型應用程式中有大量重複字串
+
+* __沒有字串駐留__: "ERROR" 出現 10000 次 → 10000 個 String 物件 → 浪費記憶體
+* __有字串駐留__: "ERROR" 出現 10000 次 → 1 個 String 物件 → 節省記憶體
+
+額外好處：
+
+* 字串比較可以用 == 而不是 equals()（更快，比較兩個 ref 而已，前提是都來自 Pool）
+
+<br>
+
+#### **哪些字串會被駐留？**
+
+自動駐留的字串:
+
+1. 字串字面量: `String s = "Hello";`
+2. 編譯期常量運算: `String s = "Hel" + "lo";`
+3. 類別名、方法名等 JVM 內部字串
+
+不會自動駐留的字串:
+
+1. `new String("Hello")`
+2. 執行時字串串接：`String s = s1 + s2;`
+3. `substring()` 等方法的返回值
+
+手動駐留:
+
+* 使用 `intern()` 會將字串加入 Pool 並返回 Pool 中的引用:
+  `String s = new String("Hello").intern();`
+
+<br>
+
+### **String Pool 的位置演變**
+
+Java 6 及之前:
+* String Pool 在 PermGen (永久代)
+* 問題：PermGen 大小固定，容易 OOM
+
+Java 7 開始:
+* String Pool 移到 Heap
+* 好處：可以被 GC 回收，更靈活
+
+Java 8:
+* PermGen 被 Metaspace 取代
+* String Pool 仍在 Heap
+
+<br>
 <br>
 
 ---
