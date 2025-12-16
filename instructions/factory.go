@@ -120,6 +120,9 @@ var (
 	fneg = &math.FNEG{}
 	dneg = &math.DNEG{}
 
+	// ============ Reference ============
+	athrow = &references.ATHROW{}
+
 	// ============ Control / Return ============
 	ireturn = &control.IRETURN{}
 	lreturn = &control.LRETURN{}
@@ -298,6 +301,10 @@ func NewInstruction(opcode byte) (base.Instruction, error) {
 		return astore_2, nil
 	case opcodes.ASTORE_3:
 		return astore_3, nil
+
+	// reference
+	case opcodes.ATHROW:
+		return athrow, nil
 
 	// Array Load Instructions
 	case opcodes.IALOAD:
