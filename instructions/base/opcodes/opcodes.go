@@ -177,6 +177,7 @@ const (
 	CHECKCAST       = 0xC0 // v0.2.8
 	INSTANCEOF      = 0xC1 // v0.2.8
 	MULTIANEWARRAY  = 0xC5 // TODO
+	ATHROW          = 0xBF // v0.2.10
 
 	// ============ Extended ============
 	LDC    = 0x12
@@ -252,6 +253,7 @@ var OpcodeNames = map[uint8]string{
 	NEW:      "new",
 	NEWARRAY: "newarray", ANEWARRAY: "anewarray", MULTIANEWARRAY: "multianewarray", ARRAYLENGTH: "arraylength",
 	INSTANCEOF: "instanceof", CHECKCAST: "checkcast",
+	ATHROW: "athrow",
 
 	// Extended
 	LDC: "ldc", LDC_W: "ldc_w", LDC2_W: "ldc2_w",

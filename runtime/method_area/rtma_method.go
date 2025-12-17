@@ -14,15 +14,17 @@ import (
 // - max Stack size
 // - max LocalVars table size
 // - method input params count (actually is slots count)
+// - exception table (v0.2.10)
 type Method struct {
-	accessFlags  uint16
-	name         string
-	descriptor   string
-	class        *Class
-	maxStack     uint16
-	maxLocals    uint16
-	code         []byte
-	argSlotCount uint
+	accessFlags    uint16
+	name           string
+	descriptor     string
+	class          *Class
+	maxStack       uint16
+	maxLocals      uint16
+	code           []byte
+	argSlotCount   uint
+	exceptionTable ExceptionTable // v0.2.10
 }
 
 // newMethods create from classfile
@@ -51,6 +53,8 @@ func (m *Method) copyAttributes(cfMethod *classfile.MemberInfo) {
 		m.maxStack = codeAttr.MaxStack()
 		m.maxLocals = codeAttr.MaxLocals()
 		m.code = codeAttr.Code()
+		// v0.2.10: parse exception table:
+		m.exceptionTable = newExceptionTable(codeAttr.ExceptionTable(), m.Class().ConstantPool())
 	}
 }
 
@@ -86,6 +90,9 @@ func (m *Method) MaxLocals() uint16   { return m.maxLocals }
 func (m *Method) Code() []byte        { return m.code }
 func (m *Method) ArgSlotCount() uint  { return m.argSlotCount }
 func (m *Method) AccessFlags() uint16 { return m.accessFlags }
+func (m *Method) ExceptionTable() ExceptionTable {
+	return m.exceptionTable
+}
 
 // =============== Access Flags ===============
 

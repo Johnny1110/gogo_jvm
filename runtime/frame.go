@@ -33,6 +33,7 @@ type Frame struct {
 	operandStack *OperandStack
 	thread       *Thread
 	nextPC       int
+	currentPC    int
 	method       *method_area.Method
 }
 
@@ -80,9 +81,14 @@ func (f *Frame) NextPC() int {
 	return f.nextPC
 }
 
+func (f *Frame) CurrentPC() int {
+	return f.currentPC
+}
+
 // SetNextPC setup next instruction address (index)
 // use for `for` `while` `if` `break`...
 func (f *Frame) SetNextPC(nextPC int) {
+	f.currentPC = f.nextPC
 	f.nextPC = nextPC
 }
 
