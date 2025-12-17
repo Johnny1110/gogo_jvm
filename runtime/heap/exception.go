@@ -6,18 +6,14 @@ package heap
 
 // ExceptionData store in object.extra
 type ExceptionData struct {
-	ClassName string // ex: "java/lang/ArithmeticException"
-	Message   string // ex: "/ by zero"
+	Message string // ex: "/ by zero"
 }
 
-// NewExceptionObject create ex Object
-// TODO: this is MVP simplify
-func NewExceptionObject(className, message string) *Object {
+func NewExceptionObject(exClass interface{}, message string) *Object {
 	return &Object{
-		class: nil, // TODO: real JVM will load ex class and create instance
+		class: exClass,
 		extra: &ExceptionData{
-			ClassName: className,
-			Message:   message,
+			Message: message,
 		},
 	}
 }

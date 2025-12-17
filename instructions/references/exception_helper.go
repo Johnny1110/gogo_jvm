@@ -66,14 +66,7 @@ func findExceptionHandler(frame *runtime.Frame, exceptionObj *heap.Object, pc in
 
 	// try to get ex class
 	exClass := getExceptionClass(exceptionObj)
-	if exClass != nil {
-		// if it has real ex class, using standard match up.
-		return exTable.FindExceptionHandler(exClass, pc)
-	}
-
-	// if not found ex class (MVP Phase), using HACK.
-	exClassName := getExceptionClassName(exceptionObj)
-	return exTable.FindExceptionHandlerByClassName(exClassName, pc)
+	return exTable.FindExceptionHandler(exClass, pc)
 }
 
 // handleCatch handle cache
@@ -132,11 +125,7 @@ func getExceptionClassName(exceptionObj *heap.Object) string {
 		return exClass.Name()
 	}
 
-	if extra := exceptionObj.Extra(); extra != nil {
-		if info, ok := extra.(*heap.ExceptionData); ok {
-			return info.ClassName
-		}
-	}
+	fmt.Println("@@ DEBUG - getExceptionClassName can not find ex class.")
 
 	return "java/lang/Throwable"
 }
@@ -156,26 +145,31 @@ func getExceptionMessage(exceptionObj *heap.Object) string {
 // ============================================================
 
 // NewArithmeticException
-func NewArithmeticException(message string) *heap.Object {
-	return heap.NewExceptionObject("java/lang/ArithmeticException", message)
+func NewArithmeticException(frame *runtime.Frame, message string) *heap.Object {
+	exClass := frame.Method().Class().Loader().LoadClass("java/lang/ArithmeticException", false)
+	return heap.NewExceptionObject(exClass, message)
 }
 
 // NewNullPointerException
-func NewNullPointerException() *heap.Object {
-	return heap.NewExceptionObject("java/lang/NullPointerException", "")
+func NewNullPointerException(frame *runtime.Frame) *heap.Object {
+	exClass := frame.Method().Class().Loader().LoadClass("java/lang/NullPointerException", false)
+	return heap.NewExceptionObject(exClass, "")
 }
 
 // NewArrayIndexOutOfBoundsException
-func NewArrayIndexOutOfBoundsException(index int32) *heap.Object {
-	return heap.NewExceptionObject("java/lang/ArrayIndexOutOfBoundsException", fmt.Sprintf("%d", index))
+func NewArrayIndexOutOfBoundsException(frame *runtime.Frame, index int32) *heap.Object {
+	exClass := frame.Method().Class().Loader().LoadClass("java/lang/ArrayIndexOutOfBoundsException", false)
+	return heap.NewExceptionObject(exClass, fmt.Sprintf("%d", index))
 }
 
 // NewClassCastException
-func NewClassCastException(from, to string) *heap.Object {
-	return heap.NewExceptionObject("java/lang/ClassCastException", fmt.Sprintf("%s cannot be cast to %s", from, to))
+func NewClassCastException(frame *runtime.Frame, from, to string) *heap.Object {
+	exClass := frame.Method().Class().Loader().LoadClass("java/lang/ClassCastException", false)
+	return heap.NewExceptionObject(exClass, fmt.Sprintf("%s cannot be cast to %s", from, to))
 }
 
 // NewNegativeArraySizeException
-func NewNegativeArraySizeException(size int32) *heap.Object {
-	return heap.NewExceptionObject("java/lang/NegativeArraySizeException", fmt.Sprintf("%d", size))
+func NewNegativeArraySizeException(frame *runtime.Frame, size int32) *heap.Object {
+	exClass := frame.Method().Class().Loader().LoadClass("java/lang/NegativeArraySizeException", false)
+	return heap.NewExceptionObject(exClass, fmt.Sprintf("%d", size))
 }

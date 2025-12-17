@@ -2,7 +2,6 @@ package method_area
 
 import (
 	"github.com/Johnny1110/gogo_jvm/classfile"
-	"strings"
 )
 
 // ============================================================
@@ -85,7 +84,7 @@ func (table ExceptionTable) FindExceptionHandler(exClass *Class, pc int) int {
 				return handler.HandlerPC
 			}
 
-			catchClass := handler.CatchType.ResolvedClass() // (TODO: v0.2.10: we don't have ex classes, currently using FindExceptionHandlerByClassName instead)
+			catchClass := handler.CatchType.ResolvedClass()
 
 			if catchClass.IsAssignableFrom(exClass) {
 				// catchCass must be parented of exClass
@@ -95,74 +94,4 @@ func (table ExceptionTable) FindExceptionHandler(exClass *Class, pc int) int {
 		}
 	}
 	return -1 // not found handler
-}
-
-// FindExceptionHandlerByClassName using className find ex handler (TODO: MVP simplify)
-// handle no class exception object
-// args:
-// - exClassName: exception class name ex: "java/lang/ArithmeticException"
-// - pc: current pc
-//
-// return:
-// - handlerPC: handler entry, of not found return 01
-func (table ExceptionTable) FindExceptionHandlerByClassName(exClassName string, pc int) int {
-	for _, handler := range table {
-		if pc >= handler.StartPC && pc < handler.EndPC {
-			if handler.CatchType == nil {
-				return handler.HandlerPC // finally
-			}
-
-			// TODO: using classname for matching
-			if isExceptionAssignable(exClassName, handler.CatchTypeName) {
-				return handler.HandlerPC
-			}
-		}
-	}
-
-	return -1
-}
-
-// isExceptionAssignable
-func isExceptionAssignable(exClassName, catchTypeName string) bool {
-	// fully match
-	if exClassName == catchTypeName {
-		return true
-	}
-
-	// remove prefix "java/lang/"
-	exSimple := simplifyClassName(exClassName)
-	catchSimple := simplifyClassName(catchTypeName)
-
-	// key: son, value: all parents classes
-	hierarchy := map[string][]string{
-		"ArithmeticException":            {"RuntimeException", "Exception", "Throwable"},
-		"NullPointerException":           {"RuntimeException", "Exception", "Throwable"},
-		"ArrayIndexOutOfBoundsException": {"IndexOutOfBoundsException", "RuntimeException", "Exception", "Throwable"},
-		"IndexOutOfBoundsException":      {"RuntimeException", "Exception", "Throwable"},
-		"ClassCastException":             {"RuntimeException", "Exception", "Throwable"},
-		"NegativeArraySizeException":     {"RuntimeException", "Exception", "Throwable"},
-		"IllegalArgumentException":       {"RuntimeException", "Exception", "Throwable"},
-		"RuntimeException":               {"Exception", "Throwable"},
-		"Exception":                      {"Throwable"},
-		"Error":                          {"Throwable"},
-		"Throwable":                      {},
-	}
-
-	if parents, ok := hierarchy[exSimple]; ok {
-		for _, parent := range parents {
-			if parent == catchSimple {
-				return true
-			}
-		}
-	}
-
-	return false
-}
-
-// simplifyClassName "java/lang/ArithmeticException" → "ArithmeticException"
-func simplifyClassName(className string) string {
-	if idx := strings.LastIndex(className, "/"); idx >= 0 {
-		return className[idx+1:]
-	}
-	return className
 }

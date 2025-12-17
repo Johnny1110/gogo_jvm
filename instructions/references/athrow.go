@@ -23,7 +23,7 @@ func (a *ATHROW) Execute(frame *runtime.Frame) {
 	exceptionRef := frame.OperandStack().PopRef()
 
 	if exceptionRef == nil {
-		exceptionObj := NewNullPointerException()
+		exceptionObj := NewNullPointerException(frame)
 		ThrowException(frame, exceptionObj)
 		return
 	}

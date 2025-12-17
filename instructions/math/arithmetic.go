@@ -214,7 +214,6 @@ func (i *DMUL) Opcode() uint8 {
 // DIV Series
 // ============================================================
 // Warning: When performing integer division, if the divisor is 0, an ArithmeticException should be thrown.
-// TODO: we using panic instead temporary (MVP Phase)
 
 // IDIV int
 // opcodes = 0x6C
@@ -226,7 +225,7 @@ func (i *IDIV) Execute(frame *runtime.Frame) {
 	v1 := stack.PopInt()
 	if v2 == 0 {
 		// 0.2.10: throw ArithmeticException
-		exceptionObj := references.NewArithmeticException("/ by zero")
+		exceptionObj := references.NewArithmeticException(frame, "/ by zero")
 		references.ThrowException(frame, exceptionObj)
 		return
 	}
@@ -248,7 +247,7 @@ func (l *LDIV) Execute(frame *runtime.Frame) {
 	v1 := stack.PopLong()
 	if v2 == 0 {
 		// 0.2.10: throw ArithmeticException
-		exceptionObj := references.NewArithmeticException("/ by zero")
+		exceptionObj := references.NewArithmeticException(frame, "/ by zero")
 		references.ThrowException(frame, exceptionObj)
 		return
 	}
@@ -307,7 +306,7 @@ func (i *IREM) Execute(frame *runtime.Frame) {
 	v1 := stack.PopInt()
 	if v2 == 0 {
 		// 0.2.10: throw ArithmeticException
-		exceptionObj := references.NewArithmeticException("/ by zero")
+		exceptionObj := references.NewArithmeticException(frame, "/ by zero")
 		references.ThrowException(frame, exceptionObj)
 		return
 	}
@@ -329,7 +328,7 @@ func (l *LREM) Execute(frame *runtime.Frame) {
 	v1 := stack.PopLong()
 	if v2 == 0 {
 		// 0.2.10: throw ArithmeticException
-		exceptionObj := references.NewArithmeticException("/ by zero")
+		exceptionObj := references.NewArithmeticException(frame, "/ by zero")
 		references.ThrowException(frame, exceptionObj)
 		return
 	}
