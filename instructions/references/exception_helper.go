@@ -2,6 +2,7 @@ package references
 
 import (
 	"fmt"
+	"github.com/Johnny1110/gogo_jvm/instructions/base/opcodes"
 	"github.com/Johnny1110/gogo_jvm/runtime"
 	"github.com/Johnny1110/gogo_jvm/runtime/heap"
 	"github.com/Johnny1110/gogo_jvm/runtime/method_area"
@@ -37,7 +38,9 @@ func ThrowException(frame *runtime.Frame, exceptionObj *heap.Object) {
 func handleException(currentThread *runtime.Thread, exceptionObj *heap.Object) bool {
 	for {
 		frame := currentThread.CurrentFrame()
-		pc := currentThread.PC()
+		pc := frame.CurrentPC() // the pc where the error thrown
+
+		fmt.Printf("@@ DEBUG - handleException frame.CurrentPC() -> %v, opcode: 0x%02X (%s) \n", pc, frame.Method().Code()[pc], opcodes.OpcodeNames[frame.Method().Code()[pc]])
 
 		// try to find handler in current frame (method) by ExceptionTable
 		handlerPC := findExceptionHandler(frame, exceptionObj, pc)
@@ -49,6 +52,7 @@ func handleException(currentThread *runtime.Thread, exceptionObj *heap.Object) b
 			currentThread.PopFrame()
 			if currentThread.IsStackEmpty() {
 				// handler not found until popped all frames (method)
+				fmt.Println("@@ DEBUG - Warning! handleException not found matching catch until popped all JVMFrameStack.")
 				return false
 			}
 		}

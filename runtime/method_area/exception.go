@@ -1,7 +1,9 @@
 package method_area
 
 import (
+	"fmt"
 	"github.com/Johnny1110/gogo_jvm/classfile"
+	"strings"
 )
 
 // ============================================================
@@ -76,9 +78,12 @@ func getCatchTypeName(catchTypeIndex uint16, cp *RuntimeConstantPool) string {
 // return:
 // - handlerPC: return handler position (pc) if found, otherwise return -1
 func (table ExceptionTable) FindExceptionHandler(exClass *Class, pc int) int {
+	fmt.Printf("@@ DEBUG - ExceptionTable.FindExceptionHandler exClass : %s, pc: %v \n", exClass.Name(), pc)
+
 	for _, handler := range table {
 		// rule-1: pc should between startPC & endPC
 		if pc >= handler.StartPC && pc < handler.EndPC {
+
 			// rule-2: check match type:
 			if handler.CatchType == nil { // finally (0)
 				return handler.HandlerPC
@@ -94,4 +99,57 @@ func (table ExceptionTable) FindExceptionHandler(exClass *Class, pc int) int {
 		}
 	}
 	return -1 // not found handler
+}
+
+func (h ExceptionHandler) String() string {
+	catch := "any (finally)"
+
+	if h.CatchType != nil {
+		if h.CatchTypeName != "" {
+			catch = h.CatchTypeName
+		} else {
+			catch = "<unknown>"
+		}
+	}
+
+	return fmt.Sprintf(
+		"start=%d end=%d handler=%d catch=%s",
+		h.StartPC,
+		h.EndPC,
+		h.HandlerPC,
+		catch,
+	)
+}
+
+func (table *ExceptionTable) String() string {
+	if len(*table) == 0 {
+		return "ExceptionTable []"
+	}
+
+	var sb strings.Builder
+	sb.WriteString("ExceptionTable [\n")
+
+	for i, h := range *table {
+		sb.WriteString(fmt.Sprintf(
+			"  [%d] start=%-4d end=%-4d handler=%-4d catch=%s\n",
+			i,
+			h.StartPC,
+			h.EndPC,
+			h.HandlerPC,
+			h.catchTypeString(),
+		))
+	}
+
+	sb.WriteString("]")
+	return sb.String()
+}
+
+func (h *ExceptionHandler) catchTypeString() string {
+	if h.CatchType == nil {
+		return "any (finally)"
+	}
+	if h.CatchTypeName != "" {
+		return h.CatchTypeName
+	}
+	return "<unknown>"
 }
