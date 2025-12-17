@@ -2,6 +2,7 @@ package math
 
 import (
 	"github.com/Johnny1110/gogo_jvm/instructions/base"
+	"github.com/Johnny1110/gogo_jvm/instructions/references"
 	"github.com/Johnny1110/gogo_jvm/runtime"
 )
 
@@ -224,7 +225,10 @@ func (i *IDIV) Execute(frame *runtime.Frame) {
 	v2 := stack.PopInt()
 	v1 := stack.PopInt()
 	if v2 == 0 {
-		panic("java.lang.ArithmeticException: / by zero")
+		// 0.2.10: throw ArithmeticException
+		exceptionObj := references.NewArithmeticException("/ by zero")
+		references.ThrowException(frame, exceptionObj)
+		return
 	}
 	result := v1 / v2
 	stack.PushInt(result)
@@ -243,7 +247,10 @@ func (l *LDIV) Execute(frame *runtime.Frame) {
 	v2 := stack.PopLong()
 	v1 := stack.PopLong()
 	if v2 == 0 {
-		panic("java.lang.ArithmeticException: / by zero")
+		// 0.2.10: throw ArithmeticException
+		exceptionObj := references.NewArithmeticException("/ by zero")
+		references.ThrowException(frame, exceptionObj)
+		return
 	}
 	result := v1 / v2
 	stack.PushLong(result)
@@ -299,7 +306,10 @@ func (i *IREM) Execute(frame *runtime.Frame) {
 	v2 := stack.PopInt()
 	v1 := stack.PopInt()
 	if v2 == 0 {
-		panic("java.lang.ArithmeticException: / by zero")
+		// 0.2.10: throw ArithmeticException
+		exceptionObj := references.NewArithmeticException("/ by zero")
+		references.ThrowException(frame, exceptionObj)
+		return
 	}
 	result := v1 % v2
 	stack.PushInt(result)
@@ -318,7 +328,10 @@ func (l *LREM) Execute(frame *runtime.Frame) {
 	v2 := stack.PopLong()
 	v1 := stack.PopLong()
 	if v2 == 0 {
-		panic("java.lang.ArithmeticException: / by zero")
+		// 0.2.10: throw ArithmeticException
+		exceptionObj := references.NewArithmeticException("/ by zero")
+		references.ThrowException(frame, exceptionObj)
+		return
 	}
 	result := v1 % v2
 	stack.PushLong(result)

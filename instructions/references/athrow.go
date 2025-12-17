@@ -4,6 +4,7 @@ import (
 	"github.com/Johnny1110/gogo_jvm/instructions/base"
 	"github.com/Johnny1110/gogo_jvm/instructions/base/opcodes"
 	"github.com/Johnny1110/gogo_jvm/runtime"
+	"github.com/Johnny1110/gogo_jvm/runtime/heap"
 )
 
 // ============================================================
@@ -18,7 +19,17 @@ type ATHROW struct {
 }
 
 func (a *ATHROW) Execute(frame *runtime.Frame) {
-	// TODO
+	// 1. pop exception
+	exceptionRef := frame.OperandStack().PopRef()
+
+	if exceptionRef == nil {
+		exceptionObj := NewNullPointerException()
+		ThrowException(frame, exceptionObj)
+		return
+	}
+
+	exceptionObj := exceptionRef.(*heap.Object)
+	ThrowException(frame, exceptionObj)
 }
 
 func (a *ATHROW) Opcode() uint8 {

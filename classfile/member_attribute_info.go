@@ -81,15 +81,32 @@ func (c *CodeAttribute) readInfo(reader *ClassReader) {
 	c.attributes = readAttributes(reader, c.cp)
 }
 
-func (c *CodeAttribute) MaxStack() uint16  { return c.maxStack }
-func (c *CodeAttribute) MaxLocals() uint16 { return c.maxLocals }
-func (c *CodeAttribute) Code() []byte      { return c.code }
+func (c *CodeAttribute) MaxStack() uint16                    { return c.maxStack }
+func (c *CodeAttribute) MaxLocals() uint16                   { return c.maxLocals }
+func (c *CodeAttribute) Code() []byte                        { return c.code }
+func (c *CodeAttribute) ExceptionTable() []*ExceptionHandler { return c.exceptionTable }
 
 type ExceptionHandler struct {
 	startPc   uint16
 	endPc     uint16
 	handlerPc uint16
 	catchType uint16
+}
+
+func (eh *ExceptionHandler) StartPc() uint16 {
+	return eh.startPc
+}
+
+func (eh *ExceptionHandler) EndPc() uint16 {
+	return eh.endPc
+}
+
+func (eh *ExceptionHandler) HandlerPc() uint16 {
+	return eh.handlerPc
+}
+
+func (eh *ExceptionHandler) CatchType() uint16 {
+	return eh.catchType
 }
 
 func readExceptionTable(reader *ClassReader) []*ExceptionHandler {
