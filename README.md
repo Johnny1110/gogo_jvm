@@ -71,7 +71,7 @@ v0.2 目標是讓 GOGO_JVM 能執行大部分 Single-Thread 的 Java 程式。
 * ✅️ v0.2.7: [Native Method And `System.out.println`](doc/version/v0_2/v0_2_7.md) 
 * ✅️ v0.2.8: [Class Enhancement - `instanceof` / `checkcast` / `anewarray`](doc/version/v0_2/v0_2_8.md)
 * ✅️ v0.2.9: [Support `java.lang.String`](doc/version/v0_2/v0_2_9.md)
-* ⌛ v0.2.10: [Support ` try-catch-finally`](doc/version/v0_2/v0_2_10.md)
+* ✅️v0.2.10: [Support ` try-catch-finally`](doc/version/v0_2/v0_2_10.md)
 * ⛔ v0.2.11: [Support interface](doc/version/v0_2/v0_2_11.md)
 
 <br>
