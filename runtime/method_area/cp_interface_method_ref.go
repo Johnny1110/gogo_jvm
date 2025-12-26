@@ -56,7 +56,10 @@ func (r *InterfaceMethodRef) resolveInterfaceMethodRef() {
 }
 
 func (r *InterfaceMethodRef) ResolvedClass() *Class {
-	return r.method.Class()
+	if r.class == nil {
+		r.resolveClassRef()
+	}
+	return r.class
 }
 
 // lookupInterfaceMethod find method in interface and super-interfaces
