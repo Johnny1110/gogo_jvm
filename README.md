@@ -58,7 +58,7 @@ MVP 時期的筆記有些雜亂，移到 MVP Plan Documents 做紀念。
 <br>
 
 
-### v0.2 - MVP JVM Project (Core Engine) ⌛
+### v0.2 - MVP JVM Project (Core Engine) ✅️
 
 v0.2 目標是讓 GOGO_JVM 能執行大部分 Single-Thread 的 Java 程式。
 
@@ -71,13 +71,13 @@ v0.2 目標是讓 GOGO_JVM 能執行大部分 Single-Thread 的 Java 程式。
 * ✅️ v0.2.7: [Native Method And `System.out.println`](doc/version/v0_2/v0_2_7.md) 
 * ✅️ v0.2.8: [Class Enhancement - `instanceof` / `checkcast` / `anewarray`](doc/version/v0_2/v0_2_8.md)
 * ✅️ v0.2.9: [Support `java.lang.String`](doc/version/v0_2/v0_2_9.md)
-* ✅️v0.2.10: [Support ` try-catch-finally`](doc/version/v0_2/v0_2_10.md)
-* ⛔ v0.2.11: [Support interface](doc/version/v0_2/v0_2_11.md)
+* ✅️ v0.2.10: [Support ` try-catch-finally`](doc/version/v0_2/v0_2_10.md)
+* ✅️ v0.2.11: [Support interface](doc/version/v0_2/v0_2_11.md)
 
 <br>
 <br>
 
-### v0.3 - Object Model (Pre-Work for GC/Multi-Thread)
+### v0.3 - Object Model (Pre-Work for GC/Multi-Thread) ⌛
 
 v0.3 目標是能支援 Class 物件與基本反射，標準物件頭 (Mark Word)，
 Reference 類型支援，完整的物件生命週期。後續可以實現多執行緒和 GC。
