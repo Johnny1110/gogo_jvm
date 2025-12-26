@@ -112,6 +112,9 @@ func (c *Class) SuperClass() *Class                 { return c.superClass }
 func (c *Class) StaticVars() rtcore.Slots           { return c.staticVars }
 func (c *Class) AccessFlags() uint16                { return c.accessFlags }
 func (c *Class) InstanceSlotCount() uint            { return c.instanceSlotCount }
+func (c *Class) Interfaces() []*Class {
+	return c.interfaces
+}
 
 // =============== Access Flags ===============
 

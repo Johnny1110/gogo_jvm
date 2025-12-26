@@ -177,3 +177,18 @@ func NewNegativeArraySizeException(frame *runtime.Frame, size int32) *heap.Objec
 	exClass := frame.Method().Class().Loader().LoadClass("java/lang/NegativeArraySizeException", false)
 	return heap.NewExceptionObject(exClass, fmt.Sprintf("%d", size))
 }
+
+func NewIncompatibleClassChangeError(frame *runtime.Frame, message string) *heap.Object {
+	exClass := frame.Method().Class().Loader().LoadClass("java/lang/IncompatibleClassChangeError", false)
+	return heap.NewExceptionObject(exClass, fmt.Sprintf("%s", message))
+}
+
+func NewAbstractMethodError(frame *runtime.Frame, className, methodName, descriptor string) *heap.Object {
+	exClass := frame.Method().Class().Loader().LoadClass("java/lang/NewAbstractMethodError", false)
+	return heap.NewExceptionObject(exClass, fmt.Sprintf("%s.%s%s", className, methodName, descriptor))
+}
+
+func NewIllegalAccessError(frame *runtime.Frame, className, methodName, descriptor string) *heap.Object {
+	exClass := frame.Method().Class().Loader().LoadClass("java/lang/IllegalAccessError", false)
+	return heap.NewExceptionObject(exClass, fmt.Sprintf("%s.%s%s", className, methodName, descriptor))
+}

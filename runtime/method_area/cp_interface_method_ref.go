@@ -4,10 +4,20 @@ import (
 	"github.com/Johnny1110/gogo_jvm/classfile"
 )
 
-// InterfaceMethodRef interface method ref
+// ============================================================
+// InterfaceMethodRef - interface method reference
+// ============================================================
+// Used by invokeinterface instruction
+// Similar to MethodRef, but for interface methods
+//
+// Key differences from MethodRef:
+//   - Must reference an interface, not a class
+//   - Used with invokeinterface, not invokevirtual
+//   - Cannot use vtable optimization
+
 type InterfaceMethodRef struct {
 	MemberRef
-	method *Method
+	method *Method // resolved method (cached)
 }
 
 // NewInterfaceMethodRef create ref from ClassFile
@@ -46,21 +56,39 @@ func (r *InterfaceMethodRef) resolveInterfaceMethodRef() {
 }
 
 func (r *InterfaceMethodRef) ResolvedClass() *Class {
-	return r.method.Class()
+	if r.class == nil {
+		r.resolveClassRef()
+	}
+	return r.class
 }
 
-// lookupInterfaceMethod find method
+// lookupInterfaceMethod find method in interface and super-interfaces
+// This searches:
+//  1. Methods declared in the interface itself
+//  2. Methods in super-interfaces (recursively)
+//  3. Methods in java.lang.Object (interfaces implicitly inherit Object methods)
 func lookupInterfaceMethod(iface *Class, name, descriptor string) *Method {
-	// find in current class
+	// Step 1: Search in this interface's methods
 	for _, method := range iface.Methods() {
 		if method.Name() == name && method.Descriptor() == descriptor {
 			return method
 		}
 	}
 
-	if iface.superClass != nil {
-		return lookupInterfaceMethod(iface.superClass, name, descriptor)
+	// Step 2: Search in super-interfaces
+	for _, superIface := range iface.Interfaces() {
+		method := lookupInterfaceMethod(superIface, name, descriptor)
+		if method != nil {
+			return method
+		}
 	}
 
+	// Step 3: Search in java.lang.Object
+	// Interface methods like toString(), hashCode() come from Object
+	if iface.SuperClass() != nil {
+		return lookupMethodInClass(iface.SuperClass(), name, descriptor)
+	}
+
+	// return nothing
 	return nil
 }
