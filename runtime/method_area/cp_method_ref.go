@@ -58,11 +58,15 @@ func lookupMethod(c *Class, methodName, methodDescriptor string) *Method {
 	return nil
 }
 
-func lookupMethodInClass(c *Class, methodName, methodDescriptor string) *Method {
-	for _, method := range c.Methods() {
-		if method.Name() == methodName && method.Descriptor() == methodDescriptor {
-			return method
+// lookupMethodInClass find method in class (helper for Object methods)
+func lookupMethodInClass(class *Class, methodName, methodDescriptor string) *Method {
+	for c := class; c != nil; c = c.superClass {
+		for _, method := range c.Methods() {
+			if method.Name() == methodName && method.Descriptor() == methodDescriptor {
+				return method
+			}
 		}
 	}
+
 	return nil
 }
