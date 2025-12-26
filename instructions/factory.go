@@ -496,6 +496,8 @@ func NewInstruction(opcode byte) (base.Instruction, error) {
 		return &references.INVOKEVIRTUAL{}, nil
 	case opcodes.INVOKESPECIAL:
 		return &references.INVOKESPECIAL{}, nil
+	case opcodes.INVOKEINTERFACE:
+		return &references.INVOKEINTERFACE{}, nil
 
 	default:
 		return nop, fmt.Errorf("unsupported opcodes: 0x%02X", opcode)
