@@ -28,7 +28,8 @@ type Object struct {
 	class interface{}
 
 	// fields object's fields ref
-	fields rtcore.Slots
+	fields   rtcore.Slots
+	markWord uint64
 
 	// extra
 	// - array Object: store ([]int32, []int64, []*Object ...)
