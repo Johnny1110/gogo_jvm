@@ -47,3 +47,42 @@ func generateHashCode() int32 {
 	}
 	return result
 }
+
+// ============================================================
+// Thread-Local Hash Generator (TODO v0.4.x 多執行緒優化用)
+// ============================================================
+// TODO: when it comes to v4.0.x, each thread can have their own HashGenerator, avoid global lock compete.
+
+// ThreadLocalHashGenerator Thread Local Hash hash Generator
+type ThreadLocalHashGenerator struct {
+	x, y, z, w uint32
+}
+
+// NewThreadLocalHashGenerator create new ThreadLocal Generator
+func NewThreadLocalHashGenerator(seed uint32) *ThreadLocalHashGenerator {
+	if seed == 0 {
+		seed = 1
+	}
+	return &ThreadLocalHashGenerator{
+		x: seed,
+		y: seed ^ 0x12345678, // XOR
+		z: seed ^ 0xABCDEF01, // XOR
+		w: seed ^ 0x87654321, // XOR
+	}
+}
+
+// Next generate hash code
+// Using XorShift128 (have longer cycle than XorShift32)
+func (g *ThreadLocalHashGenerator) Next() int32 {
+	t := g.x ^ (g.x << 11)
+	g.x = g.y
+	g.y = g.z
+	g.z = g.w
+	g.w = (g.w ^ (g.w >> 19)) ^ (t ^ (t >> 8))
+
+	result := int32(g.w & 0x7FFFFFFF)
+	if result == 0 {
+		result = 1
+	}
+	return result
+}
