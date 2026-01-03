@@ -82,8 +82,8 @@ v0.2 目標是讓 GOGO_JVM 能執行大部分 Single-Thread 的 Java 程式。
 v0.3 目標是能支援 Class 物件與基本反射，標準物件頭 (Mark Word)，
 Reference 類型支援，完整的物件生命週期。後續可以實現多執行緒和 GC。
 
-* ⛔ v0.3.0: [Revamp - Object Header](doc/version/v0_3/v0_3_0.md)
-* ⛔ v0.3.1: [Basic Reflection](doc/version/v0_3/v0_3_1.md)
+* ✅️ v0.3.0: [Revamp - Object Header](doc/version/v0_3/v0_3_0.md)
+* ⌛ v0.3.1: [Basic Reflection](doc/version/v0_3/v0_3_1.md)
 * ⛔ v0.3.2: [Support Reference Type `java.lang.ref`](doc/version/v0_3/v0_3_2.md)
 * ⛔ v0.3.3: [Object Lifecycle (Object from creation to Destroy)](doc/version/v0_3/v0_3_3.md)
 
