@@ -62,8 +62,11 @@ func invokeNativeMethod(callerFrame *runtime.Frame, nativeMethod runtime.NativeM
 	// calculate args slot count including this.
 	argSlotCount := calcArgSlotCount(descriptor) + 1 // LocalVars[0] = this, so we need + 1
 
+	// parsing return type
+	returnType := parseReturnType(descriptor)
+
 	// create a temp Frame for store params (not require to push into JVMStack)
-	tempFrame := runtime.NewNativeFrame(callerFrame.Thread(), uint16(argSlotCount))
+	tempFrame := runtime.NewNativeFrameWithStack(callerFrame.Thread(), uint16(argSlotCount), returnType)
 
 	// pop args from caller op-stack put into tempFrame's LocalVars
 	stack := callerFrame.OperandStack() // stack: [argN, argN-1, ..., arg1, this]
@@ -78,8 +81,66 @@ func invokeNativeMethod(callerFrame *runtime.Frame, nativeMethod runtime.NativeM
 	// call native method
 	nativeMethod(tempFrame)
 
-	// TODO: currently we only support void native method
-	// TODO: we should return val if called native method has return val.
+	// v0.3.0: handle return val if any
+	handleNativeReturn(callerFrame, tempFrame, returnType)
+}
+
+// parseReturnType parse return type from descriptor
+//
+//	"(I)V"  -> "V" (void)
+//	"()I"   -> "I" (int)
+//	"()J"   -> "J" (long)
+//	"()Ljava/lang/String;" -> "L" (reference)
+func parseReturnType(descriptor string) string {
+	// find ')' position, next is return type
+	for i := len(descriptor) - 1; i >= 0; i-- {
+		if descriptor[i] == ')' {
+			return descriptor[i+1:]
+		}
+	}
+	return "V" // default void
+}
+
+// handleNativeReturn handle native method return val
+// from nativeFrame's OperandStack pop return val, push to callerFrame's OperandStack
+func handleNativeReturn(callerFrame *runtime.Frame, nativeFrame *runtime.Frame, returnType string) {
+	if returnType == "V" || returnType == "" {
+		// void, just return
+		return
+	}
+
+	nativeStack := nativeFrame.OperandStack()
+	callerStack := callerFrame.OperandStack()
+
+	if nativeStack == nil {
+		// should not be happened.
+		panic("native frame has no operand stack but method has return value")
+	}
+
+	switch returnType[0] {
+	case 'Z', 'B', 'C', 'S', 'I': // boolean, byte, char, short, int -> int32
+		val := nativeStack.PopInt()
+		callerStack.PushInt(val)
+
+	case 'J': // long
+		val := nativeStack.PopLong()
+		callerStack.PushLong(val)
+
+	case 'F': // float
+		val := nativeStack.PopFloat()
+		callerStack.PushFloat(val)
+
+	case 'D': // double
+		val := nativeStack.PopDouble()
+		callerStack.PushDouble(val)
+
+	case 'L', '[': // reference (object or array)
+		ref := nativeStack.PopRef()
+		callerStack.PushRef(ref)
+
+	default:
+		panic("unknown return type: " + returnType)
+	}
 }
 
 // calcArgSlotCount calculate arg count by method descriptor

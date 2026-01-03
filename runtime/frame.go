@@ -65,6 +65,30 @@ func NewNativeFrame(thread *Thread, maxLocals uint16) *Frame {
 	}
 }
 
+// NewNativeFrameWithStack create frame for native method with return value support
+// v0.3.0: support return val native call
+func NewNativeFrameWithStack(thread *Thread, maxLocals uint16, returnType string) *Frame {
+	var opStack *OperandStack
+
+	if returnType == "V" || returnType == "" {
+		// void: not require opStack
+		opStack = nil
+	} else {
+		stackSize := uint16(1)
+		if len(returnType) > 0 && (returnType[0] == 'J' || returnType[0] == 'D') {
+			stackSize = 2 // long/double need 2 slots
+		}
+
+		opStack = NewOperandStack(stackSize)
+	}
+
+	return &Frame{
+		thread:       thread,
+		localVars:    NewLocalVars(maxLocals),
+		operandStack: opStack,
+	}
+}
+
 func (f *Frame) LocalVars() rtcore.Slots {
 	return f.localVars
 }

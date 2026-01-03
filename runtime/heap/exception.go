@@ -11,7 +11,8 @@ type ExceptionData struct {
 
 func NewExceptionObject(exClass interface{}, message string) *Object {
 	return &Object{
-		class: exClass,
+		markWord: InitialMarkWord, // init state: non-lock, age=0, hashCode=0
+		class:    exClass,
 		extra: &ExceptionData{
 			Message: message,
 		},

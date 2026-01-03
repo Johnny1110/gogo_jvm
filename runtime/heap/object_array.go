@@ -10,32 +10,36 @@ import "fmt"
 // NewByteArray create []byte or []bool
 func NewByteArray(class interface{}, length int32) *Object {
 	return &Object{
-		class: class,
-		extra: make([]int8, length),
+		markWord: InitialMarkWord, // init state: non-lock, age=0, hashCode=0
+		class:    class,
+		extra:    make([]int8, length),
 	}
 }
 
 // NewShortArray create short[] array
 func NewShortArray(class interface{}, length int32) *Object {
 	return &Object{
-		class: class,
-		extra: make([]int16, length),
+		markWord: InitialMarkWord, // init state: non-lock, age=0, hashCode=0
+		class:    class,
+		extra:    make([]int16, length),
 	}
 }
 
 // NewIntArray create int[] array
 func NewIntArray(class interface{}, length int32) *Object {
 	return &Object{
-		class: class,
-		extra: make([]int32, length),
+		markWord: InitialMarkWord, // init state: non-lock, age=0, hashCode=0
+		class:    class,
+		extra:    make([]int32, length),
 	}
 }
 
 // NewLongArray create long[] array
 func NewLongArray(class interface{}, length int32) *Object {
 	return &Object{
-		class: class,
-		extra: make([]int64, length),
+		markWord: InitialMarkWord, // init state: non-lock, age=0, hashCode=0
+		class:    class,
+		extra:    make([]int64, length),
 	}
 }
 
@@ -43,32 +47,36 @@ func NewLongArray(class interface{}, length int32) *Object {
 // Java char is 16-bit unsigned
 func NewCharArray(class interface{}, length int32) *Object {
 	return &Object{
-		class: class,
-		extra: make([]uint16, length),
+		markWord: InitialMarkWord, // init state: non-lock, age=0, hashCode=0
+		class:    class,
+		extra:    make([]uint16, length),
 	}
 }
 
 // NewFloatArray create float[] array
 func NewFloatArray(class interface{}, length int32) *Object {
 	return &Object{
-		class: class,
-		extra: make([]float32, length),
+		markWord: InitialMarkWord, // init state: non-lock, age=0, hashCode=0
+		class:    class,
+		extra:    make([]float32, length),
 	}
 }
 
 // NewDoubleArray create double[] array
 func NewDoubleArray(class interface{}, length int32) *Object {
 	return &Object{
-		class: class,
-		extra: make([]float64, length),
+		markWord: InitialMarkWord, // init state: non-lock, age=0, hashCode=0
+		class:    class,
+		extra:    make([]float64, length),
 	}
 }
 
 // NewRefArray create ref array (Object[], String[], other class[])
 func NewRefArray(class interface{}, length int32) *Object {
 	return &Object{
-		class: class,
-		extra: make([]*Object, length),
+		markWord: InitialMarkWord, // init state: non-lock, age=0, hashCode=0
+		class:    class,
+		extra:    make([]*Object, length),
 	}
 }
 

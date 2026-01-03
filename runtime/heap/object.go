@@ -22,6 +22,10 @@ import (
 // │ └──────┴──────┴──────┴──────┴──────┘    │
 // └─────────────────────────────────────────┘
 type Object struct {
+	// Object Head (64 bits)
+	// including: hashCode (31 bits) + age (4 bits) + biased (1 bit) + lock state (2 bits)
+	markWord uint64
+
 	// class pointing to class's metadata (which is in method_area)
 	// (使用 interface{} 避免與 method_area 套件循環依賴)
 	// actual type is *method_area.Class
@@ -44,8 +48,9 @@ type Object struct {
 func NewObject(class interface{}, slotCount uint) *Object {
 	fmt.Println("@@ Debug - [NewObject] class:", class, ", slotCount:", slotCount)
 	return &Object{
-		class:  class,
-		fields: rtcore.NewSlots(slotCount),
+		markWord: InitialMarkWord, // init state: non-lock, age=0, hashCode=0
+		class:    class,
+		fields:   rtcore.NewSlots(slotCount),
 	}
 }
 
