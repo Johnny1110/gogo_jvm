@@ -71,8 +71,9 @@ func NewJString(goStr string) *Object {
 	copy(charJArr.Chars(), chars)
 	// 4. create string object
 	strObject := &Object{
-		class: nil, // // TODO: in real JVM, class should be java/lang/String
-		extra: charJArr,
+		markWord: InitialMarkWord, // init state: non-lock, age=0, hashCode=0
+		class:    nil,             // // TODO: in real JVM, class should be java/lang/String
+		extra:    charJArr,
 	}
 
 	return strObject
