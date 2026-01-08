@@ -112,6 +112,14 @@ func (os *OperandStack) PushBoolean(val bool) {
 	}
 }
 
+func (os *OperandStack) PushTrue() {
+	os.PushInt(1)
+}
+
+func (os *OperandStack) PushFalse() {
+	os.PushInt(0)
+}
+
 func (os *OperandStack) PopBoolean() bool {
 	return os.PopInt() != 0
 }
