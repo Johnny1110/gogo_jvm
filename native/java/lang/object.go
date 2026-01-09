@@ -63,6 +63,7 @@ func objectGetClass(frame *runtime.Frame) {
 	// class metadata
 	class := obj.Class().(*method_area.Class)
 	// get jClass (Object) from class
+	fmt.Printf("@@ DEBUG - Native objectGetClass  obj.Class() = %s \n", class.Name())
 	jClass := class.JClass()
 	if jClass == nil {
 		panic(fmt.Sprintf("Class object not initialized for: %s", class.Name()))

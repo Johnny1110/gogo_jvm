@@ -140,15 +140,19 @@ func (loader *ClassLoader) createJClassObject(class *Class) *heap.Object {
 	// create "Class" Obj
 	classObj := &heap.Object{}
 	classObj.SetMarkWord(heap.InitialMarkWord)
+
+	// ==============================================================
+	// !!! 下面這兩個不要混淆了，SetClass 是這個 class 的類型，extra 才是實際 mirror class
+	// set up type（java.lang.Class）
 	classObj.SetClass(jlClassClass)
+	// Class Object's extra is method_area.Class (Mirror)
+	classObj.SetExtra(class)
+	// ==============================================================
 
 	// TODO: 如果 java.lang.Class 有實例欄位，需要分配空間。目前不處理 java.lang.Class 的欄位
 	if jlClassClass != nil && jlClassClass.instanceSlotCount > 0 {
 		classObj.SetFields(rtcore.NewSlots(jlClassClass.instanceSlotCount))
 	}
-
-	// Class Object;s extra is method_area.Class (Mirror)
-	classObj.SetExtra(class)
 
 	return classObj
 }
@@ -247,6 +251,11 @@ func (loader *ClassLoader) loadNonArrayClass(name string, debug bool) *Class {
 
 	// 3. do link（Verification and Preparation）
 	link(class)
+
+	// 4. create java.lang.Class (v0.3.1)
+	if class.jClass == nil && loader.jlClassClass != nil {
+		class.jClass = loader.createJClassObject(class)
+	}
 
 	fmt.Printf("@@ Debug - [ClassLoader] Loaded: %s\n", name)
 	return class

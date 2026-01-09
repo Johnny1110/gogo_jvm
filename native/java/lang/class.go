@@ -16,7 +16,8 @@ func init() {
 
 	// basic reflection
 	runtime.Register("java/lang/Class", "getPrimitiveClass", "(Ljava/lang/String;)Ljava/lang/Class;", getPrimitiveClass)
-	runtime.Register("java/lang/Class", "getName0", "()Ljava/lang/String;", getName0)
+	runtime.Register("java/lang/Class", "getName0", "()Ljava/lang/String;", getName0)           // old JDK
+	runtime.Register("java/lang/Class", "initClassName", "()Ljava/lang/String;", initClassName) // new JDK
 	runtime.Register("java/lang/Class", "getSuperclass", "()Ljava/lang/Class;", getSuperclass)
 	runtime.Register("java/lang/Class", "getInterfaces0", "()[Ljava/lang/Class;", getInterfaces0)
 	runtime.Register("java/lang/Class", "getComponentType", "()Ljava/lang/Class;", getComponentType)
@@ -78,6 +79,32 @@ func getName0(frame *runtime.Frame) {
 
 	// create Java String and return it.
 	jString := heap.InternString(javaName)
+	frame.OperandStack().PushRef(jString)
+}
+
+// ============================================================
+// initClassName - Class.initClassName()
+// ============================================================
+// Java signature: private native String initClassName();
+// get class full name（new version JDK）
+func initClassName(frame *runtime.Frame) {
+	this := frame.LocalVars().GetThis().(*heap.Object)
+
+	fmt.Printf("@@ DEBUG - initClassName, this: %s\n", this.String())
+
+	class := this.Extra().(*method_area.Class)
+
+	fmt.Printf("@@ DEBUG - initClassName, class: %s\n", class.String())
+
+	// JVM inner: java/lang/String
+	// Java API: java.lang.String
+	javaName := class.JavaName()
+
+	// create Java String and return
+	jString := heap.InternString(javaName)
+
+	// cache the name
+
 	frame.OperandStack().PushRef(jString)
 }
 
