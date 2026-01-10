@@ -200,3 +200,4 @@ v0.5 深入研究實現各種 GC 演算法
 * Java Method Descriptor: [link](doc/tips/descriptor.md)
 * ClassLoader: 為什麼類別載入時的 static field slot ID 計算時不需要考慮父類別？: [link](doc/tips/class_loader_cal_field_slot_id.md)
 * XorShift32: 用於生成 Object HashCode 的算法 [link](doc/tips/XorShift32.md)
+* private 方法會是由 `invokespecial` 處理而非 `invokevirtual`[link](doc/tips/about_private.md)

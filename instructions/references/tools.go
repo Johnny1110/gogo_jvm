@@ -1,6 +1,7 @@
 package references
 
 import (
+	"fmt"
 	"github.com/Johnny1110/gogo_jvm/common"
 	"github.com/Johnny1110/gogo_jvm/runtime"
 	"github.com/Johnny1110/gogo_jvm/runtime/heap"
@@ -33,6 +34,8 @@ func initClass(thread *runtime.Thread, class *method_area.Class) {
 func invokeMethod(invokerFrame *runtime.Frame, method *method_area.Method) {
 	// 1, get current thread
 	thread := invokerFrame.Thread()
+
+	fmt.Printf("@@ DEBUG - invokeMethod: %s \n", method.Name())
 
 	// 2. create a new frame (represent new method)
 	newFrame := thread.NewFrameWithMethod(method)

@@ -33,7 +33,7 @@ func (i *INVOKEVIRTUAL) Execute(frame *runtime.Frame) {
 	// temp solution for invokevirtual PrintStream.println
 	// currently we don't have native class init implement (rt.jar)
 	// ============================================================
-	if hacked_invoke_virtual(frame, methodRef) {
+	if hacked_invoke_native(frame, methodRef) {
 		return
 	}
 	// ============================================================
@@ -65,20 +65,6 @@ func (i *INVOKEVIRTUAL) Execute(frame *runtime.Frame) {
 
 	// 8. invoke method
 	invokeMethod(frame, methodToCall)
-}
-
-// hacked_invoke_virtual temp solution for println()
-func hacked_invoke_virtual(frame *runtime.Frame, methodRef *method_area.MethodRef) bool {
-	className := methodRef.ClassName()
-	methodName := methodRef.Name()
-	descriptor := methodRef.Descriptor()
-	if nativeMethod := runtime.FindNativeMethod(className, methodName, descriptor); nativeMethod != nil {
-		// call native() directly
-		invokeNativeMethod(frame, nativeMethod, descriptor)
-		return true
-	}
-	// not in native method registry
-	return false
 }
 
 func (i *INVOKEVIRTUAL) Opcode() uint8 {

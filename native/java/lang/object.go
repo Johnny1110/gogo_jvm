@@ -59,6 +59,8 @@ func objectGetClass(frame *runtime.Frame) {
 	}
 
 	obj := this.(*heap.Object)
+	fmt.Printf("@@ DEBUG - Native objectGetClass obj = %s \n", obj)
+	fmt.Printf("@@ DEBUG - Native objectGetClass obj.Extra() = %v \n", obj.Extra())
 
 	// class metadata
 	class := obj.Class().(*method_area.Class)

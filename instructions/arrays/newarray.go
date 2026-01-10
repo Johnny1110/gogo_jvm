@@ -1,6 +1,7 @@
 package arrays
 
 import (
+	"fmt"
 	"github.com/Johnny1110/gogo_jvm/common"
 	"github.com/Johnny1110/gogo_jvm/instructions/base"
 	"github.com/Johnny1110/gogo_jvm/instructions/base/opcodes"
@@ -50,22 +51,39 @@ func (n *NEWARRAY) Execute(frame *runtime.Frame) {
 		panic("java.lang.NegativeArraySizeException")
 	}
 
+	classLoader := frame.Method().Class().Loader()
+	if classLoader == nil {
+		fmt.Printf("NEWARRAY error, classLoader not found.")
+		panic("java.lang.ClassLoaderException")
+	}
+
 	var arr *heap.Object
 	switch n.atype {
-	case AT_BOOLEAN, AT_BYTE:
-		arr = heap.NewByteArray(nil, count)
+	case AT_BOOLEAN:
+		// v0.3.1: dynamic load array class
+		c := classLoader.LoadClass("[Z", false)
+		arr = heap.NewByteArray(c, count)
+	case AT_BYTE:
+		c := classLoader.LoadClass("[B", false)
+		arr = heap.NewByteArray(c, count)
 	case AT_SHORT:
-		arr = heap.NewShortArray(nil, count)
+		c := classLoader.LoadClass("[S", false)
+		arr = heap.NewShortArray(c, count)
 	case AT_CHAR:
-		arr = heap.NewCharArray(nil, count)
+		c := classLoader.LoadClass("[C", false)
+		arr = heap.NewCharArray(c, count)
 	case AT_INT:
-		arr = heap.NewIntArray(nil, count)
+		c := classLoader.LoadClass("[I", false)
+		arr = heap.NewIntArray(c, count)
 	case AT_LONG:
-		arr = heap.NewLongArray(nil, count)
+		c := classLoader.LoadClass("[J", false)
+		arr = heap.NewLongArray(c, count)
 	case AT_FLOAT:
-		arr = heap.NewFloatArray(nil, count)
+		c := classLoader.LoadClass("[F", false)
+		arr = heap.NewFloatArray(c, count)
 	case AT_DOUBLE:
-		arr = heap.NewDoubleArray(nil, count)
+		c := classLoader.LoadClass("[D", false)
+		arr = heap.NewDoubleArray(c, count)
 	default:
 		panic("Invalid atype for NEWARRAY operandCode")
 	}
