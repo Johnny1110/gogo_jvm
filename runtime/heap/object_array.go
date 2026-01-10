@@ -27,6 +27,7 @@ func NewShortArray(class interface{}, length int32) *Object {
 
 // NewIntArray create int[] array
 func NewIntArray(class interface{}, length int32) *Object {
+	fmt.Printf("@@ DEBUG - NewIntArray(), class: %v, length: %v\n", class, length)
 	return &Object{
 		markWord: InitialMarkWord, // init state: non-lock, age=0, hashCode=0
 		class:    class,

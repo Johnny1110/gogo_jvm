@@ -21,6 +21,8 @@ import (
 // │ fields          │   →    │ fields          │  runtime fields
 // │ methods         │   →    │ methods         │  runtime methods
 // └─────────────────┘        └─────────────────┘
+//
+// v0.3.1: add jClass column -> implement image design pattern
 type Class struct {
 	accessFlags       uint16
 	name              string // className (ex: java/lang/Object)
@@ -43,6 +45,17 @@ type Class struct {
 	// - invokestatic call static method
 	// - 子類初始化時（父類需先初始化）
 	initStarted bool
+
+	// v0.3.1: JClass - Reflection Support (Mirror Design Pattern)
+	// jClass pointing to Java's java.lang.Class Object, allow user to using obj.getClass()
+	// Mirror Relationship:
+	// method_area.Class.jClass → heap.Object (java.lang.Class Instance)
+	// heap.Object.extra → method_area.Class (pointing back)
+	jClass *heap.Object
+	// v0.3.1: ArrayType dedicated (element's type)
+	// ex - 1: int[] componentClass is int Class
+	// ex - 2: String[][] componentClass is String[] Class
+	componentClass *Class
 }
 
 // newClass create Class from classfile.ClassFile
@@ -114,6 +127,176 @@ func (c *Class) AccessFlags() uint16                { return c.accessFlags }
 func (c *Class) InstanceSlotCount() uint            { return c.instanceSlotCount }
 func (c *Class) Interfaces() []*Class {
 	return c.interfaces
+}
+
+// =============== Reflection Support - Getter & Setter (v0.3.1) ===============
+
+func (c *Class) JClass() *heap.Object {
+	return c.jClass
+}
+
+func (c *Class) SetJClass(jc *heap.Object) {
+	c.jClass = jc
+}
+
+func (c *Class) ComponentClass() *Class {
+	return c.componentClass
+}
+
+func (c *Class) SetComponentClass(componentClass *Class) {
+	c.componentClass = componentClass
+}
+
+// =============== Type Checking for Reflection (v0.3.1) ===============
+
+// IsPrimitive check is basic type
+// basic type don't have class file, they are native in JVM
+func (c *Class) IsPrimitive() bool {
+	switch c.name {
+	case "void", "boolean", "byte", "char", "int", "short", "long", "float", "double":
+		return true
+	}
+	return false
+}
+
+// IsArray check is array type
+// array type name start with "[", ex: "[I", "[Ljava/lang/String;"
+func (c *Class) IsArray() bool {
+	return len(c.name) > 0 && c.name[0] == '['
+}
+
+// JavaName get class's java name
+// JVM using "/" to split pkg, Java using "." to split pkg
+// ex: java/lang/String → java.lang.String
+// edge case:
+// - 1. Array keep the same: [I, [Ljava/lang/String;
+// - 2. basic type keep the same: int, void
+func (c *Class) JavaName() string {
+	if c.IsPrimitive() {
+		return c.name
+	}
+
+	if c.IsArray() {
+		return c.getArrayJavaName()
+	}
+
+	return strings.ReplaceAll(c.name, "/", ".")
+}
+
+// getArrayJavaName
+// [I → [I
+// [Ljava/lang/String; → [Ljava.lang.String;
+func (c *Class) getArrayJavaName() string {
+	name := c.name
+	result := strings.Builder{}
+
+	for i := 0; i < len(name); i++ {
+		ch := name[i]
+		if ch == 'L' { // found a Class
+			result.WriteByte('L')
+			i++
+			// start convert "/" to "."
+			for i < len(name) && name[i] != ';' {
+				if name[i] == '/' {
+					result.WriteByte('.')
+				} else {
+					result.WriteByte(name[i])
+				}
+				i++
+			}
+
+			if i < len(name) {
+				result.WriteByte(';')
+			}
+		} else {
+			// is basic type
+			result.WriteByte(ch)
+		}
+	}
+
+	return result.String()
+}
+
+// GetArrayClass
+// ex: String → String[], int → int[]
+// this is for support Array.newInstance()
+func (c *Class) GetArrayClass() *Class {
+	arrayClassName := getArrayClassName(c.name)
+	return c.loader.LoadClass(arrayClassName, false)
+}
+
+// getArrayClassName generate array class name according to element's name
+// int -> [I
+// java/lang/String → [Ljava/lang/String;
+// [I → [[I
+func getArrayClassName(className string) string {
+	if len(className) > 0 && className[0] == '[' {
+		return "[" + className
+	}
+
+	// basic type
+	switch className {
+	case "void":
+		panic("cannot create array of void")
+	case "boolean":
+		return "[Z"
+	case "byte":
+		return "[B"
+	case "char":
+		return "[C"
+	case "short":
+		return "[S"
+	case "int":
+		return "[I"
+	case "long":
+		return "[J"
+	case "float":
+		return "[F"
+	case "double":
+		return "[D"
+	default:
+		// Ref Type
+		return "[L" + className + ";"
+	}
+}
+
+// GetComponentClassName get element name according to ArrayClassName
+// [I → int
+// [Ljava/lang/String; → java/lang/String
+// [[I → [I
+func GetComponentClassName(arrayClassName string) string {
+	if len(arrayClassName) < 2 || arrayClassName[0] != '[' {
+		panic("not an array class: " + arrayClassName)
+	}
+
+	componentDescriptor := arrayClassName[1:]
+
+	switch componentDescriptor[0] {
+	case '[':
+		// Multidimensional array, return sub array type
+		return componentDescriptor
+	case 'L':
+		// Ref Type, remove 'L' and ';' (first and last)
+		return componentDescriptor[1 : len(componentDescriptor)-1]
+	case 'Z':
+		return "boolean"
+	case 'B':
+		return "byte"
+	case 'C':
+		return "char"
+	case 'S':
+		return "short"
+	case 'I':
+		return "int"
+	case 'J':
+		return "long"
+	case 'F':
+		return "float"
+	case 'D':
+		return "double"
+	default:
+		panic("invalid array descriptor: " + arrayClassName)
+	}
 }
 
 // =============== Access Flags ===============

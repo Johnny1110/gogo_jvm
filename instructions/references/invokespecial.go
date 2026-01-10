@@ -1,6 +1,7 @@
 package references
 
 import (
+	"fmt"
 	"github.com/Johnny1110/gogo_jvm/instructions/base"
 	"github.com/Johnny1110/gogo_jvm/runtime"
 	"github.com/Johnny1110/gogo_jvm/runtime/method_area"
@@ -27,6 +28,21 @@ func (i *INVOKESPECIAL) Execute(frame *runtime.Frame) {
 
 	// 3. resolve target method's lang and method
 	resolvedMethod := methodRef.ResolvedMethod()
+
+	// ============================================================
+	// v0.3.1: Hack - handle native method invoke for private methods
+	// private native methods (like Class.initClassName) use invokespecial
+	// ============================================================
+	if resolvedMethod.IsNative() {
+		if hacked_invoke_native(frame, methodRef) {
+			return
+		} else {
+			fmt.Printf("@@ DEBUG - INVOKESPECIAL hacked_invoke_native failed, method: %s\n", resolvedMethod.Name())
+			panic("INVOKESPECIAL Hacked invoke method failed")
+		}
+	}
+
+	// resolve class
 	resolvedClass := methodRef.ResolvedClass()
 
 	// 4. check <init> must invoke by invokespecial (# README: 實作 invokespecial 時的發現)

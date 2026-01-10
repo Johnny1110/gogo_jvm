@@ -156,3 +156,15 @@ func (o *Object) String() string {
 	}
 	return fmt.Sprintf("<Object class=%v>", o.class)
 }
+
+func (o *Object) SetMarkWord(word uint64) {
+	o.markWord = word
+}
+
+func (o *Object) SetClass(class interface{}) {
+	o.class = class
+}
+
+func (o *Object) SetFields(slots rtcore.Slots) {
+	o.fields = slots
+}

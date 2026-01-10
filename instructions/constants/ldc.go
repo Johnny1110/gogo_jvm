@@ -19,6 +19,12 @@ import (
 // format: ldc index
 // oprands: 1 byte (ConstantPool Index: 1~255)
 // stack:  [...] -> [..., constValue]
+//
+// Supported Const:
+// - int32
+// - float32
+// - string (v0.2.9)
+// - *ClassRef: Class Const (v0.3.1)
 type LDC struct {
 	base.Index8Instruction // take 1 byte ConstantPool index
 }
@@ -84,6 +90,7 @@ func (l *LDC2_W) Opcode() uint8 {
 // - *ClassRef -> for Foo.class TODO: Reflection
 func _ldc(frame *runtime.Frame, index uint) {
 	rtcp := frame.Method().Class().ConstantPool()
+	classLoader := frame.Method().Class().Loader()
 	constVal := rtcp.GetConstant(index)
 	stack := frame.OperandStack()
 
@@ -96,14 +103,25 @@ func _ldc(frame *runtime.Frame, index uint) {
 		// ldc #N (N pointing to a CONSTANT_String in rtcp - RuntimeConstantPool)
 		// rtcp will return a Go string (UTF-8)
 		// using heap.InternString() get java string reference and return.
-		javaStrObj := heap.InternString(val)
+		javaStrObj := heap.InternString(val, classLoader)
 		stack.PushRef(javaStrObj)
 	case *method_area.ClassRef:
 		// usage: Class<?> c = String.class;
-		// In real JVM, Class constant need: (TODO v0.3.x)
+		// In real JVM, Class constant need: (v0.3.1)
 		// return java.lang.Class Object
-		// IN MVP Phase: simplify
-		panic("java.lang.ClassFormatError: ldc with Class constant not supported, will be done in v0.3.x")
+		// Compile Result:
+		//   ldc #N  // N pointing to CONSTANT_Class, value is "java/lang/String"
+		// Process:
+		// 1. parse ClassRef and resolveClass
+		// 2. get java.lang.Class Object
+		// 3. push to OpStack
+		class := val.ResolvedClass()
+		jClass := class.JClass()
+		if jClass == nil {
+			panic(fmt.Sprintf("Class object not initialized for: %s", class.Name()))
+		}
+
+		stack.PushRef(jClass)
 	default:
 		panic("java.lang.ClassFormatError: ldc with unknown constant type")
 	}

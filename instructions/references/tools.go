@@ -34,6 +34,8 @@ func invokeMethod(invokerFrame *runtime.Frame, method *method_area.Method) {
 	// 1, get current thread
 	thread := invokerFrame.Thread()
 
+	//fmt.Printf("@@ DEBUG - invokeMethod: %s \n", method.Name())
+
 	// 2. create a new frame (represent new method)
 	newFrame := thread.NewFrameWithMethod(method)
 	thread.PushFrame(newFrame)

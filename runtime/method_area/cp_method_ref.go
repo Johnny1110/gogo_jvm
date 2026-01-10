@@ -1,6 +1,7 @@
 package method_area
 
 import (
+	"fmt"
 	"github.com/Johnny1110/gogo_jvm/classfile"
 )
 
@@ -38,6 +39,7 @@ func (r *MethodRef) resolveMethodRef() {
 	// 3. find method
 	method := lookupMethod(class, r.name, r.descriptor)
 	if method == nil {
+		fmt.Printf("@@ DEBUG - resolveMethodRef failed, jClass = %s \n", r.class.jClass)
 		panic("java.lang.NoSuchMethodError: " + r.className + "." + r.name + r.descriptor)
 	}
 
