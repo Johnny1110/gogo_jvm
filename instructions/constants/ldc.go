@@ -90,6 +90,7 @@ func (l *LDC2_W) Opcode() uint8 {
 // - *ClassRef -> for Foo.class TODO: Reflection
 func _ldc(frame *runtime.Frame, index uint) {
 	rtcp := frame.Method().Class().ConstantPool()
+	classLoader := frame.Method().Class().Loader()
 	constVal := rtcp.GetConstant(index)
 	stack := frame.OperandStack()
 
@@ -102,7 +103,7 @@ func _ldc(frame *runtime.Frame, index uint) {
 		// ldc #N (N pointing to a CONSTANT_String in rtcp - RuntimeConstantPool)
 		// rtcp will return a Go string (UTF-8)
 		// using heap.InternString() get java string reference and return.
-		javaStrObj := heap.InternString(val)
+		javaStrObj := heap.InternString(val, classLoader)
 		stack.PushRef(javaStrObj)
 	case *method_area.ClassRef:
 		// usage: Class<?> c = String.class;

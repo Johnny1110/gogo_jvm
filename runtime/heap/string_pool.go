@@ -61,7 +61,7 @@ func utf16ToUtf8(chars []uint16) string {
 // NewJString create java string
 // args: goStr: Go string (UTF-8)
 // return: *Object -> Java String Object
-func NewJString(goStr string) *Object {
+func NewJString(goStr string, strClass interface{}) *Object {
 	// 1. utf-8 to utf-16
 	chars := utf8ToUtf16(goStr)
 	charLen := int32(len(chars))
@@ -72,7 +72,7 @@ func NewJString(goStr string) *Object {
 	// 4. create string object
 	strObject := &Object{
 		markWord: InitialMarkWord, // init state: non-lock, age=0, hashCode=0
-		class:    nil,             // // TODO: in real JVM, class should be java/lang/String
+		class:    strClass,        // class should be java/lang/String
 		extra:    charJArr,
 	}
 
@@ -107,14 +107,17 @@ func GoString(strObject *Object) string {
 // if string not in pool, create new java string and put it into internedStrings
 // args: goStr (UTF-8)
 // return: Java String Object (from internedStrings pool)
-func InternString(goStr string) *Object {
+func InternString(goStr string, classLoader ClassLoaderProvider) *Object {
+
 	if internedObj, ok := internedStrings[goStr]; ok {
 		// already in pool
 		return internedObj
 	}
 
+	// load String class.
+	stringClass := classLoader.LoadClassIface("java/lang/String")
 	// create new String Object
-	strObj := NewJString(goStr)
+	strObj := NewJString(goStr, stringClass)
 	// in pool
 	internedStrings[goStr] = strObj
 

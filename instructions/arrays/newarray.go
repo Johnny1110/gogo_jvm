@@ -118,12 +118,15 @@ func (a *ANEWARRAY) Execute(frame *runtime.Frame) {
 	// get type from rtcp
 	rtcp := frame.Method().Class().ConstantPool()
 	elementClassRef := rtcp.GetConstant(a.Index).(*method_area.ClassRef)
-	elementClass := elementClassRef.ResolvedClass()
+	elementClassName := elementClassRef.ResolvedClass().Name()
 
 	// create array
 	// class will be store in object's class field
-	// TODO: 真正的實現需要動態生成陣列類別（如 "[Ljava/lang/String;"）
-	array := heap.NewRefArray(elementClass, count)
+	// "java/lang/String" ->"[Ljava/lang/String;"
+	arrayClassName := "[L" + elementClassName + ";"
+	classLoader := frame.Method().Class().Loader()
+	arrayClass := classLoader.LoadClass(arrayClassName, false)
+	array := heap.NewRefArray(arrayClass, count)
 
 	// push array ref into stack
 	stack.PushRef(array)

@@ -78,7 +78,7 @@ func getName0(frame *runtime.Frame) {
 	javaName := class.JavaName()
 
 	// create Java String and return it.
-	jString := heap.InternString(javaName)
+	jString := heap.InternString(javaName, class.Loader())
 	frame.OperandStack().PushRef(jString)
 }
 
@@ -101,7 +101,7 @@ func initClassName(frame *runtime.Frame) {
 	javaName := class.JavaName()
 
 	// create Java String and return
-	jString := heap.InternString(javaName)
+	jString := heap.InternString(javaName, class.Loader())
 
 	// cache the name
 

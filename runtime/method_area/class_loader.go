@@ -187,6 +187,10 @@ func (loader *ClassLoader) LoadClass(name string, debug bool) *Class {
 	}
 }
 
+func (loader *ClassLoader) LoadClassIface(name string) interface{} {
+	return loader.LoadClass(name, false)
+}
+
 // loadArrayClass load array class
 // array class is dynamic generate, no need .class file
 func (loader *ClassLoader) loadArrayClass(name string) *Class {
