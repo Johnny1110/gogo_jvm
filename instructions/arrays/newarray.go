@@ -138,13 +138,82 @@ func (a *ANEWARRAY) Opcode() uint8 {
 }
 
 // ----------------------------------------------------------------------------
-// ANEWARRAY create 2D Array (TODO)
+// ANEWARRAY create 2D Array
+// multianewarray indexbyte1 indexbyte2 dimensions
+// opcode: 0xC5
+// operands: 3 bytes total
+//   - 2 bytes: constant pool index (pointing to array type, like "[[I")
+//   - 1 byte: dimensions
 type MULTIANEWARRAY struct {
-	base.NoOperandsInstruction
+	base.Index16Instruction
+	dimensions uint8
+}
+
+func (m *MULTIANEWARRAY) FetchOperands(reader *base.BytecodeReader) {
+	m.Index = uint(reader.ReadUint16())
+	m.dimensions = reader.ReadUint8()
 }
 
 func (m *MULTIANEWARRAY) Execute(frame *runtime.Frame) {
-	// TODO
+	// 1. get array class type
+	rtcp := frame.Method().Class().ConstantPool()
+	classRef := rtcp.GetConstant(m.Index).(*method_area.ClassRef)
+	arrayClass := classRef.ResolvedClass()
+
+	// 2. pop length of all elements
+	stack := frame.OperandStack()
+	counts := popAndCheckCounts(stack, int(m.dimensions))
+	// count will be like:
+	// new int[2][3] → stack: [..., 2, 3] → counts: [2, 3]
+
+	// 3. create all dimensional array
+	arr := newMultiDimensionalArray(counts, arrayClass)
+
+	// 4. push array ref to stack
+	stack.PushRef(arr)
+}
+
+// popAndCheckCounts 彈出各維度的長度並檢查 pop every dimensions len from stack and check
+// stack order: 最外層維度在最下面，最內層在最上面
+// ex: new int[2][3] → stack: [..., 2, 3] → counts: [2, 3]
+func popAndCheckCounts(stack *runtime.OperandStack, dimensions int) []int32 {
+	counts := make([]int32, dimensions)
+
+	// pop from stack.
+	for i := dimensions - 1; i >= 0; i-- {
+		counts[i] = stack.PopInt()
+		if counts[i] < 0 {
+			// should not happen
+			panic("java.lang.NegativeArraySizeException")
+		}
+	}
+
+	return counts
+}
+
+// newMultiDimensionalArray create multi-dimension array (recursive)
+// counts: dimensions len, ex [2, 3] -> new Type[2][3]
+// arrayClass: array type, ex: "[[I" or "[[[Ljava/lang/String;"
+func newMultiDimensionalArray(counts []int32, arrayClass *method_area.Class) *heap.Object {
+	// current dimensional count
+	count := counts[0]
+	// create current dimensional array
+	arr := heap.NewRefArray(arrayClass, count)
+
+	if len(counts) > 1 { // if it has more
+		refs := arr.Refs() // get current array's ref
+
+		// get array type (sub array type)
+		// if current arrayClass is "[[Ljava/lang/String;", ComponentClass() should be "[Ljava/lang/String;"
+		componentClass := arrayClass.ComponentClass()
+
+		for i := int32(0); i < count; i++ { // each current row should create new sub array.
+			subArr := newMultiDimensionalArray(counts[1:], componentClass)
+			refs[i] = subArr
+		}
+	}
+
+	return arr
 }
 
 func (m *MULTIANEWARRAY) Opcode() uint8 {
