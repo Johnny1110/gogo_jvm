@@ -106,7 +106,7 @@ GC 發生時：
     1. 發現該 key 物件只剩 WeakReference（Entry）指向它
     2. 將該 key 物件標記為可回收
     3. 把對應的 Entry（WeakReference）加入 ReferenceQueue
-    4. Entry.get() 從此返回 null
+    4. Entry.get() 從此返回 null (因為 Entry 是弱指標，他指向的物件已經被標記清理了)
 ```
 
 <br>
