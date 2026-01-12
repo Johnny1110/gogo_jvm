@@ -110,8 +110,10 @@ public class SimpleWeakHashMap<K, V> {
 
 ## PhantomReference 追蹤資源釋放
 
+當我們需要追蹤某個物件被 GC 清理掉的事件，並觸發一些連帶事件時，使用 `PhantomReference` 是替代 `finalize()` 的更安全方式
+
 ```java
-// 替代 finalize() 的更安全方式
+// ResourceCleaner 裡面記錄哪些物件被監視，以及當清理事件發生時該被觸發的 clean 行為
 public class ResourceCleaner {
     private static final ReferenceQueue<Object> queue = new ReferenceQueue<>();
     private static final Set<CleanerRef> refs = ConcurrentHashMap.newKeySet();
@@ -122,8 +124,8 @@ public class ResourceCleaner {
             while (true) {
                 try {
                     CleanerRef ref = (CleanerRef) queue.remove(); // 阻塞等待
-                    ref.clean();
-                    refs.remove(ref);
+                    ref.clean();                                  // 執行自定義的 clean() 方法 
+                    refs.remove(ref);                             // 從監管列表中除出
                 } catch (InterruptedException e) {
                     break;
                 }
@@ -136,10 +138,12 @@ public class ResourceCleaner {
     // 註冊需要清理的資源
     public static void register(Object obj, Runnable cleanupAction) {
         CleanerRef ref = new CleanerRef(obj, queue, cleanupAction);
-        refs.add(ref);
+        refs.add(ref); // 加入監管列表
     }
     
+    // Wrapper for Watched Target Object
     private static class CleanerRef extends PhantomReference<Object> {
+        // 自定義的清理 Event 方法
         private final Runnable cleanupAction;
         
         CleanerRef(Object referent, ReferenceQueue<Object> q, Runnable action) {
@@ -152,8 +156,12 @@ public class ResourceCleaner {
         }
     }
 }
+```
+`
 
-// 使用方式
+#### 使用方式
+
+```java
 class NativeResource {
     private long nativePtr;
     
