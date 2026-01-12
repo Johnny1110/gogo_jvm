@@ -201,3 +201,4 @@ v0.5 深入研究實現各種 GC 演算法
 * ClassLoader: 為什麼類別載入時的 static field slot ID 計算時不需要考慮父類別？: [link](doc/tips/class_loader_cal_field_slot_id.md)
 * XorShift32: 用於生成 Object HashCode 的算法 [link](doc/tips/XorShift32.md)
 * private 方法會是由 `invokespecial` 處理而非 `invokevirtual`[link](doc/tips/about_private.md)
+* Soft, Weak, Phantom References 的應用場景 [link](doc/tips/refs_in_action.md)
