@@ -50,6 +50,9 @@ func init() {
 //
 //	[this] → [referent or null]
 func referenceGet(frame *runtime.Frame) {
+
+	fmt.Printf("@@ DEBUG - native referenceGet in ... \n")
+
 	this := frame.LocalVars().GetThis()
 	if this == nil {
 		frame.OperandStack().PushRef(nil)
@@ -68,6 +71,9 @@ func referenceGet(frame *runtime.Frame) {
 	// - PhantomReference always returning null
 	// - SoftReference timestamp update
 	referent := refData.Get()
+
+	fmt.Printf("@@ DEBUG - native referenceGet > referent: %v \n", referent)
+
 	frame.OperandStack().PushRef(referent)
 }
 
@@ -88,8 +94,11 @@ func referenceGet(frame *runtime.Frame) {
 //
 //	[this] → []
 func referenceClear(frame *runtime.Frame) {
+	fmt.Printf("@@ DEBUG - native referenceClear in...\n")
+
 	this := frame.LocalVars().GetThis()
 	if this == nil {
+		fmt.Printf("@@ DEBUG - native referenceClear > ref is null (high level error)...\n")
 		return
 	}
 
@@ -97,10 +106,14 @@ func referenceClear(frame *runtime.Frame) {
 	refData := obj.GetReferenceData()
 
 	if refData == nil {
+		fmt.Printf("@@ DEBUG - native referenceClear > refData is null (high level error)...\n")
 		return
 	}
 
 	// Referent = nil
+
+	obj.Fields()[0].Ref = nil // TODO: ? test clean first filed (java referent)
+
 	refData.Clear()
 }
 

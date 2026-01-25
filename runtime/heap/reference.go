@@ -1,6 +1,9 @@
 package heap
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 // ============================================================
 // Reference Type - v0.3.2
@@ -184,6 +187,7 @@ func (rd *ReferenceData) Get() *Object {
 // Clear sets the referent to nil
 // This can be called explicitly by user code or by GC
 func (rd *ReferenceData) Clear() {
+	fmt.Printf("@@ DEBUG - heap/reference Clear in..\n")
 	rd.Referent = nil
 }
 

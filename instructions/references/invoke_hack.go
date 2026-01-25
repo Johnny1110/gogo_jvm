@@ -10,6 +10,7 @@ func hacked_invoke_native(frame *runtime.Frame, methodRef *method_area.MethodRef
 	className := methodRef.ClassName()
 	methodName := methodRef.Name()
 	descriptor := methodRef.Descriptor()
+
 	if nativeMethod := runtime.FindNativeMethod(className, methodName, descriptor); nativeMethod != nil {
 		// call native() directly
 		invokeNativeMethod(frame, nativeMethod, descriptor)

@@ -198,7 +198,7 @@ func IsReferenceQueueConstructor(className string, methodName string) bool {
 
 // isSubclassOfName checks if class is a subclass of `ofClassName`
 func isSubclassOfName(class *Class, ofClassName string) bool {
-	for c := class.superClass; c != nil; c = class.superClass {
+	for c := class.superClass; c != nil; c = c.superClass {
 		if c.name == ofClassName {
 			return true
 		}
