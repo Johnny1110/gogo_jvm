@@ -112,7 +112,7 @@ func referenceClear(frame *runtime.Frame) {
 
 	// Referent = nil
 
-	obj.Fields()[0].Ref = nil // TODO: ? test clean first filed (java referent)
+	// obj.Fields()[0].Ref = nil // TODO: ? test clean first filed (java referent)
 
 	refData.Clear()
 }

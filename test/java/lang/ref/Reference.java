@@ -66,8 +66,9 @@ public abstract class Reference<T> {
     }
 
     public void clear() {
-            clear0();
-        }
+        this.referent = null;
+        clear0();
+    }
 
     /* Implementation of clear(), also used by enqueue().  A simple
     * assignment of the referent field won't do for some garbage
