@@ -2,6 +2,7 @@ package control
 
 import (
 	"github.com/Johnny1110/gogo_jvm/instructions/base"
+	"github.com/Johnny1110/gogo_jvm/instructions/base/opcodes"
 	"github.com/Johnny1110/gogo_jvm/runtime"
 )
 
@@ -302,4 +303,30 @@ func (i *IFNONNULL) Execute(frame *runtime.Frame) {
 
 func (g *IFNONNULL) Opcode() uint8 {
 	return 0xC7
+}
+
+// ============================================================
+// LCMP: long compare
+// ============================================================
+
+// LCMP compare 2 long on stack top, push result back to stack top
+// opcodes = 0x94
+type LCMP struct{ base.NoOperandsInstruction }
+
+func (i *LCMP) Execute(frame *runtime.Frame) {
+	opstack := frame.OperandStack()
+	long2 := opstack.PopLong()
+	long1 := opstack.PopLong()
+
+	if long1 > long2 {
+		opstack.PushInt(1)
+	} else if long1 == long2 {
+		opstack.PushInt(0)
+	} else {
+		opstack.PushInt(-1)
+	}
+}
+
+func (i *LCMP) Opcode() uint8 {
+	return opcodes.LCMP
 }

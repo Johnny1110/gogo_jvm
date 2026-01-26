@@ -149,6 +149,9 @@ var (
 	castore     = &arrays.CASTORE{}
 	sastore     = &arrays.SASTORE{}
 	arraylength = &arrays.ARRAYLENGTH{}
+
+	// ============ Compare ============
+	lcmp = &control.LCMP{}
 )
 
 // NewInstruction return instruction based on input opcodes
@@ -414,6 +417,8 @@ func NewInstruction(opcode byte) (base.Instruction, error) {
 		return &math.IINC{}, nil
 
 	// compare instructions
+	case opcodes.LCMP:
+		return lcmp, nil
 	case opcodes.IFEQ:
 		return &control.IFEQ{}, nil
 	case opcodes.IFNE:

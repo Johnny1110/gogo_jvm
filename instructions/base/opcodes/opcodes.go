@@ -135,6 +135,7 @@ const (
 	IINC = 0x84
 
 	// ============ Comparisons / Branch ============
+	LCMP      = 0x94
 	IFEQ      = 0x99
 	IFNE      = 0x9A
 	IFLT      = 0x9B
@@ -235,7 +236,7 @@ var OpcodeNames = map[uint8]string{
 	IINC: "iinc",
 
 	// Comparisons / Branch
-	IFEQ: "ifeq", IFNE: "ifne", IFLT: "iflt", IFGE: "ifge", IFGT: "ifgt", IFLE: "ifle",
+	LCMP: "lcmp", IFEQ: "ifeq", IFNE: "ifne", IFLT: "iflt", IFGE: "ifge", IFGT: "ifgt", IFLE: "ifle",
 	IF_ICMPEQ: "if_icmpeq", IF_ICMPNE: "if_icmpne", IF_ICMPLT: "if_icmplt",
 	IF_ICMPGE: "if_icmpge", IF_ICMPGT: "if_icmpgt", IF_ICMPLE: "if_icmple",
 	IF_ACMPEQ: "if_acmpeq", IF_ACMPNE: "if_acmpne",
