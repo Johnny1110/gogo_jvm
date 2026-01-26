@@ -60,7 +60,7 @@ func invokeMethod(invokerFrame *runtime.Frame, method *method_area.Method) {
 // 2. put args into a temp LocalVars
 // 3. pass args to native Go func
 // no need a read frame to do native method.
-func invokeNativeMethod(callerFrame *runtime.Frame, nativeMethod runtime.NativeMethod, descriptor string) {
+func invokeNativeMethod(callerFrame *runtime.Frame, callNativeMethod runtime.NativeMethod, descriptor string) {
 	// calculate args slot count including this.
 	argSlotCount := calcArgSlotCount(descriptor) + 1 // LocalVars[0] = this, so we need + 1
 
@@ -81,7 +81,7 @@ func invokeNativeMethod(callerFrame *runtime.Frame, nativeMethod runtime.NativeM
 	}
 
 	// call native method
-	nativeMethod(tempFrame)
+	callNativeMethod(tempFrame)
 
 	// v0.3.0: handle return val if any
 	handleNativeReturn(callerFrame, tempFrame, returnType)

@@ -70,7 +70,7 @@ func (cf *ClassFile) readAndCheckVersion(reader *ClassReader) {
 	// gogo-jvm support from Java 1.0 ~ Java 8 (version no 45-52)
 	// java 8 is 52.0, java 7 is 51.0 ...
 	switch cf.majorVersion {
-	case 45, 46, 47, 48, 49, 50, 51, 52:
+	case 45, 46, 47, 48, 49, 50, 51, 52, 53:
 		return
 	}
 
