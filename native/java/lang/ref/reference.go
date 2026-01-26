@@ -94,7 +94,6 @@ func referenceGet(frame *runtime.Frame) {
 //
 //	[this] → []
 func referenceClear(frame *runtime.Frame) {
-	fmt.Printf("@@ DEBUG - native referenceClear in...\n")
 
 	this := frame.LocalVars().GetThis()
 	if this == nil {
