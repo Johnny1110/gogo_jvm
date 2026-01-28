@@ -1,6 +1,7 @@
 package references
 
 import (
+	"fmt"
 	"github.com/Johnny1110/gogo_jvm/instructions/base"
 	"github.com/Johnny1110/gogo_jvm/runtime"
 	"github.com/Johnny1110/gogo_jvm/runtime/heap"
@@ -28,16 +29,6 @@ func (i *INVOKEVIRTUAL) Execute(frame *runtime.Frame) {
 	// 2. load methodRef
 	methodRef := rtcp.GetConstant(i.Index).(*method_area.MethodRef)
 
-	// ============================================================
-	// Hack: handle native method invoke (TODO: revamp this in future)
-	// temp solution for invokevirtual PrintStream.println
-	// currently we don't have native class init implement (rt.jar)
-	// ============================================================
-	if hacked_invoke_native(frame, methodRef) {
-		return
-	}
-	// ============================================================
-
 	// 3. load method
 	resolvedMethod := methodRef.ResolvedMethod()
 
@@ -45,6 +36,21 @@ func (i *INVOKEVIRTUAL) Execute(frame *runtime.Frame) {
 	if resolvedMethod.IsStatic() {
 		panic("java.lang.IncompatibleClassChangeError")
 	}
+
+	// ============================================================
+	// Hack: handle native method invoke
+	// temp solution for invokevirtual PrintStream.println
+	// currently we don't have native class init implement (rt.jar)
+	// ============================================================
+	if resolvedMethod.IsNative() {
+		if hacked_invoke_native(frame, methodRef) {
+			return
+		} else {
+			fmt.Printf("@@ DEBUG - INVOKEVIRTUAL hacked_invoke_native failed, method: %s\n", resolvedMethod.Name())
+			panic("INVOKEVIRTUAL Hacked invoke method failed")
+		}
+	}
+	// ============================================================
 
 	// 5. get objectref
 	objectref := frame.OperandStack().PeekRefFromTop(resolvedMethod.ArgSlotCount() - 1)
