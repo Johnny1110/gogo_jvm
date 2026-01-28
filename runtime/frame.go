@@ -39,6 +39,9 @@ type Frame struct {
 	method       *method_area.Method
 
 	exHandler func(frame *Frame, ex *heap.Object)
+
+	// this is for native method throw exception, will be handled after back to java call stack.
+	nativeError *heap.Object
 }
 
 // NewFrame create new Frame
@@ -106,7 +109,7 @@ func NewNativeFrameWithStack(thread *Thread, maxLocals uint16, returnType string
 	}
 }
 
-func NewNativeFrameWithStackAndExHandler(thread *Thread,
+func NewNativeFrameWithStackAndExHandler(callerFrame *Frame,
 	maxLocals uint16,
 	returnType string,
 	exHandler func(frame *Frame, ex *heap.Object)) *Frame {
@@ -125,9 +128,10 @@ func NewNativeFrameWithStackAndExHandler(thread *Thread,
 	}
 
 	return &Frame{
-		thread:       thread,
+		thread:       callerFrame.Thread(),
 		localVars:    NewLocalVars(maxLocals),
 		operandStack: opStack,
+		method:       callerFrame.method,
 		exHandler:    exHandler,
 	}
 }
@@ -172,14 +176,14 @@ func (f *Frame) RevertNextPC() {
 
 func (f *Frame) Method() *method_area.Method { return f.method }
 
-func (f *Frame) ThrowException(ex *heap.Object) {
+func (f *Frame) JavaThrow(ex *heap.Object) {
 	if ex == nil {
-		panic("ThrowException called with nil exception.")
+		panic("JavaThrow called with nil exception.")
 	}
 
 	exData, ok := ex.Extra().(*heap.ExceptionData)
 	if !ok {
-		panic("ThrowException called with a non exception object.")
+		panic("JavaThrow called with a non exception object.")
 	}
 
 	if f.exHandler == nil {
@@ -189,4 +193,16 @@ func (f *Frame) ThrowException(ex *heap.Object) {
 
 	// handle ex.
 	f.exHandler(f, ex)
+}
+
+func (f *Frame) NativeThrow(ex *heap.Object) {
+	f.nativeError = ex
+}
+
+func (f *Frame) NativeError() (ex *heap.Object, exists bool) {
+	if f.nativeError != nil {
+		return f.nativeError, true
+	} else {
+		return nil, false
+	}
 }

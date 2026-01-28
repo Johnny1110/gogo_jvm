@@ -2,6 +2,7 @@ package lang
 
 import (
 	"fmt"
+	"github.com/Johnny1110/gogo_jvm/exception"
 	"github.com/Johnny1110/gogo_jvm/runtime"
 	"github.com/Johnny1110/gogo_jvm/runtime/heap"
 	"github.com/Johnny1110/gogo_jvm/runtime/method_area"
@@ -242,7 +243,8 @@ func forName0(frame *runtime.Frame) {
 
 	nameObj := frame.LocalVars().GetRef(0)
 	if nameObj == nil {
-		panic("java.lang.NullPointerException")
+		frame.NativeThrow(exception.NewNullPointerException(frame))
+		return
 	}
 
 	// get class name
@@ -303,7 +305,8 @@ func isAssignableFrom(frame *runtime.Frame) {
 	// this -- -- -- -- -- -- -- -- -- -- -- -- --
 	this := frame.LocalVars().GetThis()
 	if this == nil {
-		panic("java.lang.NullPointerException")
+		frame.NativeThrow(exception.NewNullPointerException(frame))
+		return
 	}
 	thisObj := this.(*heap.Object)
 	thisClass := thisObj.Extra().(*method_area.Class)
@@ -311,7 +314,8 @@ func isAssignableFrom(frame *runtime.Frame) {
 	// other -- -- -- -- -- -- -- -- -- -- -- -- --
 	clsRef := frame.LocalVars().GetRef(1)
 	if clsRef == nil {
-		panic("java.lang.NullPointerException")
+		frame.NativeThrow(exception.NewNullPointerException(frame))
+		return
 	}
 	clsObj := clsRef.(*heap.Object)
 	otherClass := clsObj.Extra().(*method_area.Class)

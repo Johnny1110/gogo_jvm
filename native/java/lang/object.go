@@ -63,7 +63,7 @@ func objectHashCode(frame *runtime.Frame) {
 func objectGetClass(frame *runtime.Frame) {
 	this := frame.LocalVars().GetThis()
 	if this == nil {
-		panic("java.lang.NullPointerException")
+		frame.NativeThrow(exception.NewNullPointerException(frame))
 	}
 
 	obj := this.(*heap.Object)
@@ -101,7 +101,7 @@ func objectGetClass(frame *runtime.Frame) {
 func objectClone(frame *runtime.Frame) {
 	this := frame.LocalVars().GetThis()
 	if this == nil {
-		frame.ThrowException(exception.NewNullPointerException(frame))
+		frame.NativeThrow(exception.NewNullPointerException(frame))
 		return
 	}
 
@@ -111,7 +111,7 @@ func objectClone(frame *runtime.Frame) {
 	// v0.3.3: Check if implements Cloneable interface
 	// Arrays are always Cloneable (JLS requirement)
 	if !class.IsCloneable() {
-		frame.ThrowException(exception.NewCloneNotSupportedException(frame, class.Name()))
+		frame.NativeThrow(exception.NewCloneNotSupportedException(frame, class.Name()))
 		return
 	}
 

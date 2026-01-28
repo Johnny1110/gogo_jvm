@@ -68,7 +68,7 @@ func invokeNativeMethod(callerFrame *runtime.Frame, callNativeMethod runtime.Nat
 	returnType := parseReturnType(descriptor)
 
 	// create a temp Frame for store params (not require to push into JVMStack)
-	tempFrame := runtime.NewNativeFrameWithStackAndExHandler(callerFrame.Thread(), uint16(argSlotCount), returnType, ThrowException)
+	tempFrame := runtime.NewNativeFrameWithStackAndExHandler(callerFrame, uint16(argSlotCount), returnType, ThrowException)
 
 	// pop args from caller op-stack put into tempFrame's LocalVars
 	stack := callerFrame.OperandStack() // stack: [argN, argN-1, ..., arg1, this]
@@ -106,13 +106,20 @@ func parseReturnType(descriptor string) string {
 // handleNativeReturn handle native method return val
 // from nativeFrame's OperandStack pop return val, push to callerFrame's OperandStack
 func handleNativeReturn(callerFrame *runtime.Frame, nativeFrame *runtime.Frame, returnType string) {
-	if returnType == "V" || returnType == "" {
-		// void, just return
+	// check if native method threw ex or not.
+	if err, exists := nativeFrame.NativeError(); exists {
+		// because native method call is not count in JVMFrameStack, so we need throw ex with callerFrame.
+		callerFrame.JavaThrow(err)
 		return
 	}
 
 	nativeStack := nativeFrame.OperandStack()
 	callerStack := callerFrame.OperandStack()
+
+	if returnType == "V" || returnType == "" {
+		// void, just return
+		return
+	}
 
 	if nativeStack == nil {
 		// should not be happened.
