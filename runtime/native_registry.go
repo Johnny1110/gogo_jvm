@@ -2,6 +2,7 @@ package runtime
 
 import (
 	"fmt"
+	"github.com/Johnny1110/gogo_jvm/runtime/heap"
 )
 
 // ============================================================
@@ -12,7 +13,7 @@ import (
 // why need input frame?
 //  1. read args from LocalVars (including this)
 //  2. put return val into caller's op-stack
-type NativeMethod func(frame *Frame)
+type NativeMethod func(frame *Frame) (ex *heap.Object)
 
 // registry Native Method Registry
 // key: className + methodName + descriptor
@@ -50,6 +51,7 @@ func FindNativeMethod(className, methodName, descriptor string) NativeMethod {
 }
 
 // emptyNativeMethod for MVP Phase: ignore some native methods
-func emptyNativeMethod(frame *Frame) {
+func emptyNativeMethod(frame *Frame) (ex *heap.Object) {
 	// do nothing
+	return nil
 }

@@ -37,7 +37,7 @@ func init() {
 // objectHashCode v0.3.0 - native implementation of Object.hashCode()
 // Java signature: public native int hashCode();
 // return Object's identity hash code (store in Object's markWord)
-func objectHashCode(frame *runtime.Frame) {
+func objectHashCode(frame *runtime.Frame) (ex *heap.Object) {
 	this := frame.LocalVars().GetThis()
 	if this == nil {
 		// should not be happened
@@ -48,6 +48,8 @@ func objectHashCode(frame *runtime.Frame) {
 	obj := this.(*heap.Object)
 	hash := obj.HashCode()
 	frame.OperandStack().PushInt(hash)
+
+	return nil
 }
 
 // ============================================================
@@ -60,10 +62,10 @@ func objectHashCode(frame *runtime.Frame) {
 //
 //	Object obj = new String("hello");
 //	Class<?> c = obj.getClass();  // -> java.lang.String  Class (Object)
-func objectGetClass(frame *runtime.Frame) {
+func objectGetClass(frame *runtime.Frame) (ex *heap.Object) {
 	this := frame.LocalVars().GetThis()
 	if this == nil {
-		frame.NativeThrow(exception.NewNullPointerException(frame))
+		return exception.NewNullPointerException(frame)
 	}
 
 	obj := this.(*heap.Object)
@@ -81,6 +83,8 @@ func objectGetClass(frame *runtime.Frame) {
 
 	// return java.lang.Class (Object)
 	frame.OperandStack().PushRef(jClass)
+
+	return nil
 }
 
 // ============================================================
@@ -98,11 +102,10 @@ func objectGetClass(frame *runtime.Frame) {
 // - x.clone() != x (must be a new object)
 // - x.clone().getClass() == x.getClass() (same type)
 // - x.clone().equals(x) is typically true (but not required)
-func objectClone(frame *runtime.Frame) {
+func objectClone(frame *runtime.Frame) (ex *heap.Object) {
 	this := frame.LocalVars().GetThis()
 	if this == nil {
-		frame.NativeThrow(exception.NewNullPointerException(frame))
-		return
+		return exception.NewNullPointerException(frame)
 	}
 
 	obj := this.(*heap.Object)
@@ -111,8 +114,7 @@ func objectClone(frame *runtime.Frame) {
 	// v0.3.3: Check if implements Cloneable interface
 	// Arrays are always Cloneable (JLS requirement)
 	if !class.IsCloneable() {
-		frame.NativeThrow(exception.NewCloneNotSupportedException(frame, class.Name()))
-		return
+		return exception.NewCloneNotSupportedException(frame, class.Name())
 	}
 
 	var cloned *heap.Object
@@ -126,6 +128,8 @@ func objectClone(frame *runtime.Frame) {
 	}
 
 	frame.OperandStack().PushRef(cloned)
+
+	return nil
 }
 
 // cloneRegularObject creates a shallow copy of a regular (non-array) object
@@ -207,18 +211,21 @@ func cloneArrayData(arr *heap.Object) interface{} {
 
 // objectNotify - Object.notify()
 // Java signature: public final native void notify();
-func objectNotify(frame *runtime.Frame) {
+func objectNotify(frame *runtime.Frame) (ex *heap.Object) {
 	fmt.Println("Warning - Object.notify() not implemented (v0.4.x)")
+	return nil
 }
 
 // objectNotifyAll - Object.notifyAll()
 // Java signature: public final native void notifyAll();
-func objectNotifyAll(frame *runtime.Frame) {
+func objectNotifyAll(frame *runtime.Frame) (ex *heap.Object) {
 	fmt.Println("Warning - Object.notifyAll() not implemented (v0.4.x)")
+	return nil
 }
 
 // objectWait - Object.wait(long timeout)
 // Java signature: public final native void wait(long timeout);
-func objectWait(frame *runtime.Frame) {
+func objectWait(frame *runtime.Frame) (ex *heap.Object) {
 	fmt.Println("Warning - Object.wait() not implemented (v0.4.x)")
+	return nil
 }

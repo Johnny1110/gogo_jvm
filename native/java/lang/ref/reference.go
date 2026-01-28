@@ -49,7 +49,7 @@ func init() {
 // Stack:
 //
 //	[this] → [referent or null]
-func referenceGet(frame *runtime.Frame) {
+func referenceGet(frame *runtime.Frame) (ex *heap.Object) {
 
 	fmt.Printf("@@ DEBUG - native referenceGet in ... \n")
 
@@ -75,6 +75,8 @@ func referenceGet(frame *runtime.Frame) {
 	fmt.Printf("@@ DEBUG - native referenceGet > referent: %v \n", referent)
 
 	frame.OperandStack().PushRef(referent)
+
+	return nil
 }
 
 // ============================================================
@@ -93,7 +95,7 @@ func referenceGet(frame *runtime.Frame) {
 // Stack:
 //
 //	[this] → []
-func referenceClear(frame *runtime.Frame) {
+func referenceClear(frame *runtime.Frame) (ex *heap.Object) {
 
 	this := frame.LocalVars().GetThis()
 	if this == nil {
@@ -114,6 +116,8 @@ func referenceClear(frame *runtime.Frame) {
 	// obj.Fields()[0].Ref = nil // TODO: ? test clean first filed (java referent)
 
 	refData.Clear()
+
+	return nil
 }
 
 // ============================================================
@@ -130,7 +134,7 @@ func referenceClear(frame *runtime.Frame) {
 // Stack:
 //
 //	[this] → [boolean]
-func referenceEnqueue(frame *runtime.Frame) {
+func referenceEnqueue(frame *runtime.Frame) (ex *heap.Object) {
 	if refData, ok := getThisReferenceData(frame); ok {
 		// Check if queue is registered
 		if refData.Queue == nil {
@@ -158,6 +162,8 @@ func referenceEnqueue(frame *runtime.Frame) {
 		frame.OperandStack().PushFalse()
 		return
 	}
+
+	return nil
 }
 
 // ============================================================
@@ -171,7 +177,7 @@ func referenceEnqueue(frame *runtime.Frame) {
 // Stack:
 //
 //	[this] → [boolean]
-func referenceIsEnqueued(frame *runtime.Frame) {
+func referenceIsEnqueued(frame *runtime.Frame) (ex *heap.Object) {
 	if refData, ok := getThisReferenceData(frame); ok {
 		if refData.State == heap.RefStateEnqueued {
 			frame.OperandStack().PushTrue()
@@ -197,7 +203,7 @@ func referenceIsEnqueued(frame *runtime.Frame) {
 // Stack:
 //
 //	[this, obj] → [boolean]
-func referenceRefersTo(frame *runtime.Frame) {
+func referenceRefersTo(frame *runtime.Frame) (ex *heap.Object) {
 	refData, ok := getThisReferenceData(frame)
 	if !ok {
 		frame.OperandStack().PushFalse()
@@ -225,7 +231,7 @@ func referenceRefersTo(frame *runtime.Frame) {
 // Stack:
 //
 //	[this] → throws CloneNotSupportedException
-func referenceClone(frame *runtime.Frame) {
+func referenceClone(frame *runtime.Frame) (ex *heap.Object) {
 	// Reference objects cannot be cloned
 	// In real JVM, this throws CloneNotSupportedException
 	// For MVP, we panic with a descriptive message

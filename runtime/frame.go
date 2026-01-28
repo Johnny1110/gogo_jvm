@@ -39,9 +39,6 @@ type Frame struct {
 	method       *method_area.Method
 
 	exHandler func(frame *Frame, ex *heap.Object)
-
-	// this is for native method throw exception, will be handled after back to java call stack.
-	nativeError *heap.Object
 }
 
 // NewFrame create new Frame
@@ -193,16 +190,4 @@ func (f *Frame) JavaThrow(ex *heap.Object) {
 
 	// handle ex.
 	f.exHandler(f, ex)
-}
-
-func (f *Frame) NativeThrow(ex *heap.Object) {
-	f.nativeError = ex
-}
-
-func (f *Frame) NativeError() (ex *heap.Object, exists bool) {
-	if f.nativeError != nil {
-		return f.nativeError, true
-	} else {
-		return nil, false
-	}
 }
