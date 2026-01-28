@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/Johnny1110/gogo_jvm/runtime"
 	"github.com/Johnny1110/gogo_jvm/runtime/heap"
+	"github.com/Johnny1110/gogo_jvm/runtime/method_area"
 )
 
 // ============================================================
@@ -58,4 +59,8 @@ func NewIllegalAccessError(frame *runtime.Frame, className, methodName, descript
 func NewCloneNotSupportedException(frame *runtime.Frame, classname string) *heap.Object {
 	exClass := frame.Method().Class().Loader().LoadClass("java/lang/CloneNotSupportedException", false)
 	return heap.NewExceptionObject(exClass, fmt.Sprintf("%s.%s", classname, "clone()"))
+}
+
+func NewExceptionObject(exClass *method_area.Class, msg string) *heap.Object {
+	return heap.NewExceptionObject(exClass, msg)
 }

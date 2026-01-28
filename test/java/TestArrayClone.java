@@ -54,11 +54,11 @@ public class TestArrayClone {
     }
     
     static void testReferenceArrayClone() {
-        StringBuilder[] original = new StringBuilder[2];
-        original[0] = new StringBuilder("Hello");
-        original[1] = new StringBuilder("World");
+        SimpleBean[] original = new SimpleBean[2];
+        original[0] = new SimpleBean("TestA");
+        original[1] = new SimpleBean("TestB");
         
-        StringBuilder[] cloned = original.clone();
+        SimpleBean[] cloned = original.clone();
         
         // Test 4: Clone is a new array
         if (original != cloned) {

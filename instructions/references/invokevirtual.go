@@ -30,7 +30,10 @@ func (i *INVOKEVIRTUAL) Execute(frame *runtime.Frame) {
 	methodRef := rtcp.GetConstant(i.Index).(*method_area.MethodRef)
 
 	// 3. load method
-	resolvedMethod := methodRef.ResolvedMethod()
+	resolvedMethod, err := methodRef.ResolvedMethod()
+	if err != nil {
+		frame.JavaThrow(err)
+	}
 
 	// 4. check is static (no static)
 	if resolvedMethod.IsStatic() {
