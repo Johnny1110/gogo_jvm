@@ -1,6 +1,7 @@
 package references
 
 import (
+	"fmt"
 	"github.com/Johnny1110/gogo_jvm/common"
 	"github.com/Johnny1110/gogo_jvm/runtime"
 	"github.com/Johnny1110/gogo_jvm/runtime/heap"
@@ -42,6 +43,8 @@ func invokeMethod(invokerFrame *runtime.Frame, method *method_area.Method) {
 
 	// 3. pass vars
 	argSlotCount := int(method.ArgSlotCount())
+	fmt.Printf("@@ DEBUG - invokeMethod [%s], desc: %s, method max Locals: %v, argSlotCount:%v . \n", method.Name(), method.Descriptor(), method.MaxLocals(), argSlotCount)
+
 	if argSlotCount > 0 {
 		for i := argSlotCount - 1; i >= 0; i-- {
 			// the passing var will be standby in invokerFrame's stack.
