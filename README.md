@@ -58,39 +58,39 @@ MVP 時期的筆記有些雜亂，移到 MVP Plan Documents 做紀念。
 <br>
 
 
-### v0.2 - MVP JVM Project (Core Engine) ✅️
+### v0.2 - MVP JVM Project (Core Engine) 
 
 v0.2 目標是讓 GOGO_JVM 能執行大部分 Single-Thread 的 Java 程式。
 
-* ✅️ v0.2.1: [Basic Instructions](doc/version/v0_2/v0_2_1.md)
-* ✅️ v0.2.2: [Simple Runtime Thread](doc/version/v0_2/v0_2_2.md)
-* ✅️ v0.2.3: [Basic Method Area Implementation](doc/version/v0_2/v0_2_3.md)
-* ✅️ v0.2.4: [Define Object Structure And `new` Instruction](doc/version/v0_2/v0_2_4.md)
-* ✅️ v0.2.5: [Invoke Object Method `invokespecial` And `invokevirtual`](doc/version/v0_2/v0_2_5.md)
-* ✅️ v0.2.6: [Support Basic Type Array](doc/version/v0_2/v0_2_6.md) 
-* ✅️ v0.2.7: [Native Method And `System.out.println`](doc/version/v0_2/v0_2_7.md) 
-* ✅️ v0.2.8: [Class Enhancement - `instanceof` / `checkcast` / `anewarray`](doc/version/v0_2/v0_2_8.md)
-* ✅️ v0.2.9: [Support `java.lang.String`](doc/version/v0_2/v0_2_9.md)
-* ✅️ v0.2.10: [Support ` try-catch-finally`](doc/version/v0_2/v0_2_10.md)
-* ✅️ v0.2.11: [Support interface](doc/version/v0_2/v0_2_11.md)
+* v0.2.1: [Basic Instructions](doc/version/v0_2/v0_2_1.md)
+* v0.2.2: [Simple Runtime Thread](doc/version/v0_2/v0_2_2.md)
+* v0.2.3: [Basic Method Area Implementation](doc/version/v0_2/v0_2_3.md)
+* v0.2.4: [Define Object Structure And `new` Instruction](doc/version/v0_2/v0_2_4.md)
+* v0.2.5: [Invoke Object Method `invokespecial` And `invokevirtual`](doc/version/v0_2/v0_2_5.md)
+* v0.2.6: [Support Basic Type Array](doc/version/v0_2/v0_2_6.md) 
+* v0.2.7: [Native Method And `System.out.println`](doc/version/v0_2/v0_2_7.md) 
+* v0.2.8: [Class Enhancement - `instanceof` / `checkcast` / `anewarray`](doc/version/v0_2/v0_2_8.md)
+* v0.2.9: [Support `java.lang.String`](doc/version/v0_2/v0_2_9.md)
+* v0.2.10: [Support ` try-catch-finally`](doc/version/v0_2/v0_2_10.md)
+* v0.2.11: [Support interface](doc/version/v0_2/v0_2_11.md)
 
 <br>
 <br>
 
-### v0.3 - Object Model (Pre-Work for GC/Multi-Thread) ⌛
+### v0.3 - Object Model (Pre-Work for GC/Multi-Thread) 
 
 v0.3 目標是能支援 Class 物件與基本反射，標準物件頭 (Mark Word)，
 Reference 類型支援，完整的物件生命週期。後續可以實現多執行緒和 GC。
 
-* ✅️ v0.3.0: [Revamp - Object Header](doc/version/v0_3/v0_3_0.md)
-* ✅️ v0.3.1: [Basic Reflection](doc/version/v0_3/v0_3_1.md)
-* ✅️ v0.3.2: [Support Reference Type `java.lang.ref`](doc/version/v0_3/v0_3_2.md)
-* ✅️ v0.3.3: [Object Lifecycle (Object from creation to Destroy)](doc/version/v0_3/v0_3_3.md)
+* v0.3.0: [Revamp - Object Header](doc/version/v0_3/v0_3_0.md)
+* v0.3.1: [Basic Reflection](doc/version/v0_3/v0_3_1.md)
+* v0.3.2: [Support Reference Type `java.lang.ref`](doc/version/v0_3/v0_3_2.md)
+* v0.3.3: [Object Lifecycle (Object from creation to Destroy)](doc/version/v0_3/v0_3_3.md)
 
 <br>
 <br>
 
-### v0.4 - Multi-Thread  (Pre-Work for GC)
+### v0.4 - Multi-Thread  (Pre-Work for GC) 
 
 v0.4 目標是實現 `java.lang.Thread` 類與基本執行緒管理。
 
