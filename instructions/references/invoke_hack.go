@@ -16,6 +16,7 @@ func hacked_invoke_native(frame *runtime.Frame, methodRef *method_area.MethodRef
 		invokeNativeMethod(frame, nativeMethod, descriptor)
 		return true
 	}
+
 	// not in native method registry
 	return false
 }

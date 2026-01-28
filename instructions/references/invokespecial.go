@@ -28,7 +28,10 @@ func (i *INVOKESPECIAL) Execute(frame *runtime.Frame) {
 	methodRef := rtcp.GetConstant(i.Index).(*method_area.MethodRef)
 
 	// 3. resolve target method's lang and method
-	resolvedMethod := methodRef.ResolvedMethod()
+	resolvedMethod, err := methodRef.ResolvedMethod()
+	if err != nil {
+		frame.JavaThrow(err)
+	}
 
 	// ============================================================
 	// v0.3.1: Hack - handle native method invoke for private methods

@@ -85,7 +85,7 @@ Reference 類型支援，完整的物件生命週期。後續可以實現多執�
 * ✅️ v0.3.0: [Revamp - Object Header](doc/version/v0_3/v0_3_0.md)
 * ✅️ v0.3.1: [Basic Reflection](doc/version/v0_3/v0_3_1.md)
 * ✅️ v0.3.2: [Support Reference Type `java.lang.ref`](doc/version/v0_3/v0_3_2.md)
-* ⌛ v0.3.3: [Object Lifecycle (Object from creation to Destroy)](doc/version/v0_3/v0_3_3.md)
+* ✅️ v0.3.3: [Object Lifecycle (Object from creation to Destroy)](doc/version/v0_3/v0_3_3.md)
 
 <br>
 <br>

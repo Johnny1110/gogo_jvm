@@ -1,6 +1,8 @@
 package runtime
 
 import (
+	"fmt"
+	"github.com/Johnny1110/gogo_jvm/runtime/heap"
 	"github.com/Johnny1110/gogo_jvm/runtime/method_area"
 	"github.com/Johnny1110/gogo_jvm/runtime/rtcore"
 )
@@ -35,6 +37,8 @@ type Frame struct {
 	nextPC       int
 	currentPC    int
 	method       *method_area.Method
+
+	exHandler func(frame *Frame, ex *heap.Object)
 }
 
 // NewFrame create new Frame
@@ -47,12 +51,25 @@ func NewFrame(thread *Thread, maxLocals, maxStack uint16) *Frame {
 	}
 }
 
+// please using NewFrameWithMethodAndExHandler if possible.
 func NewFrameWithMethod(thread *Thread, method *method_area.Method) *Frame {
 	return &Frame{
 		thread:       thread,
 		method:       method,
 		localVars:    NewLocalVars(method.MaxLocals()),
 		operandStack: NewOperandStack(method.MaxStack()),
+	}
+}
+
+func NewFrameWithMethodAndExHandler(thread *Thread,
+	method *method_area.Method,
+	exHandler func(frame *Frame, ex *heap.Object)) *Frame {
+	return &Frame{
+		thread:       thread,
+		method:       method,
+		localVars:    NewLocalVars(method.MaxLocals()),
+		operandStack: NewOperandStack(method.MaxStack()),
+		exHandler:    exHandler,
 	}
 }
 
@@ -86,6 +103,33 @@ func NewNativeFrameWithStack(thread *Thread, maxLocals uint16, returnType string
 		thread:       thread,
 		localVars:    NewLocalVars(maxLocals),
 		operandStack: opStack,
+	}
+}
+
+func NewNativeFrameWithStackAndExHandler(callerFrame *Frame,
+	maxLocals uint16,
+	returnType string,
+	exHandler func(frame *Frame, ex *heap.Object)) *Frame {
+	var opStack *OperandStack
+
+	if returnType == "V" || returnType == "" {
+		// void: not require opStack
+		opStack = nil
+	} else {
+		stackSize := uint16(1)
+		if len(returnType) > 0 && (returnType[0] == 'J' || returnType[0] == 'D') {
+			stackSize = 2 // long/double need 2 slots
+		}
+
+		opStack = NewOperandStack(stackSize)
+	}
+
+	return &Frame{
+		thread:       callerFrame.Thread(),
+		localVars:    NewLocalVars(maxLocals),
+		operandStack: opStack,
+		method:       callerFrame.method,
+		exHandler:    exHandler,
 	}
 }
 
@@ -128,3 +172,22 @@ func (f *Frame) RevertNextPC() {
 }
 
 func (f *Frame) Method() *method_area.Method { return f.method }
+
+func (f *Frame) JavaThrow(ex *heap.Object) {
+	if ex == nil {
+		panic("JavaThrow called with nil exception.")
+	}
+
+	exData, ok := ex.Extra().(*heap.ExceptionData)
+	if !ok {
+		panic("JavaThrow called with a non exception object.")
+	}
+
+	if f.exHandler == nil {
+		fmt.Printf("@@ DEBUG - current frame didn't have exHandler, panic directly.\n")
+		panic(exData.Message)
+	}
+
+	// handle ex.
+	f.exHandler(f, ex)
+}

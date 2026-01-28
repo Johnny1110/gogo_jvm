@@ -62,7 +62,7 @@ func (n *NEW) Opcode() uint8 {
 func scheduleClinit(thread *runtime.Thread, class *method_area.Class) {
 	clinit := class.GetClinitMethod()
 	if clinit != nil {
-		newFrame := thread.NewFrameWithMethod(clinit)
+		newFrame := thread.NewFrameWithMethodAndExHandler(clinit, ThrowException)
 		thread.PushFrame(newFrame)
 	}
 }

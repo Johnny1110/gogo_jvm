@@ -37,11 +37,13 @@ func invokeMethod(invokerFrame *runtime.Frame, method *method_area.Method) {
 	//fmt.Printf("@@ DEBUG - invokeMethod: %s \n", method.Name())
 
 	// 2. create a new frame (represent new method)
-	newFrame := thread.NewFrameWithMethod(method)
+	newFrame := thread.NewFrameWithMethodAndExHandler(method, ThrowException)
 	thread.PushFrame(newFrame)
 
 	// 3. pass vars
 	argSlotCount := int(method.ArgSlotCount())
+	//fmt.Printf("@@ DEBUG - invokeMethod [%s], desc: %s, method max Locals: %v, argSlotCount:%v . \n", method.Name(), method.Descriptor(), method.MaxLocals(), argSlotCount)
+
 	if argSlotCount > 0 {
 		for i := argSlotCount - 1; i >= 0; i-- {
 			// the passing var will be standby in invokerFrame's stack.
@@ -68,7 +70,7 @@ func invokeNativeMethod(callerFrame *runtime.Frame, callNativeMethod runtime.Nat
 	returnType := parseReturnType(descriptor)
 
 	// create a temp Frame for store params (not require to push into JVMStack)
-	tempFrame := runtime.NewNativeFrameWithStack(callerFrame.Thread(), uint16(argSlotCount), returnType)
+	tempFrame := runtime.NewNativeFrameWithStackAndExHandler(callerFrame, uint16(argSlotCount), returnType, ThrowException)
 
 	// pop args from caller op-stack put into tempFrame's LocalVars
 	stack := callerFrame.OperandStack() // stack: [argN, argN-1, ..., arg1, this]
@@ -81,7 +83,12 @@ func invokeNativeMethod(callerFrame *runtime.Frame, callNativeMethod runtime.Nat
 	}
 
 	// call native method
-	callNativeMethod(tempFrame)
+	ex := callNativeMethod(tempFrame)
+	if ex != nil {
+		// because native method call is not count in JVMFrameStack, so we need throw ex with callerFrame.
+		callerFrame.JavaThrow(ex)
+		return
+	}
 
 	// v0.3.0: handle return val if any
 	handleNativeReturn(callerFrame, tempFrame, returnType)
@@ -106,13 +113,13 @@ func parseReturnType(descriptor string) string {
 // handleNativeReturn handle native method return val
 // from nativeFrame's OperandStack pop return val, push to callerFrame's OperandStack
 func handleNativeReturn(callerFrame *runtime.Frame, nativeFrame *runtime.Frame, returnType string) {
+	nativeStack := nativeFrame.OperandStack()
+	callerStack := callerFrame.OperandStack()
+
 	if returnType == "V" || returnType == "" {
 		// void, just return
 		return
 	}
-
-	nativeStack := nativeFrame.OperandStack()
-	callerStack := callerFrame.OperandStack()
 
 	if nativeStack == nil {
 		// should not be happened.

@@ -3,6 +3,7 @@ package lang
 import (
 	"github.com/Johnny1110/gogo_jvm/common"
 	"github.com/Johnny1110/gogo_jvm/runtime"
+	"github.com/Johnny1110/gogo_jvm/runtime/heap"
 )
 
 // System class's native methods
@@ -12,12 +13,12 @@ func init() {
 	runtime.Register("java/lang/System", "currentTimeMillis", "()J", systemCurrentTimeMillis)
 }
 
-func systemArraycopy(frame *runtime.Frame) {
+func systemArraycopy(frame *runtime.Frame) (ex *heap.Object) {
 	// TODO
 	panic(common.NewJavaException("System", "systemArraycopy not implemented"))
 }
 
-func systemCurrentTimeMillis(frame *runtime.Frame) {
+func systemCurrentTimeMillis(frame *runtime.Frame) (ex *heap.Object) {
 	// TODO
 	panic(common.NewJavaException("System", "systemCurrentTimeMillis not implemented"))
 }

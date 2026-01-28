@@ -2,6 +2,7 @@ package runtime
 
 import (
 	"fmt"
+	"github.com/Johnny1110/gogo_jvm/runtime/heap"
 )
 
 // ============================================================
@@ -12,7 +13,7 @@ import (
 // why need input frame?
 //  1. read args from LocalVars (including this)
 //  2. put return val into caller's op-stack
-type NativeMethod func(frame *Frame)
+type NativeMethod func(frame *Frame) (ex *heap.Object)
 
 // registry Native Method Registry
 // key: className + methodName + descriptor
@@ -33,6 +34,14 @@ func Register(className, methodName, descriptor string, method NativeMethod) {
 // FindNativeMethod find method in Native Method Registry
 func FindNativeMethod(className, methodName, descriptor string) NativeMethod {
 	key := makeKey(className, methodName, descriptor)
+
+	// v0.3.3: Array native method fallback mechanism
+	// Array class start with '[', like "[I", "[Ljava/lang/String;"
+	// Array don't have own native method, they should delegate to Object
+	if isArrayClass(className) {
+		key = makeKey("java/lang/Object", methodName, descriptor)
+	}
+
 	if method, ok := registry[key]; ok {
 		return method
 	}
@@ -49,7 +58,19 @@ func FindNativeMethod(className, methodName, descriptor string) NativeMethod {
 	return nil
 }
 
+// isArrayClass
+// ex:
+//   - "[I"                    -> int[]
+//   - "[B"                    -> byte[]
+//   - "[[I"                   -> int[][]
+//   - "[Ljava/lang/String;"   -> String[]
+//   - "[[Ljava/lang/Object;"  -> Object[][]
+func isArrayClass(className string) bool {
+	return len(className) > 0 && className[0] == '['
+}
+
 // emptyNativeMethod for MVP Phase: ignore some native methods
-func emptyNativeMethod(frame *Frame) {
+func emptyNativeMethod(frame *Frame) (ex *heap.Object) {
 	// do nothing
+	return nil
 }

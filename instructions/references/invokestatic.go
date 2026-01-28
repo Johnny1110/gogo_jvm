@@ -20,7 +20,10 @@ func (i *INVOKE_STATIC) Execute(frame *runtime.Frame) {
 	methodRef := cp.GetConstant(i.Index).(*method_area.MethodRef)
 
 	// 3. parse method ref, get target method
-	resolvedMethod := methodRef.ResolvedMethod()
+	resolvedMethod, err := methodRef.ResolvedMethod()
+	if err != nil {
+		frame.JavaThrow(err)
+	}
 
 	// 4. make sure it's a static method
 	if !resolvedMethod.IsStatic() {

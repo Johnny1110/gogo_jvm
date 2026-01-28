@@ -35,8 +35,10 @@ func init() {
 // LocalVars:
 //
 //	[0] = this (PrintStream Ref)
-func println(frame *runtime.Frame) {
+func println(frame *runtime.Frame) (ex *heap.Object) {
 	fmt.Println()
+
+	return
 }
 
 // ============================================================
@@ -49,13 +51,15 @@ func println(frame *runtime.Frame) {
 //
 //	[0] = this (PrintStream Ref)
 //	[1] = boolean value (JVM present by int: 0=false, non 0=true)
-func printlnBoolean(frame *runtime.Frame) {
+func printlnBoolean(frame *runtime.Frame) (ex *heap.Object) {
 	val := frame.LocalVars().GetInt(1)
 	if val != 0 {
 		fmt.Println("true")
 	} else {
 		fmt.Println("false")
 	}
+
+	return
 }
 
 // ============================================================
@@ -70,9 +74,11 @@ func printlnBoolean(frame *runtime.Frame) {
 //	[1] = char 值 (JVM - int: scope = 0-65535)
 //
 // Java char is 16-bit unsigned (UTF-16)
-func printlnChar(frame *runtime.Frame) {
+func printlnChar(frame *runtime.Frame) (ex *heap.Object) {
 	val := frame.LocalVars().GetInt(1)
 	fmt.Println(string(rune(val)))
+
+	return
 }
 
 // ============================================================
@@ -85,9 +91,11 @@ func printlnChar(frame *runtime.Frame) {
 //
 //	[0] = this (PrintStream Ref)
 //	[1] = int
-func printlnInt(frame *runtime.Frame) {
+func printlnInt(frame *runtime.Frame) (ex *heap.Object) {
 	val := frame.LocalVars().GetInt(1)
 	fmt.Println(val)
+
+	return
 }
 
 // ============================================================
@@ -100,9 +108,11 @@ func printlnInt(frame *runtime.Frame) {
 //
 //	[0] = this
 //	[1-2] = long 值（take 2 slots）
-func printlnLong(frame *runtime.Frame) {
+func printlnLong(frame *runtime.Frame) (ex *heap.Object) {
 	val := frame.LocalVars().GetLong(1)
 	fmt.Println(val)
+
+	return
 }
 
 // ============================================================
@@ -115,9 +125,11 @@ func printlnLong(frame *runtime.Frame) {
 //
 //	[0] = this
 //	[1] = float value
-func printlnFloat(frame *runtime.Frame) {
+func printlnFloat(frame *runtime.Frame) (ex *heap.Object) {
 	val := frame.LocalVars().GetFloat(1)
 	fmt.Println(val)
+
+	return
 }
 
 // ============================================================
@@ -130,9 +142,11 @@ func printlnFloat(frame *runtime.Frame) {
 //
 //	[0] = this
 //	[1-2] = double 值（take 2 slots）
-func printlnDouble(frame *runtime.Frame) {
+func printlnDouble(frame *runtime.Frame) (ex *heap.Object) {
 	val := frame.LocalVars().GetDouble(1)
 	fmt.Println(val)
+
+	return
 }
 
 // ============================================================
@@ -154,7 +168,7 @@ func printlnDouble(frame *runtime.Frame) {
 // │           ↓                 │
 // │    []uint16 (UTF-16 data)   │
 // └─────────────────────────────┘
-func printlnString(frame *runtime.Frame) {
+func printlnString(frame *runtime.Frame) (ex *heap.Object) {
 	strRef := frame.LocalVars().GetRef(1)
 
 	if strRef == nil {
@@ -166,4 +180,6 @@ func printlnString(frame *runtime.Frame) {
 	goStr := heap.GoString(strObject)
 
 	fmt.Println(goStr)
+
+	return
 }
