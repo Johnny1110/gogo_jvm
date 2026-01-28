@@ -1,6 +1,7 @@
 package runtime
 
 import (
+	"github.com/Johnny1110/gogo_jvm/runtime/heap"
 	"github.com/Johnny1110/gogo_jvm/runtime/method_area"
 )
 
@@ -66,6 +67,6 @@ func (t *Thread) NewFrame(maxLocals, maxStack uint16) *Frame {
 	return NewFrame(t, maxLocals, maxStack)
 }
 
-func (t *Thread) NewFrameWithMethod(method *method_area.Method) *Frame {
-	return NewFrameWithMethod(t, method)
+func (t *Thread) NewFrameWithMethodAndExHandler(method *method_area.Method, exHandler func(frame *Frame, ex *heap.Object)) *Frame {
+	return NewFrameWithMethodAndExHandler(t, method, exHandler)
 }

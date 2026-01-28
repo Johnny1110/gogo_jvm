@@ -2,6 +2,7 @@ package lang
 
 import (
 	"fmt"
+	"github.com/Johnny1110/gogo_jvm/exception"
 	"github.com/Johnny1110/gogo_jvm/runtime"
 	"github.com/Johnny1110/gogo_jvm/runtime/heap"
 	"github.com/Johnny1110/gogo_jvm/runtime/method_area"
@@ -15,8 +16,15 @@ func init() {
 	runtime.Register("java/lang/Object", "hashCode", "()I", objectHashCode)
 	// v0.3.1
 	runtime.Register("java/lang/Object", "getClass", "()Ljava/lang/Class;", objectGetClass)
-	// (MVP Clone)
+
+	// v0.3.3: equals (non-native in standard Java, but we provide default implementation)
+	// Note: In standard Java, equals() is not native, but we intercept it for efficiency
+	// Actually equals() is a normal Java method, so we don't register it here
+	// The default Object.equals() in Java bytecode will be executed normally
+
+	// v0.3.3: clone (with Cloneable check)
 	runtime.Register("java/lang/Object", "clone", "()Ljava/lang/Object;", objectClone)
+
 	// TODO: v0.4.x: notify/notifyAll/wait
 	runtime.Register("java/lang/Object", "notify", "()V", objectNotify)
 	runtime.Register("java/lang/Object", "notifyAll", "()V", objectNotifyAll)
@@ -79,37 +87,82 @@ func objectGetClass(frame *runtime.Frame) {
 // clone - Object.clone()
 // ============================================================
 // Java signature: protected native Object clone() throws CloneNotSupportedException;
-// TODO: MVP 簡化版 - 只複製基本物件，不處理 Cloneable 檢查
+//
+// v0.3.3 Implementation:
+// 1. Check if the object's class implements Cloneable interface
+// 2. If not Cloneable, throw CloneNotSupportedException
+// 3. Create a shallow copy of the object
+// 4. For arrays, copy the array data (still shallow for reference arrays)
+//
+// Contract:
+// - x.clone() != x (must be a new object)
+// - x.clone().getClass() == x.getClass() (same type)
+// - x.clone().equals(x) is typically true (but not required)
 func objectClone(frame *runtime.Frame) {
 	this := frame.LocalVars().GetThis()
 	if this == nil {
-		panic("java.lang.NullPointerException")
+		frame.ThrowException(exception.NewNullPointerException(frame))
+		return
 	}
 
 	obj := this.(*heap.Object)
 	class := obj.Class().(*method_area.Class)
 
-	// TODO: 檢查是否實現 Cloneable 介面 如果沒有實現，應該拋出 CloneNotSupportedException MVP 簡化：跳過檢查
-	cloned := class.NewObject()
-
-	// copy all fields (shallow copy)
-	srcFields := obj.Fields()
-	dstFields := cloned.Fields()
-
-	if srcFields != nil && dstFields != nil {
-		copy(dstFields, srcFields)
+	// v0.3.3: Check if implements Cloneable interface
+	// Arrays are always Cloneable (JLS requirement)
+	if !class.IsCloneable() {
+		frame.ThrowException(exception.NewCloneNotSupportedException(frame, class.Name()))
+		return
 	}
 
-	// if is array: copy extra
+	var cloned *heap.Object
+
+	// Handle array cloning specially
 	if obj.IsArray() {
-		cloned.SetExtra(cloneArray(obj))
+		cloned = cloneArrayObject(obj, class)
+	} else {
+		// Clone regular object
+		cloned = cloneRegularObject(obj, class)
 	}
 
 	frame.OperandStack().PushRef(cloned)
 }
 
-// cloneArray copy array
-func cloneArray(arr *heap.Object) interface{} {
+// cloneRegularObject creates a shallow copy of a regular (non-array) object
+func cloneRegularObject(obj *heap.Object, class *method_area.Class) *heap.Object {
+	cloned := class.NewObject()
+
+	// Copy all fields (shallow copy)
+	// This copies primitive values directly, and copies references (not the objects they point to)
+	srcFields := obj.Fields()
+	dstFields := cloned.Fields()
+
+	if srcFields != nil && dstFields != nil {
+		copy(dstFields, srcFields)
+	} else {
+		// should not be happened.
+		panic("Clone object not initialized")
+	}
+
+	// Copy markWord state (except hashCode which should be regenerated)
+	// Actually, the cloned object should have its own identity hashCode
+	// So we don't copy the markWord - the new object starts with InitialMarkWord
+	return cloned
+}
+
+// cloneArrayObject creates a shallow copy of an array object
+func cloneArrayObject(arr *heap.Object, class *method_area.Class) *heap.Object {
+	cloned := &heap.Object{}
+	cloned.SetMarkWord(heap.InitialMarkWord)
+	cloned.SetClass(class)
+	// Copy array data based on type
+	cloned.SetExtra(cloneArrayData(arr))
+
+	return cloned
+}
+
+// cloneArrayData copy array
+func cloneArrayData(arr *heap.Object) interface{} {
 	switch data := arr.Extra().(type) {
 	case []int8:
 		cloned := make([]int8, len(data))
@@ -144,7 +197,7 @@ func cloneArray(arr *heap.Object) interface{} {
 		copy(cloned, data) // !!! shallow copy, only copy ref.
 		return cloned
 	default:
-		return nil
+		panic(fmt.Sprintf("Unknown array type: %T", data))
 	}
 }
 

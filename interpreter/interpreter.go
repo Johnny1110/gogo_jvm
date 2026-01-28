@@ -5,6 +5,7 @@ import (
 	"github.com/Johnny1110/gogo_jvm/instructions"
 	"github.com/Johnny1110/gogo_jvm/instructions/base"
 	"github.com/Johnny1110/gogo_jvm/instructions/base/opcodes"
+	"github.com/Johnny1110/gogo_jvm/instructions/references"
 	"github.com/Johnny1110/gogo_jvm/runtime"
 	"github.com/Johnny1110/gogo_jvm/runtime/heap"
 	"github.com/Johnny1110/gogo_jvm/runtime/method_area"
@@ -18,7 +19,7 @@ func Interpret(method *method_area.Method, debug bool) {
 	thread := runtime.NewThread()
 
 	// 2. create frame
-	frame := thread.NewFrameWithMethod(method)
+	frame := thread.NewFrameWithMethodAndExHandler(method, references.ThrowException)
 	thread.PushFrame(frame)
 
 	// 3. start execute

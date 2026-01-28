@@ -37,7 +37,7 @@ func invokeMethod(invokerFrame *runtime.Frame, method *method_area.Method) {
 	//fmt.Printf("@@ DEBUG - invokeMethod: %s \n", method.Name())
 
 	// 2. create a new frame (represent new method)
-	newFrame := thread.NewFrameWithMethod(method)
+	newFrame := thread.NewFrameWithMethodAndExHandler(method, ThrowException)
 	thread.PushFrame(newFrame)
 
 	// 3. pass vars
@@ -68,7 +68,7 @@ func invokeNativeMethod(callerFrame *runtime.Frame, callNativeMethod runtime.Nat
 	returnType := parseReturnType(descriptor)
 
 	// create a temp Frame for store params (not require to push into JVMStack)
-	tempFrame := runtime.NewNativeFrameWithStack(callerFrame.Thread(), uint16(argSlotCount), returnType)
+	tempFrame := runtime.NewNativeFrameWithStackAndExHandler(callerFrame.Thread(), uint16(argSlotCount), returnType, ThrowException)
 
 	// pop args from caller op-stack put into tempFrame's LocalVars
 	stack := callerFrame.OperandStack() // stack: [argN, argN-1, ..., arg1, this]
