@@ -108,13 +108,13 @@ v0.4 目標是實現 `java.lang.Thread` 類與基本執行緒管理。
 
 v0.5 深入研究實現各種 GC 演算法
 
-* 🚧 [v0.5.0: Heap Structure](doc/version/v0_5/v0_5_0.md)
-* 🚧 [v0.5.1: Mark-Sweep GC](doc/version/v0_5/v0_5_1.md)
-* 🚧 [v0.5.2: Mark-Compact GC](doc/version/v0_5/v0_5_2.md)
-* 🚧 [v0.5.3: Copying GC](doc/version/v0_5/v0_5_3.md)
-* 🚧 [v0.5.4: GC (Generational)](doc/version/v0_5/v0_5_4.md)
-* 🚧 [v0.5.5: Concurrent GC Basic](doc/version/v0_5/v0_5_5.md)
-* 🚧 [v0.5.6: GC Advance (G1 / ZGC)](doc/version/v0_5/v0_5_6.md)
+* 🚧 v0.5.0: [Heap Structure](doc/version/v0_5/v0_5_0.md)
+* 🚧 v0.5.1: [Mark-Sweep GC](doc/version/v0_5/v0_5_1.md)
+* 🚧 v0.5.2: [Mark-Compact GC](doc/version/v0_5/v0_5_2.md)
+* 🚧 v0.5.3: [Copying GC](doc/version/v0_5/v0_5_3.md)
+* 🚧 v0.5.4: [GC (Generational)](doc/version/v0_5/v0_5_4.md)
+* 🚧 v0.5.5: [Concurrent GC Basic](doc/version/v0_5/v0_5_5.md)
+* 🚧 v0.5.6: [GC Advance (G1 / ZGC)](doc/version/v0_5/v0_5_6.md)
 
 <br>
 <br>
