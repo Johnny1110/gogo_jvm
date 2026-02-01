@@ -2,6 +2,7 @@ package runtime
 
 import (
 	"fmt"
+	"github.com/Johnny1110/gogo_jvm/global"
 	"github.com/Johnny1110/gogo_jvm/runtime/heap"
 	"github.com/Johnny1110/gogo_jvm/runtime/method_area"
 	"github.com/Johnny1110/gogo_jvm/runtime/rtcore"
@@ -184,10 +185,16 @@ func (f *Frame) JavaThrow(ex *heap.Object) {
 	}
 
 	if f.exHandler == nil {
-		fmt.Printf("@@ DEBUG - current frame didn't have exHandler, panic directly.\n")
+		if global.DebugMode() {
+			fmt.Printf("@@ DEBUG - current frame didn't have exHandler, panic directly.\n")
+		}
 		panic(exData.Message)
 	}
 
 	// handle ex.
 	f.exHandler(f, ex)
+}
+
+func (f *Frame) LoaderClass(className string) *method_area.Class {
+	return f.method.Class().Loader().LoadClass(className, false)
 }

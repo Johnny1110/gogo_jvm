@@ -2,6 +2,7 @@ package heap
 
 import (
 	"fmt"
+	"github.com/Johnny1110/gogo_jvm/global"
 	"github.com/Johnny1110/gogo_jvm/runtime/rtcore"
 )
 
@@ -46,7 +47,10 @@ type Object struct {
 // this func only alloc space, not executing constructor
 // the object's constructor is calling by `invokespecial` <init>
 func NewObject(class interface{}, slotCount uint) *Object {
-	fmt.Println("@@ Debug - [NewObject] class:", class, ", slotCount:", slotCount)
+	if global.DebugMode() {
+		fmt.Println("@@ Debug - [NewObject] class:", class, ", slotCount:", slotCount)
+	}
+
 	return &Object{
 		markWord: InitialMarkWord, // init state: non-lock, age=0, hashCode=0
 		class:    class,

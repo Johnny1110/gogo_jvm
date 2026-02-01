@@ -5,20 +5,18 @@ import (
 	"github.com/Johnny1110/gogo_jvm/runtime/method_area"
 )
 
-const DEFAULT_STACK_SIZE = 1024
-
 type Thread struct {
 	pc    int       // Program Counter
 	stack *JVMStack // JVM Frame Stack
 }
 
 // NewThread create new Thread
-func NewThread() *Thread {
-	return &Thread{
-		pc:    0,
-		stack: NewJVMStack(DEFAULT_STACK_SIZE),
-	}
-}
+//func NewThread() *Thread {
+//	return &Thread{
+//		pc:    0,
+//		stack: NewJVMStack(DEFAULT_STACK_SIZE),
+//	}
+//}
 
 func (t *Thread) PC() int {
 	return t.pc

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/Johnny1110/gogo_jvm/global"
 	"github.com/Johnny1110/gogo_jvm/interpreter"
 	"github.com/Johnny1110/gogo_jvm/runtime/method_area"
 	"os"
@@ -21,6 +22,9 @@ func main() {
 	}
 	classFilePath := os.Args[1]
 	debug := len(os.Args) > 2 && os.Args[2] == "-debug"
+
+	// setup debug mod
+	global.SetDebugMode(debug)
 
 	// get class path (.class file's dir）
 	classPath := getClassPath(classFilePath)

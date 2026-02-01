@@ -3,6 +3,7 @@ package lang
 import (
 	"fmt"
 	"github.com/Johnny1110/gogo_jvm/exception"
+	"github.com/Johnny1110/gogo_jvm/global"
 	"github.com/Johnny1110/gogo_jvm/runtime"
 	"github.com/Johnny1110/gogo_jvm/runtime/heap"
 	"github.com/Johnny1110/gogo_jvm/runtime/method_area"
@@ -11,7 +12,10 @@ import (
 // Object class's native methods (hashCode etc.)
 
 func init() {
-	fmt.Println("@@ Debug - init Native java/lang/Object")
+	if global.DebugMode() {
+		fmt.Println("@@ Debug - init Native java/lang/Object")
+	}
+
 	// v0.3.0
 	runtime.Register("java/lang/Object", "hashCode", "()I", objectHashCode)
 	// v0.3.1
@@ -69,13 +73,18 @@ func objectGetClass(frame *runtime.Frame) (ex *heap.Object) {
 	}
 
 	obj := this.(*heap.Object)
-	fmt.Printf("@@ DEBUG - Native objectGetClass obj = %s \n", obj)
-	fmt.Printf("@@ DEBUG - Native objectGetClass obj.Extra() = %v \n", obj.Extra())
+	if global.DebugMode() {
+		fmt.Printf("@@ DEBUG - Native objectGetClass obj = %s \n", obj)
+		fmt.Printf("@@ DEBUG - Native objectGetClass obj.Extra() = %v \n", obj.Extra())
+	}
 
 	// class metadata
 	class := obj.Class().(*method_area.Class)
 	// get jClass (Object) from class
-	fmt.Printf("@@ DEBUG - Native objectGetClass  obj.Class() = %s \n", class.Name())
+	if global.DebugMode() {
+		fmt.Printf("@@ DEBUG - Native objectGetClass  obj.Class() = %s \n", class.Name())
+	}
+
 	jClass := class.JClass()
 	if jClass == nil {
 		panic(fmt.Sprintf("Class object not initialized for: %s", class.Name()))
