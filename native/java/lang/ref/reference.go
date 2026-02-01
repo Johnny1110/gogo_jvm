@@ -2,6 +2,7 @@ package ref
 
 import (
 	"fmt"
+	"github.com/Johnny1110/gogo_jvm/global"
 	"github.com/Johnny1110/gogo_jvm/runtime"
 	"github.com/Johnny1110/gogo_jvm/runtime/heap"
 )
@@ -18,7 +19,9 @@ import (
 //   - isEnqueued(): checks if this reference is in a queue
 
 func init() {
-	fmt.Println("@@ Debug - init Native java/lang/ref/Reference")
+	if global.DebugMode() {
+		fmt.Println("@@ Debug - init Native java/lang/ref/Reference")
+	}
 
 	// Core Reference methods
 	runtime.Register("java/lang/ref/Reference", "get", "()Ljava/lang/Object;", referenceGet)
@@ -51,7 +54,9 @@ func init() {
 //	[this] → [referent or null]
 func referenceGet(frame *runtime.Frame) (ex *heap.Object) {
 
-	fmt.Printf("@@ DEBUG - native referenceGet in ... \n")
+	if global.DebugMode() {
+		fmt.Printf("@@ DEBUG - native referenceGet in ... \n")
+	}
 
 	this := frame.LocalVars().GetThis()
 	if this == nil {
@@ -72,7 +77,9 @@ func referenceGet(frame *runtime.Frame) (ex *heap.Object) {
 	// - SoftReference timestamp update
 	referent := refData.Get()
 
-	fmt.Printf("@@ DEBUG - native referenceGet > referent: %v \n", referent)
+	if global.DebugMode() {
+		fmt.Printf("@@ DEBUG - native referenceGet > referent: %v \n", referent)
+	}
 
 	frame.OperandStack().PushRef(referent)
 
@@ -99,7 +106,9 @@ func referenceClear(frame *runtime.Frame) (ex *heap.Object) {
 
 	this := frame.LocalVars().GetThis()
 	if this == nil {
-		fmt.Printf("@@ DEBUG - native referenceClear > ref is null (high level error)...\n")
+		if global.DebugMode() {
+			fmt.Printf("@@ DEBUG - native referenceClear > ref is null (high level error)...\n")
+		}
 		return
 	}
 
@@ -107,7 +116,9 @@ func referenceClear(frame *runtime.Frame) (ex *heap.Object) {
 	refData := obj.GetReferenceData()
 
 	if refData == nil {
-		fmt.Printf("@@ DEBUG - native referenceClear > refData is null (high level error)...\n")
+		if global.DebugMode() {
+			fmt.Printf("@@ DEBUG - native referenceClear > refData is null (high level error)...\n")
+		}
 		return
 	}
 

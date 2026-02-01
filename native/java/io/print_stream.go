@@ -2,6 +2,7 @@ package io
 
 import (
 	"fmt"
+	"github.com/Johnny1110/gogo_jvm/global"
 	"github.com/Johnny1110/gogo_jvm/runtime"
 	"github.com/Johnny1110/gogo_jvm/runtime/heap"
 )
@@ -14,7 +15,10 @@ import (
 
 // init register all different println overloading
 func init() {
-	fmt.Println("@@ Debug - init Native java/io/PrintStream")
+	if global.DebugMode() {
+		fmt.Println("@@ Debug - init Native java/io/PrintStream")
+	}
+
 	runtime.Register("java/io/PrintStream", "println", "()V", println)
 	runtime.Register("java/io/PrintStream", "println", "(Z)V", printlnBoolean)
 	runtime.Register("java/io/PrintStream", "println", "(C)V", printlnChar)

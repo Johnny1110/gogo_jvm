@@ -3,6 +3,7 @@ package lang
 import (
 	"fmt"
 	"github.com/Johnny1110/gogo_jvm/exception"
+	"github.com/Johnny1110/gogo_jvm/global"
 	"github.com/Johnny1110/gogo_jvm/runtime"
 	"github.com/Johnny1110/gogo_jvm/runtime/heap"
 	"github.com/Johnny1110/gogo_jvm/runtime/method_area"
@@ -13,7 +14,9 @@ import (
 // java.lang.Class Native Methods - v0.3.1
 // ============================================================
 func init() {
-	fmt.Println("@@ Debug - init Native java/lang/Class")
+	if global.DebugMode() {
+		fmt.Println("@@ Debug - init Native java/lang/Class")
+	}
 
 	// basic reflection
 	runtime.Register("java/lang/Class", "getPrimitiveClass", "(Ljava/lang/String;)Ljava/lang/Class;", getPrimitiveClass)
@@ -94,11 +97,15 @@ func getName0(frame *runtime.Frame) (ex *heap.Object) {
 func initClassName(frame *runtime.Frame) (ex *heap.Object) {
 	this := frame.LocalVars().GetThis().(*heap.Object)
 
-	fmt.Printf("@@ DEBUG - initClassName, this: %s\n", this.String())
+	if global.DebugMode() {
+		fmt.Printf("@@ DEBUG - initClassName, this: %s\n", this.String())
+	}
 
 	class := this.Extra().(*method_area.Class)
 
-	fmt.Printf("@@ DEBUG - initClassName, class: %s\n", class.String())
+	if global.DebugMode() {
+		fmt.Printf("@@ DEBUG - initClassName, class: %s\n", class.String())
+	}
 
 	// JVM inner: java/lang/String
 	// Java API: java.lang.String

@@ -42,6 +42,20 @@ func (s Slots) GetInt(index uint) int32 {
 	return s[index].Num
 }
 
+// =============== Boolean ===============
+
+func (s Slots) SetBoolean(index uint, boolean bool) {
+	if boolean {
+		s[index].Num = 1
+	} else {
+		s[index].Num = 0
+	}
+}
+
+func (s Slots) GetBoolean(index uint) bool {
+	return s[index].Num == 1
+}
+
 // =============== Float ===============
 
 func (s Slots) SetFloat(index uint, val float32) {

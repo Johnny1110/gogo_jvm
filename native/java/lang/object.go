@@ -238,3 +238,8 @@ func objectWait(frame *runtime.Frame) (ex *heap.Object) {
 	fmt.Println("Warning - Object.wait() not implemented (v0.4.x)")
 	return nil
 }
+
+func genExceptionObj(frame *runtime.Frame, className string, msg string) (ex *heap.Object) {
+	exClass := frame.Method().Class().Loader().LoadClass(className, false)
+	return heap.NewExceptionObject(exClass, msg)
+}
