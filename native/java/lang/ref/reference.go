@@ -24,18 +24,18 @@ func init() {
 	}
 
 	// Core Reference methods
-	runtime.Register("java/lang/ref/Reference", "get", "()Ljava/lang/Object;", referenceGet)
-	runtime.Register("java/lang/ref/Reference", "clear", "()V", referenceClear)
-	runtime.Register("java/lang/ref/Reference", "clear0", "()V", referenceClear) // JDK internal variant
-	runtime.Register("java/lang/ref/Reference", "enqueue", "()Z", referenceEnqueue)
-	runtime.Register("java/lang/ref/Reference", "isEnqueued", "()Z", referenceIsEnqueued)
+	runtime.Register("java/lang/ref/Reference", "get", "()Ljava/lang/Object;", false, referenceGet)
+	runtime.Register("java/lang/ref/Reference", "clear", "()V", false, referenceClear)
+	runtime.Register("java/lang/ref/Reference", "clear0", "()V", false, referenceClear) // JDK internal variant
+	runtime.Register("java/lang/ref/Reference", "enqueue", "()Z", false, referenceEnqueue)
+	runtime.Register("java/lang/ref/Reference", "isEnqueued", "()Z", false, referenceIsEnqueued)
 
 	// JDK 9+ uses refersTo for phantom reference check
-	runtime.Register("java/lang/ref/Reference", "refersTo", "(Ljava/lang/Object;)Z", referenceRefersTo)
-	runtime.Register("java/lang/ref/Reference", "refersTo0", "(Ljava/lang/Object;)Z", referenceRefersTo)
+	runtime.Register("java/lang/ref/Reference", "refersTo", "(Ljava/lang/Object;)Z", false, referenceRefersTo)
+	runtime.Register("java/lang/ref/Reference", "refersTo0", "(Ljava/lang/Object;)Z", false, referenceRefersTo)
 
 	// Clone is not supported for Reference
-	runtime.Register("java/lang/ref/Reference", "clone", "()Ljava/lang/Object;", referenceClone)
+	runtime.Register("java/lang/ref/Reference", "clone", "()Ljava/lang/Object;", false, referenceClone)
 }
 
 // ============================================================

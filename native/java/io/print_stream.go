@@ -19,15 +19,15 @@ func init() {
 		fmt.Println("@@ Debug - init Native java/io/PrintStream")
 	}
 
-	runtime.Register("java/io/PrintStream", "println", "()V", println)
-	runtime.Register("java/io/PrintStream", "println", "(Z)V", printlnBoolean)
-	runtime.Register("java/io/PrintStream", "println", "(C)V", printlnChar)
-	runtime.Register("java/io/PrintStream", "println", "(I)V", printlnInt)
-	runtime.Register("java/io/PrintStream", "println", "(J)V", printlnLong)
-	runtime.Register("java/io/PrintStream", "println", "(F)V", printlnFloat)
-	runtime.Register("java/io/PrintStream", "println", "(D)V", printlnDouble)
+	runtime.Register("java/io/PrintStream", "println", "()V", false, println)
+	runtime.Register("java/io/PrintStream", "println", "(Z)V", false, printlnBoolean)
+	runtime.Register("java/io/PrintStream", "println", "(C)V", false, printlnChar)
+	runtime.Register("java/io/PrintStream", "println", "(I)V", false, printlnInt)
+	runtime.Register("java/io/PrintStream", "println", "(J)V", false, printlnLong)
+	runtime.Register("java/io/PrintStream", "println", "(F)V", false, printlnFloat)
+	runtime.Register("java/io/PrintStream", "println", "(D)V", false, printlnDouble)
 	// v0.2.9 supported - string print
-	runtime.Register("java/io/PrintStream", "println", "(Ljava/lang/String;)V", printlnString)
+	runtime.Register("java/io/PrintStream", "println", "(Ljava/lang/String;)V", false, printlnString)
 }
 
 // ============================================================

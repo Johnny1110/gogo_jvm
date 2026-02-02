@@ -19,21 +19,21 @@ func init() {
 		fmt.Println("@@ Debug - init Native java/lang/Thread")
 	}
 	// core
-	jvmruntime.Register("java/lang/Thread", "start0", "()V", threadStart0)
-	jvmruntime.Register("java/lang/Thread", "sleep", "(J)V", threadSleep)
-	jvmruntime.Register("java/lang/Thread", "yield", "()V", threadYield)
-	jvmruntime.Register("java/lang/Thread", "currentThread", "()Ljava/lang/Thread;", threadCurrentThread)
-	jvmruntime.Register("java/lang/Thread", "isAlive", "()Z", threadIsAlive)
+	jvmruntime.Register("java/lang/Thread", "start0", "()V", false, threadStart0)
+	jvmruntime.Register("java/lang/Thread", "sleep0", "(J)V", true, threadSleep)
+	jvmruntime.Register("java/lang/Thread", "yield", "()V", false, threadYield)
+	jvmruntime.Register("java/lang/Thread", "currentThread", "()Ljava/lang/Thread;", true, threadCurrentThread)
+	jvmruntime.Register("java/lang/Thread", "isAlive", "()Z", false, threadIsAlive)
 
 	// attrs
-	jvmruntime.Register("java/lang/Thread", "setPriority0", "(I)V", threadSetPriority0)
-	jvmruntime.Register("java/lang/Thread", "isInterrupted", "(Z)Z", threadIsInterrupted)
-	jvmruntime.Register("java/lang/Thread", "interrupt0", "()V", threadInterrupt0)
+	jvmruntime.Register("java/lang/Thread", "setPriority0", "(I)V", false, threadSetPriority0)
+	jvmruntime.Register("java/lang/Thread", "isInterrupted", "(Z)Z", false, threadIsInterrupted)
+	jvmruntime.Register("java/lang/Thread", "interrupt0", "()V", false, threadInterrupt0)
 
 	// other
-	jvmruntime.Register("java/lang/Thread", "holdsLock", "(Ljava/lang/Object;)Z", threadHoldsLock)
-	jvmruntime.Register("java/lang/Thread", "getThreads", "()[Ljava/lang/Thread;", threadGetThreads)
-	jvmruntime.Register("java/lang/Thread", "dumpThreads", "([Ljava/lang/Thread;)[[Ljava/lang/StackTraceElement;", threadDumpThreads)
+	jvmruntime.Register("java/lang/Thread", "holdsLock", "(Ljava/lang/Object;)Z", false, threadHoldsLock)
+	jvmruntime.Register("java/lang/Thread", "getThreads", "()[Ljava/lang/Thread;", false, threadGetThreads)
+	jvmruntime.Register("java/lang/Thread", "dumpThreads", "([Ljava/lang/Thread;)[[Ljava/lang/StackTraceElement;", false, threadDumpThreads)
 }
 
 // ============================================================

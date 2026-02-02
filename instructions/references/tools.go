@@ -1,7 +1,9 @@
 package references
 
 import (
+	"fmt"
 	"github.com/Johnny1110/gogo_jvm/common"
+	"github.com/Johnny1110/gogo_jvm/global"
 	"github.com/Johnny1110/gogo_jvm/runtime"
 	"github.com/Johnny1110/gogo_jvm/runtime/heap"
 	"github.com/Johnny1110/gogo_jvm/runtime/method_area"
@@ -62,9 +64,12 @@ func invokeMethod(invokerFrame *runtime.Frame, method *method_area.Method) {
 // 2. put args into a temp LocalVars
 // 3. pass args to native Go func
 // no need a read frame to do native method.
-func invokeNativeMethod(callerFrame *runtime.Frame, callNativeMethod runtime.NativeMethod, descriptor string) {
+func invokeNativeMethod(callerFrame *runtime.Frame, callNativeMethod runtime.NativeMethod, descriptor string, isStaticCall bool) {
 	// calculate args slot count including this.
-	argSlotCount := calcArgSlotCount(descriptor) + 1 // LocalVars[0] = this, so we need + 1
+	argSlotCount := calcArgSlotCount(descriptor)
+	if !isStaticCall {
+		argSlotCount += 1 // non-static call -> LocalVars[0] = this, so we need + 1
+	}
 
 	// parsing return type
 	returnType := parseReturnType(descriptor)
@@ -73,12 +78,17 @@ func invokeNativeMethod(callerFrame *runtime.Frame, callNativeMethod runtime.Nat
 	tempFrame := runtime.NewNativeFrameWithStackAndExHandler(callerFrame, uint16(argSlotCount), returnType, ThrowException)
 
 	// pop args from caller op-stack put into tempFrame's LocalVars
-	stack := callerFrame.OperandStack() // stack: [argN, argN-1, ..., arg1, this]
-	localVars := tempFrame.LocalVars()  // localVars: [this, arg1, ... argN-1, argN]
+	callerStack := callerFrame.OperandStack() // stack: [argN, argN-1, ..., arg1, this]
+	localVars := tempFrame.LocalVars()        // localVars: [this, arg1, ... argN-1, argN]
+
+	if global.DebugMode() {
+		curr, m := callerStack.Size()
+		fmt.Printf("@@ DEBUG - invokeNativeMethod isStatic:[%v] argSlotCount: %v, callerStackSize: curr-%v max-%v \n", isStaticCall, argSlotCount, curr, m)
+	}
 
 	// push args into temp LocalVars
 	for i := argSlotCount - 1; i >= 0; i-- { // i := argSlotCount - 1 -> skip this
-		slot := stack.PopSlot()
+		slot := callerStack.PopSlot()
 		localVars.SetSlot(uint(i), slot)
 	}
 

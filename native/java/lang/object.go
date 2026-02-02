@@ -17,9 +17,9 @@ func init() {
 	}
 
 	// v0.3.0
-	runtime.Register("java/lang/Object", "hashCode", "()I", objectHashCode)
+	runtime.Register("java/lang/Object", "hashCode", "()I", false, objectHashCode)
 	// v0.3.1
-	runtime.Register("java/lang/Object", "getClass", "()Ljava/lang/Class;", objectGetClass)
+	runtime.Register("java/lang/Object", "getClass", "()Ljava/lang/Class;", false, objectGetClass)
 
 	// v0.3.3: equals (non-native in standard Java, but we provide default implementation)
 	// Note: In standard Java, equals() is not native, but we intercept it for efficiency
@@ -27,12 +27,12 @@ func init() {
 	// The default Object.equals() in Java bytecode will be executed normally
 
 	// v0.3.3: clone (with Cloneable check)
-	runtime.Register("java/lang/Object", "clone", "()Ljava/lang/Object;", objectClone)
+	runtime.Register("java/lang/Object", "clone", "()Ljava/lang/Object;", false, objectClone)
 
 	// TODO: v0.4.x: notify/notifyAll/wait
-	runtime.Register("java/lang/Object", "notify", "()V", objectNotify)
-	runtime.Register("java/lang/Object", "notifyAll", "()V", objectNotifyAll)
-	runtime.Register("java/lang/Object", "wait", "(J)V", objectWait)
+	runtime.Register("java/lang/Object", "notify", "()V", false, objectNotify)
+	runtime.Register("java/lang/Object", "notifyAll", "()V", false, objectNotifyAll)
+	runtime.Register("java/lang/Object", "wait", "(J)V", false, objectWait)
 }
 
 // ============================================================

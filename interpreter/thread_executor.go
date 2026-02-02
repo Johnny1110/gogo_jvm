@@ -5,6 +5,7 @@ import (
 	"github.com/Johnny1110/gogo_jvm/global"
 	"github.com/Johnny1110/gogo_jvm/instructions"
 	"github.com/Johnny1110/gogo_jvm/instructions/base"
+	"github.com/Johnny1110/gogo_jvm/instructions/base/opcodes"
 	"github.com/Johnny1110/gogo_jvm/instructions/references"
 	"github.com/Johnny1110/gogo_jvm/runtime"
 	"github.com/Johnny1110/gogo_jvm/runtime/method_area"
@@ -78,7 +79,7 @@ func loopForThread(jvmThread *runtime.JVMThread) {
 		frame.SetNextPC(reader.PC())
 
 		if global.DebugMode() {
-			fmt.Printf("Thread [%s] PC:%3d | %s\n", jvmThread.Name(), pc, instruction)
+			fmt.Printf("@@ DEBUG - loopFor Thread -> Thread [%s] PC:%v | %s\n", jvmThread.Name(), pc, opcodes.OpcodeNames[opcode])
 		}
 
 		// Execute

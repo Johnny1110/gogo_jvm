@@ -38,7 +38,7 @@ func (i *INVOKESPECIAL) Execute(frame *runtime.Frame) {
 	// private native methods (like Class.initClassName) use invokespecial
 	// ============================================================
 	if resolvedMethod.IsNative() {
-		if hacked_invoke_native(frame, methodRef) {
+		if hacked_invoke_native(frame, methodRef, false) {
 			return
 		} else {
 			fmt.Printf("@@ DEBUG - INVOKESPECIAL hacked_invoke_native failed, method: %s\n", resolvedMethod.Name())

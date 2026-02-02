@@ -1,6 +1,7 @@
 package references
 
 import (
+	"fmt"
 	"github.com/Johnny1110/gogo_jvm/instructions/base"
 	"github.com/Johnny1110/gogo_jvm/runtime"
 	"github.com/Johnny1110/gogo_jvm/runtime/method_area"
@@ -31,6 +32,21 @@ func (i *INVOKE_STATIC) Execute(frame *runtime.Frame) {
 	}
 
 	// 5. TODO: 類初始化（<clinit>，如果類還沒初始化，需要先執行 <clinit> MVP 階段暫時跳過
+
+	// ============================================================
+	// Hack: handle native method invoke
+	// temp solution for invokevirtual PrintStream.println
+	// currently we don't have native class init implement (rt.jar)
+	// ============================================================
+	if resolvedMethod.IsNative() {
+		if hacked_invoke_native(frame, methodRef, true) {
+			return
+		} else {
+			fmt.Printf("@@ DEBUG - INVOKE_STATIC hacked_invoke_native failed (maybe not found in registry), method: %s\n", resolvedMethod.Name())
+			panic("INVOKEVIRTUAL Hacked invoke method failed")
+		}
+	}
+	// ============================================================
 
 	// 6. call method
 	invokeMethod(frame, resolvedMethod)

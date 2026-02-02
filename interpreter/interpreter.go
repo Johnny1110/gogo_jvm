@@ -2,6 +2,7 @@ package interpreter
 
 import (
 	"fmt"
+	"github.com/Johnny1110/gogo_jvm/global"
 	"github.com/Johnny1110/gogo_jvm/instructions"
 	"github.com/Johnny1110/gogo_jvm/instructions/base"
 	"github.com/Johnny1110/gogo_jvm/instructions/base/opcodes"
@@ -39,6 +40,10 @@ func loop(thread *runtime.Thread, debug bool) {
 	for !thread.IsStackEmpty() {
 		// get current frame
 		frame := thread.CurrentFrame()
+
+		if global.DebugMode() {
+			fmt.Printf("@@ DEBUG - interoreter loop, frame method: %s, class: %s \n", frame.Method().Name(), frame.Method().Class().Name())
+		}
 
 		// get bytecode from frame's method
 		bytecode := frame.Method().Code()

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/Johnny1110/gogo_jvm/classfile"
 	"github.com/Johnny1110/gogo_jvm/common"
+	"github.com/Johnny1110/gogo_jvm/global"
 	"github.com/Johnny1110/gogo_jvm/runtime/heap"
 	"github.com/Johnny1110/gogo_jvm/runtime/rtcore"
 	"io/ioutil"
@@ -45,7 +46,9 @@ func NewClassLoader(classPath string) *ClassLoader {
 // - load all basic type without jClass
 // - inject required jClass
 func (loader *ClassLoader) initReflection() {
-	fmt.Println("@@ Debug - [ClassLoader] Initializing reflection system...")
+	if global.DebugMode() {
+		fmt.Println("@@ Debug - [ClassLoader] Initializing reflection system...")
+	}
 
 	// ---------------------------------------------------------------------------
 	// 1: load "java/lang/Class" but not create jClass (Object), jlClassClass.jClass = nil
@@ -65,7 +68,9 @@ func (loader *ClassLoader) initReflection() {
 	// 4: init primitive classes
 	loader.initPrimitiveClasses()
 	// ---------------------------------------------------------------------------
-	fmt.Println("@@ Debug - [ClassLoader] Reflection system initialized.")
+	if global.DebugMode() {
+		fmt.Println("@@ Debug - [ClassLoader] Reflection system initialized.")
+	}
 }
 
 // loadBasicClass load basic class not create  jClass
@@ -103,7 +108,9 @@ func (loader *ClassLoader) loadBasicClass(name string) *Class {
 	// link（Verification and Preparation）
 	link(class)
 
-	fmt.Printf("@@ Debug - [ClassLoader] Loaded (basic): %s\n", name)
+	if global.DebugMode() {
+		fmt.Printf("@@ Debug - [ClassLoader] Loaded (basic): %s\n", name)
+	}
 	return class
 }
 
@@ -129,7 +136,9 @@ func (loader *ClassLoader) initPrimitiveClasses() {
 		// store into ClassLoader's primitiveClasses
 		loader.primitiveClasses[typeName] = primitiveClass
 
-		fmt.Printf("@@ Debug - [ClassLoader] Created primitive class: %s\n", typeName)
+		if global.DebugMode() {
+			fmt.Printf("@@ Debug - [ClassLoader] Created primitive class: %s\n", typeName)
+		}
 	}
 }
 
@@ -194,7 +203,9 @@ func (loader *ClassLoader) LoadClassIface(name string) interface{} {
 // loadArrayClass load array class
 // array class is dynamic generate, no need .class file
 func (loader *ClassLoader) loadArrayClass(name string) *Class {
-	fmt.Printf("@@ Debug - [ClassLoader] Loading array class: %s\n", name)
+	if global.DebugMode() {
+		fmt.Printf("@@ Debug - [ClassLoader] Loading array class: %s\n", name)
+	}
 
 	arrayClass := &Class{
 		name:        name,
@@ -225,8 +236,10 @@ func (loader *ClassLoader) loadArrayClass(name string) *Class {
 	// cache
 	loader.classMap[name] = arrayClass
 
-	fmt.Printf("@@ Debug - [ClassLoader] Loaded array class: %s (component: %s)\n",
-		name, componentClassName)
+	if global.DebugMode() {
+		fmt.Printf("@@ Debug - [ClassLoader] Loaded array class: %s (component: %s)\n",
+			name, componentClassName)
+	}
 
 	return arrayClass
 }
@@ -261,7 +274,9 @@ func (loader *ClassLoader) loadNonArrayClass(name string, debug bool) *Class {
 		class.jClass = loader.createJClassObject(class)
 	}
 
-	fmt.Printf("@@ Debug - [ClassLoader] Loaded: %s\n", name)
+	if global.DebugMode() {
+		fmt.Printf("@@ Debug - [ClassLoader] Loaded: %s\n", name)
+	}
 	return class
 }
 

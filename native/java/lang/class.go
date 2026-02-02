@@ -19,27 +19,27 @@ func init() {
 	}
 
 	// basic reflection
-	runtime.Register("java/lang/Class", "getPrimitiveClass", "(Ljava/lang/String;)Ljava/lang/Class;", getPrimitiveClass)
-	runtime.Register("java/lang/Class", "getName0", "()Ljava/lang/String;", getName0)           // old JDK
-	runtime.Register("java/lang/Class", "initClassName", "()Ljava/lang/String;", initClassName) // new JDK
-	runtime.Register("java/lang/Class", "getSuperclass", "()Ljava/lang/Class;", getSuperclass)
-	runtime.Register("java/lang/Class", "getInterfaces0", "()[Ljava/lang/Class;", getInterfaces0)
-	runtime.Register("java/lang/Class", "getComponentType", "()Ljava/lang/Class;", getComponentType)
+	runtime.Register("java/lang/Class", "getPrimitiveClass", "(Ljava/lang/String;)Ljava/lang/Class;", false, getPrimitiveClass)
+	runtime.Register("java/lang/Class", "getName0", "()Ljava/lang/String;", false, getName0)           // old JDK
+	runtime.Register("java/lang/Class", "initClassName", "()Ljava/lang/String;", false, initClassName) // new JDK
+	runtime.Register("java/lang/Class", "getSuperclass", "()Ljava/lang/Class;", false, getSuperclass)
+	runtime.Register("java/lang/Class", "getInterfaces0", "()[Ljava/lang/Class;", false, getInterfaces0)
+	runtime.Register("java/lang/Class", "getComponentType", "()Ljava/lang/Class;", false, getComponentType)
 
 	// type etc.
-	runtime.Register("java/lang/Class", "isInterface", "()Z", isInterface)
-	runtime.Register("java/lang/Class", "isArray", "()Z", isArray)
-	runtime.Register("java/lang/Class", "isPrimitive", "()Z", isPrimitive)
+	runtime.Register("java/lang/Class", "isInterface", "()Z", false, isInterface)
+	runtime.Register("java/lang/Class", "isArray", "()Z", false, isArray)
+	runtime.Register("java/lang/Class", "isPrimitive", "()Z", false, isPrimitive)
 
 	// dynamic loading
-	runtime.Register("java/lang/Class", "forName0", "(Ljava/lang/String;ZLjava/lang/ClassLoader;Ljava/lang/Class;)Ljava/lang/Class;", forName0)
+	runtime.Register("java/lang/Class", "forName0", "(Ljava/lang/String;ZLjava/lang/ClassLoader;Ljava/lang/Class;)Ljava/lang/Class;", false, forName0)
 
 	// new
-	runtime.Register("java/lang/Class", "newInstance", "()Ljava/lang/Object;", newInstance)
+	runtime.Register("java/lang/Class", "newInstance", "()Ljava/lang/Object;", false, newInstance)
 
 	// others
-	runtime.Register("java/lang/Class", "desiredAssertionStatus0", "(Ljava/lang/Class;)Z", desiredAssertionStatus0)
-	runtime.Register("java/lang/Class", "isAssignableFrom", "(Ljava/lang/Class;)Z", isAssignableFrom)
+	runtime.Register("java/lang/Class", "desiredAssertionStatus0", "(Ljava/lang/Class;)Z", false, desiredAssertionStatus0)
+	runtime.Register("java/lang/Class", "isAssignableFrom", "(Ljava/lang/Class;)Z", false, isAssignableFrom)
 }
 
 // ============================================================

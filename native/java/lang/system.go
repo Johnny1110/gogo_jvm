@@ -14,8 +14,8 @@ func init() {
 	if global.DebugMode() {
 		fmt.Println("@@ Debug - init Native java/lang/System")
 	}
-	runtime.Register("java/lang/System", "arraycopy", "(Ljava/lang/Object;ILjava/lang/Object;II)V", systemArraycopy)
-	runtime.Register("java/lang/System", "currentTimeMillis", "()J", systemCurrentTimeMillis)
+	runtime.Register("java/lang/System", "arraycopy", "(Ljava/lang/Object;ILjava/lang/Object;II)V", false, systemArraycopy)
+	runtime.Register("java/lang/System", "currentTimeMillis", "()J", false, systemCurrentTimeMillis)
 }
 
 func systemArraycopy(frame *runtime.Frame) (ex *heap.Object) {

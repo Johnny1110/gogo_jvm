@@ -46,7 +46,7 @@ func (i *INVOKEVIRTUAL) Execute(frame *runtime.Frame) {
 	// currently we don't have native class init implement (rt.jar)
 	// ============================================================
 	if resolvedMethod.IsNative() {
-		if hacked_invoke_native(frame, methodRef) {
+		if hacked_invoke_native(frame, methodRef, false) {
 			return
 		} else {
 			fmt.Printf("@@ DEBUG - INVOKEVIRTUAL hacked_invoke_native failed, method: %s\n", resolvedMethod.Name())

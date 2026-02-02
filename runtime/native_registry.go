@@ -21,25 +21,29 @@ var registry = map[string]NativeMethod{}
 
 // makeKey java support method overloading like: System.out.println(String s), System.out.println(Integer i)
 // so we need add descriptor to make a method as unique
-func makeKey(className, methodName, descriptor string) string {
-	return fmt.Sprintf("%s~%s~%s", className, methodName, descriptor)
+func makeKey(className, methodName, descriptor string, isStatic bool) string {
+	if isStatic {
+		return fmt.Sprintf("%s~%s~%s~static", className, methodName, descriptor)
+	} else {
+		return fmt.Sprintf("%s~%s~%s", className, methodName, descriptor)
+	}
 }
 
 // Register a method into Native Method Registry
-func Register(className, methodName, descriptor string, method NativeMethod) {
-	key := makeKey(className, methodName, descriptor)
+func Register(className, methodName, descriptor string, isStatic bool, method NativeMethod) {
+	key := makeKey(className, methodName, descriptor, isStatic)
 	registry[key] = method
 }
 
 // FindNativeMethod find method in Native Method Registry
-func FindNativeMethod(className, methodName, descriptor string) NativeMethod {
-	key := makeKey(className, methodName, descriptor)
+func FindNativeMethod(className, methodName, descriptor string, isStaticCall bool) NativeMethod {
+	key := makeKey(className, methodName, descriptor, isStaticCall)
 
 	// v0.3.3: Array native method fallback mechanism
 	// Array class start with '[', like "[I", "[Ljava/lang/String;"
 	// Array don't have own native method, they should delegate to Object
 	if isArrayClass(className) {
-		key = makeKey("java/lang/Object", methodName, descriptor)
+		key = makeKey("java/lang/Object", methodName, descriptor, isStaticCall)
 	}
 
 	if method, ok := registry[key]; ok {
