@@ -34,7 +34,7 @@ type Frame struct {
 	lower        *Frame // previous frame (caller frame)
 	localVars    rtcore.Slots
 	operandStack *OperandStack
-	thread       *Thread
+	thread       *JVMThread
 	nextPC       int
 	currentPC    int
 	method       *method_area.Method
@@ -44,7 +44,7 @@ type Frame struct {
 
 // NewFrame create new Frame
 // thread: target thread which is frame belongs to
-func NewFrame(thread *Thread, maxLocals, maxStack uint16) *Frame {
+func NewFrame(thread *JVMThread, maxLocals, maxStack uint16) *Frame {
 	return &Frame{
 		thread:       thread,
 		localVars:    NewLocalVars(maxLocals),
@@ -53,7 +53,7 @@ func NewFrame(thread *Thread, maxLocals, maxStack uint16) *Frame {
 }
 
 // please using NewFrameWithMethodAndExHandler if possible.
-func NewFrameWithMethod(thread *Thread, method *method_area.Method) *Frame {
+func NewFrameWithMethod(thread *JVMThread, method *method_area.Method) *Frame {
 	return &Frame{
 		thread:       thread,
 		method:       method,
@@ -62,7 +62,7 @@ func NewFrameWithMethod(thread *Thread, method *method_area.Method) *Frame {
 	}
 }
 
-func NewFrameWithMethodAndExHandler(thread *Thread,
+func NewFrameWithMethodAndExHandler(thread *JVMThread,
 	method *method_area.Method,
 	exHandler func(frame *Frame, ex *heap.Object)) *Frame {
 	return &Frame{
@@ -75,7 +75,7 @@ func NewFrameWithMethodAndExHandler(thread *Thread,
 }
 
 // NewNativeFrame create frame for native method, not require to push into JVMStack
-func NewNativeFrame(thread *Thread, maxLocals uint16) *Frame {
+func NewNativeFrame(thread *JVMThread, maxLocals uint16) *Frame {
 	return &Frame{
 		thread:       thread,
 		localVars:    NewLocalVars(maxLocals),
@@ -85,7 +85,7 @@ func NewNativeFrame(thread *Thread, maxLocals uint16) *Frame {
 
 // NewNativeFrameWithStack create frame for native method with return value support
 // v0.3.0: support return val native call
-func NewNativeFrameWithStack(thread *Thread, maxLocals uint16, returnType string) *Frame {
+func NewNativeFrameWithStack(thread *JVMThread, maxLocals uint16, returnType string) *Frame {
 	var opStack *OperandStack
 
 	if returnType == "V" || returnType == "" {
@@ -138,7 +138,7 @@ func (f *Frame) LocalVars() rtcore.Slots {
 	return f.localVars
 }
 
-func (f *Frame) Thread() *Thread {
+func (f *Frame) Thread() *JVMThread {
 	return f.thread
 }
 

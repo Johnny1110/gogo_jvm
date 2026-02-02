@@ -19,7 +19,7 @@ import (
 //
 // this func will create a new Frame to execute <clinit>
 // we need call RevertNextPC() let interpreor do this `new` again after init
-func initClass(thread *runtime.Thread, class *method_area.Class) {
+func initClass(thread *runtime.JVMThread, class *method_area.Class) {
 	// mark class is doing init
 	class.StartInit()
 

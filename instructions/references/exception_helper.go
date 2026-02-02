@@ -35,7 +35,7 @@ func ThrowException(frame *runtime.Frame, exceptionObj *heap.Object) {
 // return:
 //   - true: found handler and goto target PC
 //   - false: can not find handler until searched all JVMStack
-func handleException(currentThread *runtime.Thread, exceptionObj *heap.Object) bool {
+func handleException(currentThread *runtime.JVMThread, exceptionObj *heap.Object) bool {
 	for {
 		frame := currentThread.CurrentFrame()
 		pc := frame.CurrentPC() // the pc where the error thrown
@@ -92,7 +92,7 @@ func handleCatch(frame *runtime.Frame, exceptionObj *heap.Object, handlerPC int)
 
 // handleUncaughtException handle uncaught exception
 // print ex and os.exit()
-func handleUncaughtException(thread *runtime.Thread, exceptionObj *heap.Object) {
+func handleUncaughtException(thread *runtime.JVMThread, exceptionObj *heap.Object) {
 	className := getExceptionClassName(exceptionObj)
 	message := getExceptionMessage(exceptionObj)
 

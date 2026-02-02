@@ -59,7 +59,7 @@ func (n *NEW) Opcode() uint8 {
 // ============================================================
 
 // scheduleClinit settle <clinit> (if exist) method to a new Frame
-func scheduleClinit(thread *runtime.Thread, class *method_area.Class) {
+func scheduleClinit(thread *runtime.JVMThread, class *method_area.Class) {
 	clinit := class.GetClinitMethod()
 	if clinit != nil {
 		newFrame := thread.NewFrameWithMethodAndExHandler(clinit, ThrowException)
@@ -69,7 +69,7 @@ func scheduleClinit(thread *runtime.Thread, class *method_area.Class) {
 
 // initSuperClass
 // JVM standards: before init class, all parent should be init
-func initSuperClass(thread *runtime.Thread, class *method_area.Class) {
+func initSuperClass(thread *runtime.JVMThread, class *method_area.Class) {
 	if class.IsInterface() { // skip interface
 		return
 	}

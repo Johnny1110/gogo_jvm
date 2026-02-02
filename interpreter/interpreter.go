@@ -16,8 +16,8 @@ import (
 
 // Interpret Bytecode interpret
 func Interpret(method *method_area.Method, debug bool) {
-	// 1. create thread
-	thread := runtime.NewThread()
+	// 1. create main thread
+	thread := runtime.NewMainThread()
 
 	// 2. create frame
 	frame := thread.NewFrameWithMethodAndExHandler(method, references.ThrowException)
@@ -29,50 +29,22 @@ func Interpret(method *method_area.Method, debug bool) {
 
 // loop interpreter main logic
 // Fetch -> Decode -> Execute -> Fetch ...
-func loop(thread *runtime.Thread, debug bool) {
-	reader := &base.BytecodeReader{}
-
+func loop(thread *runtime.JVMThread, debug bool) {
 	mainMethodFrame := thread.TopFrame()
 
-	// check is end
-	// when func returned, stack will be empty (for main method)
-	// or current frame is not origin frame (for not main method)
-	for !thread.IsStackEmpty() {
-		// get current frame
-		frame := thread.CurrentFrame()
-
+	executeLoop(thread, func(frame *runtime.Frame, pc int, instruction base.Instruction) {
 		if global.DebugMode() {
 			fmt.Printf("@@ DEBUG - interoreter loop, frame method: %s, class: %s \n", frame.Method().Name(), frame.Method().Class().Name())
 		}
-
-		// get bytecode from frame's method
-		bytecode := frame.Method().Code()
-
-		// calculate PC
-		pc := frame.NextPC()
-		thread.SetPC(pc)
-
-		// Fetch: 1 byte opcodes
-		reader.Reset(bytecode, pc)
-		opcode := reader.ReadUint8()
-
-		// Decode:
-		instruction, err := instructions.NewInstruction(opcode)
-		if err != nil {
-			fmt.Printf("Error parsing instruction: %s\n", err)
-			os.Exit(1)
-		}
-		instruction.FetchOperands(reader) // fetch (index, offset) if required
-		frame.SetNextPC(reader.PC())      // update PC (to next instruction)
 
 		if debug {
 			fmt.Println("<--------------------------------------------------------------------------------->")
 			printDebug(pc, instruction, frame)
 		}
-
-		// Execute: perform instruction
-		instruction.Execute(frame)
-	}
+	}, func(err error) {
+		fmt.Printf("Error parsing instruction: %s\n", err)
+		os.Exit(1)
+	})
 
 	if debug {
 		fmt.Println("================================================================")
@@ -121,4 +93,34 @@ func printStack(stack *runtime.OperandStack) {
 	currentSize, maxSize := stack.Size()
 	fmt.Printf("[currentSize=%d, maxSize=%d]\n", currentSize, maxSize)
 	fmt.Printf("stack: %v \n", stack)
+}
+
+// executeLoop common execution loop for both main thread and other threads
+func executeLoop(thread *runtime.JVMThread, debugCallback func(*runtime.Frame, int, base.Instruction), errorCallback func(error)) {
+	reader := &base.BytecodeReader{}
+
+	for !thread.IsStackEmpty() {
+		frame := thread.CurrentFrame()
+		bytecode := frame.Method().Code()
+		pc := frame.NextPC()
+		thread.SetPC(pc)
+
+		reader.Reset(bytecode, pc)
+		opcode := reader.ReadUint8()
+
+		instruction, err := instructions.NewInstruction(opcode)
+		if err != nil {
+			errorCallback(err)
+			return
+		}
+
+		instruction.FetchOperands(reader)
+		frame.SetNextPC(reader.PC())
+
+		if debugCallback != nil {
+			debugCallback(frame, pc, instruction)
+		}
+
+		instruction.Execute(frame)
+	}
 }

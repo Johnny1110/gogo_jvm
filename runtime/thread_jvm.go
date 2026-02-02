@@ -217,11 +217,7 @@ func (t *JVMThread) ClearStack() {
 // ============================================================
 
 func (t *JVMThread) NewFrameWithMethodAndExHandler(method *method_area.Method, exHandler func(frame *Frame, ex *heap.Object)) *Frame {
-	return NewFrameWithMethodAndExHandler(t.asThread(), method, exHandler)
-}
-
-func (t *JVMThread) asThread() *Thread {
-	return getThreadAdapter(t)
+	return NewFrameWithMethodAndExHandler(t, method, exHandler)
 }
 
 // ============================================================

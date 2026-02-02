@@ -233,40 +233,6 @@ func (tm *ThreadManager) WaitForExit() {
 }
 
 // ============================================================
-// Thread Adapter (Compatible with legacy Thread structure)
-// ============================================================
-
-var threadAdapters sync.Map // JVMThread -> *Thread
-
-// getThreadAdapter
-func getThreadAdapter(jvmThread *JVMThread) *Thread {
-	if adapter, ok := threadAdapters.Load(jvmThread); ok {
-		return adapter.(*Thread)
-	}
-
-	// 創建新的適配器
-	adapter := &Thread{
-		pc:    0,
-		stack: jvmThread.jvmStack,
-	}
-
-	threadAdapters.Store(jvmThread, adapter)
-	return adapter
-}
-
-// GetThreadAdapter
-func (tm *ThreadManager) GetThreadAdapter(jvmThread *JVMThread) *Thread {
-	return getThreadAdapter(jvmThread)
-}
-
-// syncAdapterPC
-func syncAdapterPC(jvmThread *JVMThread) {
-	if adapter, ok := threadAdapters.Load(jvmThread); ok {
-		adapter.(*Thread).pc = jvmThread.pc
-	}
-}
-
-// ============================================================
 // Goroutine ID Helper
 // ============================================================
 
@@ -336,27 +302,4 @@ func InitMainThread() *JVMThread {
 	tm.RegisterGoroutineMapping(mainThread)
 
 	return mainThread
-}
-
-// ============================================================
-// Compatibility Layer
-// ============================================================
-
-func NewThread() *Thread {
-	tm := GetThreadManager()
-	if tm.mainThread == nil {
-		// 初始化主執行緒
-		mainThread := InitMainThread()
-		return getThreadAdapter(mainThread)
-	}
-
-	current := tm.CurrentThread()
-	if current != nil {
-		return getThreadAdapter(current)
-	}
-
-	return &Thread{
-		pc:    0,
-		stack: NewJVMStack(DEFAULT_STACK_SIZE),
-	}
 }
